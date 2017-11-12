@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Demoname | Demo 1 | Codrops</title>
+		<title>Particle Loader | Demo 1 | Codrops</title>
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
 		<meta name="author" content="Codrops" />
@@ -43,8 +43,8 @@
 						<a class="codrops-icon codrops-icon--prev" href="" title="Previous Demo"><svg class="icon icon--arrow"><use xlink:href="#icon-arrow"></use></svg></a>
 						<a class="codrops-icon codrops-icon--drop" href="" title="Back to the article"><svg class="icon icon--drop"><use xlink:href="#icon-drop"></use></svg></a>
 					</div>
-					<h1 class="codrops-header__title">The Title</h1>
-					<span class="info">Some info</span>
+					<h1 class="codrops-header__title">Particle Loader</h1>
+					<span class="info">Demo 1</span>
 				</header>
 				<a class="github" href="" title="Find this project on GitHub"><svg class="icon icon--github"><use xlink:href="#icon-github"></use></svg></a>
 				<nav class="demos">
@@ -61,9 +61,20 @@
 				</a>-->
 			</div>
 			<div class="content">
-
+				<div class="loader"></div>
 			</div>
 		</main>
+		<script>var PL = PL || {};</script>
 		<script src="js/demo.js"></script>
+		<script src="js/vendor/three.min.js"></script>
+		<script src="js/vendor/OrbitControls.js"></script>
+		<script src="js/vendor/simplex-noise.js"></script>
+		<script src="js/utils/axis.js"></script>
+		<script src="js/utils/ease.js"></script>
+		<script src="js/utils/calc.js"></script>
+		<script src="js/demo1/system.js"></script>
+		<script src="js/demo1/particle.js"></script>
+		<script src="js/loader.js"></script>
+		<script>var loader = new PL.Loader();</script>
 	</body>
 </html>
