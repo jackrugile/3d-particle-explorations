@@ -22,19 +22,19 @@ body {
 
 /* Color schemes */
 .demo-1 {
-	--color-text: #fff;
-	--color-bg: #333;
-	--color-link: #72af3a;
-	--color-link-hover: #d8d1d1;
-	--color-info: #72af3a;
+	--color-text: #333333;
+	--color-bg: #333333;
+	--color-link: #333333;
+	--color-link-hover: #333333;
+	--color-info: #333333;
 }
 
 .demo-2 {
 	--color-text: #333;
-	--color-bg: #bee897;
-	--color-link: #72af3a;
-	--color-link-hover: #485a36;
-	--color-info: #fff;
+	--color-bg: #333333;
+	--color-link: #333333;
+	--color-link-hover: #333333;
+	--color-info: #333333;
 }
 
 .demo-3 {
