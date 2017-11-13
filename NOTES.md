@@ -10,6 +10,7 @@
 - eclipse
 - star trails
 - starfield
+- planets orbiting (space)
 - spiral
 - wanderers
 - game of life
