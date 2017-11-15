@@ -89,6 +89,10 @@ PL.Calc = function() {
 		return Math.max(Math.min(val, max), min);
 	}
 
+	this.lerp = function(current, target, mix) {
+		return current + (target - current) * mix;
+	}
+
 	/*
 	------------------------------------------
 	| roundToUpperInterval:number - returns rounded up value

@@ -17,6 +17,7 @@
 - simplex noise
 - double helix
 - simplex noise line across center
+- HITS of simplex noise (actual noise), then settle back down to zero
 
 #### EXITS
 
