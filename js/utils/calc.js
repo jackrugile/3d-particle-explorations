@@ -1,4 +1,4 @@
-PL.Calc = function() {
+PL.Calc = class {
 
 	/*
 	------------------------------------------
@@ -11,7 +11,7 @@ PL.Calc = function() {
 	| Get a random float between two values,
 	| with the option of easing bias.
 	------------------------------------------ */
-	this.rand = function(min, max, ease) {
+	rand(min, max, ease) {
 		if(max === undefined) {
 			max = min;
 			min = 0;
@@ -34,7 +34,7 @@ PL.Calc = function() {
 	| Get a random integer between two values,
 	| with the option of easing bias.
 	------------------------------------------ */
-	this.randInt = function(min, max, ease) {
+	randInt(min, max, ease) {
 		if(max === undefined) {
 			max = min;
 			min = 0;
@@ -54,7 +54,7 @@ PL.Calc = function() {
 	|
 	| Get a random item from an array.
 	------------------------------------------ */
-	this.randArr = function(arr) {
+	randArr(arr) {
 		return arr[Math.floor(Math.random() * arr.length)];
 	}
 
@@ -71,7 +71,7 @@ PL.Calc = function() {
 	| Get a mapped value from and input min/max
 	| to an output min/max.
 	------------------------------------------ */
-	this.map = function(val, inputMin, inputMax, outputMin, outputMax) {
+	map(val, inputMin, inputMax, outputMin, outputMax) {
 		return ((outputMax - outputMin) * ((val - inputMin) / (inputMax - inputMin))) + outputMin;
 	}
 
@@ -85,11 +85,11 @@ PL.Calc = function() {
 	|
 	| Clamp a value to a min/max range.
 	------------------------------------------ */
-	this.clamp = function(val, min, max) {
+	clamp(val, min, max) {
 		return Math.max(Math.min(val, max), min);
 	}
 
-	this.lerp = function(current, target, mix) {
+	lerp(current, target, mix) {
 		return current + (target - current) * mix;
 	}
 
@@ -102,7 +102,7 @@ PL.Calc = function() {
 	|
 	| Round up a value to the next highest interval.
 	------------------------------------------ */
-	this.roundToUpperInterval = function(value, interval) {
+	roundToUpperInterval(value, interval) {
 		if(value % interval === 0) {
 			value += 0.0001;
 		}
@@ -118,7 +118,7 @@ PL.Calc = function() {
 	|
 	| Round down a value to the next lowest interval.
 	------------------------------------------ */
-	this.roundToLowerInterval = function(value, interval) {
+	roundToLowerInterval(value, interval) {
 		if(value % interval === 0) {
 			value -= 0.0001;
 		}
@@ -134,7 +134,7 @@ PL.Calc = function() {
 	|
 	| Round a value to the nearest interval.
 	------------------------------------------ */
-	this.roundToNearestInterval = function(value, interval) {
+	roundToNearestInterval(value, interval) {
 		return Math.round(value / interval) * interval;
 	}
 
@@ -148,7 +148,7 @@ PL.Calc = function() {
 	| Check if two sphere are intersecting
 	| in 3D space.
 	------------------------------------------ */
-	this.intersectSphere = function(a, b) {
+	intersectSphere(a, b) {
 		let distance = Math.sqrt(
 			(a.x - b.x) * (a.x - b.x) +
 			(a.y - b.y) * (a.y - b.y) +
@@ -167,7 +167,7 @@ PL.Calc = function() {
 	|
 	| Convert from grid coords to index.
 	------------------------------------------ */
-	this.getIndexFromCoords = function(x, y, w) {
+	getIndexFromCoords(x, y, w) {
 		return x + (y * w);
 	}
 
@@ -180,25 +180,25 @@ PL.Calc = function() {
 	|
 	| Convert from index to grid coords.
 	------------------------------------------ */
-	this.getCoordsFromIndex = function(i, w) {
+	getCoordsFromIndex(i, w) {
 		return {
 			x: i % w,
 			y: Math.floor(i / w)
 		}
 	}
 
-	this.visibleHeightAtZDepth = function(depth, camera) {
+	visibleHeightAtZDepth(depth, camera) {
 		// https://discourse.threejs.org/t/functions-to-calculate-the-visible-width-height-at-a-given-z-depth-from-a-perspective-camera/269
-		var cameraOffset = camera.position.z;
+		let cameraOffset = camera.position.z;
 		if ( depth < cameraOffset ) depth -= cameraOffset;
 		else depth += cameraOffset;
-		var vFOV = camera.fov * Math.PI / 180; 
+		let vFOV = camera.fov * Math.PI / 180; 
 		return 2 * Math.tan( vFOV / 2 ) * Math.abs( depth );
 	};
 
-	this.visibleWidthAtZDepth = function(depth, camera) {
+	visibleWidthAtZDepth(depth, camera) {
 		// https://discourse.threejs.org/t/functions-to-calculate-the-visible-width-height-at-a-given-z-depth-from-a-perspective-camera/269
-		var height = this.visibleHeightAtZDepth( depth, camera );
+		let height = this.visibleHeightAtZDepth( depth, camera );
 		return height * camera.aspect;
 	};
 

@@ -1,36 +1,42 @@
-PL.AxisHelper = function(axisLength, opacity) {
+PL.AxisHelper = class {
 
-	this.object3d = new THREE.Object3D();
+	constructor(axisLength, opacity) {
+		this.object3d = new THREE.Object3D();
+		this.axisLength = axisLength;
+		this.opacity = opacity;
 
-	this.createAxis = function(p1, p2, color){
-		var geom = new THREE.Geometry();
-		var mat = new THREE.LineBasicMaterial({
+		this.createAxis(
+			new THREE.Vector3(-this.axisLength, 0, 0),
+			new THREE.Vector3(this.axisLength, 0, 0),
+			new THREE.Color('hsl(0, 100%, 50%)'),
+		);
+
+		this.createAxis(
+			new THREE.Vector3(0, -this.axisLength, 0),
+			new THREE.Vector3(0, this.axisLength, 0),
+			new THREE.Color('hsl(120, 100%, 50%)')
+		);
+
+		this.createAxis(
+			new THREE.Vector3(0, 0, -this.axisLength),
+			new THREE.Vector3(0, 0, this.axisLength),
+			new THREE.Color('hsl(240, 100%, 50%)')
+		);
+
+		return this.object3d;
+	}
+
+	createAxis(p1, p2, color){
+		let geom = new THREE.Geometry();
+		let mat = new THREE.LineBasicMaterial({
 			color: color,
-			opacity: opacity,
+			opacity: this.opacity,
 			transparent: true
 		});
 		geom.vertices.push(p1, p2);
-		var line = new THREE.Line(geom, mat);
+		let line = new THREE.Line(geom, mat);
 		this.object3d.add(line);
 	}
-
-	this.createAxis(
-		new THREE.Vector3(-axisLength, 0, 0),
-		new THREE.Vector3(axisLength, 0, 0),
-		new THREE.Color('hsl(0, 100%, 50%)')
-	);
-	this.createAxis(
-		new THREE.Vector3(0, -axisLength, 0),
-		new THREE.Vector3(0, axisLength, 0),
-		new THREE.Color('hsl(120, 100%, 50%)')
-	);
-	this.createAxis(
-		new THREE.Vector3(0, 0, -axisLength),
-		new THREE.Vector3(0, 0, axisLength),
-		new THREE.Color('hsl(240, 100%, 50%)')
-	);
-
-	return this.object3d;
 
 }
 

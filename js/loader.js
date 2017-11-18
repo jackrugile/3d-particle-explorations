@@ -1,36 +1,58 @@
-PL.Loader = function() {
+PL.Loader = class {
 
-	this.calc = new PL.Calc();
+	constructor() {
+		this.calc = new PL.Calc();
 
-	this.container = document.querySelector('.loader');
-	this.width = null;
-	this.height = null;
-	this.rAF = null;
+		this.container = document.querySelector('.loader');
+		this.width = null;
+		this.height = null;
 
-	this.isGrid = location.hash.indexOf('grid') > 0;
-	this.isGridDark = location.hash.indexOf('dark') > 0
-	this.isOrbit = location.hash.indexOf('orbit') > 0;
+		this.isGrid = location.hash.indexOf('grid') > 0;
+		this.isGridDark = location.hash.indexOf('dark') > 0
+		this.isOrbit = location.hash.indexOf('orbit') > 0;
 
-	this.setupTime = function() {
-		this.clock = new THREE.Clock();
-		this.elapsed = this.clock.getElapsedTime();
-		this.elapsedMs = 0;
-		this.dt = this.clock.getDelta();
-		this.dtn = this.dt * 1000;
+		this.setupTime();
+		this.setupScene();
+		this.setupCamera();
+		this.setupRenderer();
+		this.setupControls();
+		this.setupHelpers();
+
+		this.listen();
+		this.onResize();
+		this.setupSystem();
+		MainLoop
+			.setUpdate((delta) => this.update(delta))
+			.setDraw(() => this.render())
+			.setEnd((fps, panic) => this.end(fps, panic))
+			.start();
 	}
 
-	this.setupScene = function() {
+	setupTime() {
+		this.clock = new THREE.Clock();
+		this.dtS = this.clock.getDelta();
+		this.dtMs = this.dtS * 1000;
+		this.dtN = this.dtMs / (1000 / 60);
+		this.elapsedMs = 0;
+	}
+
+	setupScene() {
 		this.scene = new THREE.Scene();
 	}
 
-	this.setupCamera = function() {
+	setupCamera() {
 		this.camera = new THREE.PerspectiveCamera(45, 0, 0.1, 10000);
 		this.camera.position.x = 0;
 		this.camera.position.y = 0;
-		this.camera.position.z = 300;
+		this.camera.position.z = 100;
+		if(this.isOrbit) {
+			this.camera.position.x = -100;
+			this.camera.position.y = 50;
+			this.camera.position.z = 100;
+		}
 	}
 
-	this.setupRenderer = function() {
+	setupRenderer() {
 		this.renderer = new THREE.WebGLRenderer({
 			alpha: true,
 			antialias: true
@@ -38,15 +60,15 @@ PL.Loader = function() {
 		this.container.appendChild(this.renderer.domElement);
 	}
 
-	this.setupControls = function() {
+	setupControls() {
 		if(this.isOrbit) {
 			this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 		}
 	}
 
-	this.setupHelpers = function() {
+	setupHelpers() {
 		if(this.isGrid) {
-			var color = this.isGridDark ? 0x000000 : 0xffffff
+			let color = this.isGridDark ? 0x000000 : 0xffffff
 			this.gridHelper = new THREE.GridHelper(1000, 100, color, color);
 			this.gridHelper.material.transparent = true;
 			this.gridHelper.material.opacity = this.isGridDark ? 0.15 : 0.25;
@@ -57,15 +79,15 @@ PL.Loader = function() {
 		}
 	}
 
-	this.setupSystem = function() {
+	setupSystem() {
 		this.system = new PL.System(this);
 	}
 
-	this.update = function() {
-		this.elapsed = this.clock.getElapsedTime();
-		this.elapsedMs = this.elapsed * 1000;
-		this.dt = this.clock.getDelta();
-		this.dtn = 1 + this.dt * 1000 * 60;
+	update() {
+		this.dtS = this.clock.getDelta();
+		this.dtMs = this.dtS * 1000;
+		this.dtN = this.dtMs / (1000 / 60);
+		this.elapsedMs += this.dtMs;
 
 		this.system.update();
 
@@ -74,15 +96,21 @@ PL.Loader = function() {
 		}
 	}
 
-	this.render = function() {
+	render() {
 		this.renderer.render(this.scene, this.camera);
 	}
 
-	this.listen = function() {
+	end(fps, panic) {
+		if(panic) {
+			MainLoop.resetFrameDelta();
+		}
+	}
+
+	listen() {
 		window.addEventListener('resize', this.onResize.bind(this));
 	}
 
-	this.onResize = function() {
+	onResize() {
 		this.width = window.innerWidth;
 		this.height = window.innerHeight;
 
@@ -92,23 +120,5 @@ PL.Loader = function() {
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(this.width, this.height);
 	}
-
-	this.loop = function() {
-		this.rAF = requestAnimationFrame(this.loop.bind(this));
-		this.update();
-		this.render();
-	}
-
-	this.setupTime();
-	this.setupScene();
-	this.setupCamera();
-	this.setupRenderer();
-	this.setupControls();
-	this.setupHelpers();
-
-	this.listen();
-	this.onResize();
-	this.setupSystem();
-	this.loop();
 
 }

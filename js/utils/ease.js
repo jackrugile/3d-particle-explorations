@@ -1,4 +1,4 @@
-PL.Ease = function() {
+PL.Ease = class {
 
 	/*
 	------------------------------------------
@@ -11,7 +11,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inQuad.
 	------------------------------------------ */
-	this.inQuad = function(t, b, c, d) {
+	inQuad(t, b, c, d) {
 		return c*(t/=d)*t + b;
 	}
 
@@ -26,7 +26,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outQuad.
 	------------------------------------------ */
-	this.outQuad = function(t, b, c, d) {
+	outQuad(t, b, c, d) {
 		return -c *(t/=d)*(t-2) + b;
 	}
 
@@ -41,7 +41,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inOutQuad.
 	------------------------------------------ */
-	this.inOutQuad = function(t, b, c, d) {
+	inOutQuad(t, b, c, d) {
 		if ((t/=d/2) < 1) return c/2*t*t + b;
 		return -c/2 * ((--t)*(t-2) - 1) + b;
 	}
@@ -57,7 +57,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inCubic.
 	------------------------------------------ */
-	this.inCubic = function(t, b, c, d) {
+	inCubic(t, b, c, d) {
 		return c*(t/=d)*t*t + b;
 	}
 
@@ -72,7 +72,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outCubic.
 	------------------------------------------ */
-	this.outCubic = function(t, b, c, d) {
+	outCubic(t, b, c, d) {
 		return c*((t=t/d-1)*t*t + 1) + b;
 	}
 
@@ -87,7 +87,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inOutCubic.
 	------------------------------------------ */
-	this.inOutCubic = function(t, b, c, d) {
+	inOutCubic(t, b, c, d) {
 		if ((t/=d/2) < 1) return c/2*t*t*t + b;
 		return c/2*((t-=2)*t*t + 2) + b;
 	}
@@ -103,7 +103,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inQuart.
 	------------------------------------------ */
-	this.inQuart = function(t, b, c, d) {
+	inQuart(t, b, c, d) {
 		return c*(t/=d)*t*t*t + b;
 	}
 
@@ -118,7 +118,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outQuart.
 	------------------------------------------ */
-	this.outQuart = function(t, b, c, d) {
+	outQuart(t, b, c, d) {
 		return -c * ((t=t/d-1)*t*t*t - 1) + b;
 	}
 
@@ -133,7 +133,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inOutQuart.
 	------------------------------------------ */
-	this.inOutQuart = function(t, b, c, d) {
+	inOutQuart(t, b, c, d) {
 		if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
 		return -c/2 * ((t-=2)*t*t*t - 2) + b;
 	}
@@ -149,7 +149,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inQuint.
 	------------------------------------------ */
-	this.inQuint = function(t, b, c, d) {
+	inQuint(t, b, c, d) {
 		return c*(t/=d)*t*t*t*t + b;
 	}
 
@@ -164,7 +164,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outQuint.
 	------------------------------------------ */
-	this.outQuint = function(t, b, c, d) {
+	outQuint(t, b, c, d) {
 		return c*((t=t/d-1)*t*t*t*t + 1) + b;
 	}
 
@@ -179,7 +179,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inOutQuint.
 	------------------------------------------ */
-	this.inOutQuint = function(t, b, c, d) {
+	inOutQuint(t, b, c, d) {
 		if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
 		return c/2*((t-=2)*t*t*t*t + 2) + b;
 	}
@@ -195,7 +195,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inSine.
 	------------------------------------------ */
-	this.inSine = function(t, b, c, d) {
+	inSine(t, b, c, d) {
 		return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
 	}
 
@@ -210,7 +210,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outSine.
 	------------------------------------------ */
-	this.outSine = function(t, b, c, d) {
+	outSine(t, b, c, d) {
 		return c * Math.sin(t/d * (Math.PI/2)) + b;
 	}
 
@@ -225,7 +225,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inOutSine.
 	------------------------------------------ */
-	this.inOutSine = function(t, b, c, d) {
+	inOutSine(t, b, c, d) {
 		return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
 	}
 
@@ -240,7 +240,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inExpo.
 	------------------------------------------ */
-	this.inExpo = function(t, b, c, d) {
+	inExpo(t, b, c, d) {
 		return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
 	}
 
@@ -255,7 +255,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outExpo.
 	------------------------------------------ */
-	this.outExpo = function(t, b, c, d) {
+	outExpo(t, b, c, d) {
 		return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
 	}
 
@@ -270,7 +270,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inOutExpo.
 	------------------------------------------ */
-	this.inOutExpo = function(t, b, c, d) {
+	inOutExpo(t, b, c, d) {
 		if (t==0) return b;
 		if (t==d) return b+c;
 		if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
@@ -288,7 +288,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inCirc.
 	------------------------------------------ */
-	this.inCirc = function(t, b, c, d) {
+	inCirc(t, b, c, d) {
 		return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
 	}
 
@@ -303,7 +303,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outCirc.
 	------------------------------------------ */
-	this.outCirc = function(t, b, c, d) {
+	outCirc(t, b, c, d) {
 		return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
 	}
 
@@ -318,7 +318,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inOutCirc.
 	------------------------------------------ */
-	this.inOutCirc = function(t, b, c, d) {
+	inOutCirc(t, b, c, d) {
 		if ((t/=d/2) < 1) return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
 		return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
 	}
@@ -334,11 +334,11 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inElastic.
 	------------------------------------------ */
-	this.inElastic = function(t, b, c, d) {
-		var s=1.70158;var p=0;var a=c;
+	inElastic(t, b, c, d) {
+		let s=1.70158;let p=0;let a=c;
 		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
-		if (a < Math.abs(c)) { a=c; var s=p/4; }
-		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		if (a < Math.abs(c)) { a=c; let s=p/4; }
+		else s = p/(2*Math.PI) * Math.asin (c/a);
 		return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
 	}
 
@@ -353,11 +353,11 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outElastic.
 	------------------------------------------ */
-	this.outElastic = function(t, b, c, d) {
-		var s=1.70158;var p=0;var a=c;
+	outElastic(t, b, c, d) {
+		let s=1.70158;let p=0;let a=c;
 		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
-		if (a < Math.abs(c)) { a=c; var s=p/4; }
-		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		if (a < Math.abs(c)) { a=c; let s=p/4; }
+		else s = p/(2*Math.PI) * Math.asin (c/a);
 		return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
 	}
 
@@ -372,11 +372,11 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inOutElastic.
 	------------------------------------------ */
-	this.inOutElastic = function(t, b, c, d) {
-		var s=1.70158;var p=0;var a=c;
+	inOutElastic(t, b, c, d) {
+		let s=1.70158;let p=0;let a=c;
 		if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (!p) p=d*(.3*1.5);
-		if (a < Math.abs(c)) { a=c; var s=p/4; }
-		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		if (a < Math.abs(c)) { a=c; let s=p/4; }
+		else s = p/(2*Math.PI) * Math.asin (c/a);
 		if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
 		return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*.5 + c + b;
 	}
@@ -393,7 +393,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inBack.
 	------------------------------------------ */
-	this.inBack = function(t, b, c, d, s) {
+	inBack(t, b, c, d, s) {
 		if (s == undefined) s = 1.70158;
 		return c*(t/=d)*t*((s+1)*t - s) + b;
 	}
@@ -410,7 +410,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outBack.
 	------------------------------------------ */
-	this.outBack = function(t, b, c, d, s) {
+	outBack(t, b, c, d, s) {
 		if (s == undefined) s = 1.70158;
 		return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
 	}
@@ -427,7 +427,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inOutBack.
 	------------------------------------------ */
-	this.inOutBack = function(t, b, c, d, s) {
+	inOutBack(t, b, c, d, s) {
 		if (s == undefined) s = 1.70158;
 		if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
 		return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
@@ -444,7 +444,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outBounce.
 	------------------------------------------ */
-	this.inBounce = function(t, b, c, d) {
+	inBounce(t, b, c, d) {
 		return c - this.outBounce (d-t, 0, c, d) + b;
 	}
 
@@ -459,7 +459,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on outBounce.
 	------------------------------------------ */
-	this.outBounce = function(t, b, c, d) {
+	outBounce(t, b, c, d) {
 		if ((t/=d) < (1/2.75)) {
 			return c*(7.5625*t*t) + b;
 		} else if (t < (2/2.75)) {
@@ -482,7 +482,7 @@ PL.Ease = function() {
 	|
 	| Get an eased float value based on inOutBounce.
 	------------------------------------------ */
-	this.inOutBounce = function(t, b, c, d) {
+	inOutBounce(t, b, c, d) {
 		if (t < d/2) return this.inBounce (t*2, 0, c, d) * .5 + b;
 		return this.outBounce (t*2-d, 0, c, d) * .5 + c*.5 + b;
 	}

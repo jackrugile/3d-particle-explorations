@@ -1,44 +1,65 @@
-PL.System = function(loader) {
+/*
+	- push apart based on size
+	- set life span for this, by system? or by particle?
+	- set opacity to fade out at end when zooming
+*/
 
-	// #1 have all pop at once then start over
+PL.System = class {
 
-	this.loader = loader;
-	this.calc = new PL.Calc();
+	constructor(loader) {
+		this.loader = loader;
+		this.calc = new PL.Calc();
 
-	this.particles = [];
-	this.particleGroup = new THREE.Object3D();
-	this.loader.scene.add(this.particleGroup);
+		this.particles = [];
+		this.particleGroup = new THREE.Object3D();
+		this.loader.scene.add(this.particleGroup);
 
-	this.count = 300;
-	this.popping = false;
+		this.count = 75;
 
-	this.update = function() {
-		if(this.particles.length < this.count && !this.popping) {
-			for(let i = 0; i < 6; i++) {
-				this.particles.push(new PL.Particle({
-					group: this.particleGroup,
-					x: 0,
-					y: 0,
-					z: 0,
-					size: this.calc.rand(0.2, 2)
-				}, this, this.loader));
+		for(let i = 0; i < this.count; i++) {
+			this.particles.push(new PL.Particle({
+				group: this.particleGroup,
+				x: 0,
+				y: 0,
+				z: 0,
+				size: this.calc.rand(0.2, 1.2),
+				delay: i
+			}, this, this.loader));
+		}
+	}
+
+	update() {
+		let i = this.particles.length;
+		let initiatedCount = 0;
+		while(i--) {
+			this.particles[i].update();
+			if(this.particles[i].initiated) {
+				initiatedCount++;
 			}
 		}
 
-		var i = this.particles.length;
-		while(i--) {
-			this.particles[i].update();
+		if(initiatedCount === 0) {
+			let j = this.particles.length;
+			while(j--) {
+				this.particles[j].initiated = true;
+			}
 		}
 
 		for(let i = 0, l = this.particles.length; i < l; i++) {
 			let c1 = this.particles[i];
+			if(!c1.active) {
+				break;
+			}
 			let c1pos = c1.mesh.position;
 			for(let j = i + 1; j < l; j++) {
 				let c2 = this.particles[j];
+				if(!c2.active) {
+					break;
+				}
 				let c2pos = c2.mesh.position;
 				let dx = c1pos.x - c2pos.x;
 				let dy = c1pos.y - c2pos.y;
-				let dist = dx * dx + dy * dy - 10;
+				let dist = dx * dx + dy * dy - 7;
 				let radii = (c1.size + c2.size) * (c1.size + c2.size);
 				if(dist < radii) {
 					let angle = Math.atan2(dy, dx) + this.calc.rand(-0.05, 0.05);
@@ -51,24 +72,6 @@ PL.System = function(loader) {
 					c2pos.y -= y;
 				}
 			}
-		}
-
-		if(this.particles.length >= this.count) {
-			setTimeout(() => {
-				this.popping = true;
-			}, 500);
-		}
-
-		if(this.popping) {
-			let i = 6;
-			while(i--) {
-				this.particleGroup.remove(this.particleGroup.children[this.particles.length - 1]);
-				this.particles.pop();
-			}
-		}
-
-		if(this.particles.length === 0) {
-			this.popping = false;
 		}
 
 	}
