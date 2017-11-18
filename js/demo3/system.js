@@ -2,6 +2,7 @@
 	- push apart based on size
 	- set life span for this, by system? or by particle?
 	- set opacity to fade out at end when zooming
+	- find a way to still separate while zooming at end?
 */
 
 PL.System = class {

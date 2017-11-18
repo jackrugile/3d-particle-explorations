@@ -43,7 +43,7 @@ PL.Particle = class {
 			this.elapsed += this.loader.dtMs;
 		}
 
-		if(!this.active && this.elapsed > 200 + this.delay * 10) {
+		if(!this.active && this.elapsed > 200 + this.delay * 5) {
 			this.mesh.position.x = 0;
 			this.mesh.position.y = 0;
 			this.mesh.position.z = 0;
