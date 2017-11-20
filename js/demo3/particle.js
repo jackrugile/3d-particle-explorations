@@ -22,9 +22,9 @@ PL.Particle = class {
 		this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
 		this.material = new THREE.MeshBasicMaterial({
 			//blending: THREE.AdditiveBlending,
-			color: Math.random() > 0.5 ? new THREE.Color('magenta') : new THREE.Color('rebeccapurple'),
+			color: 0xffffff,
 			transparent: true,
-			opacity: 1,
+			opacity: this.calc.rand(0.1, 1),
 			depthTest: false,
 			precision: 'lowp'
 		});
@@ -60,9 +60,9 @@ PL.Particle = class {
 		}
 
 		if(this.dying) {
-			//this.size = 0.00001;
 			this.size *= 0.85;
-			this.mesh.position.z *= 1.3;
+			this.mesh.position.z *= 1.2;
+			this.mesh.material.opacity = this.size / this.sizeConfig;
 			if(this.size < 0.1) {
 				this.dying = false;
 				this.active = false;
@@ -73,6 +73,7 @@ PL.Particle = class {
 				this.mesh.position.z = 0;
 				this.size = 0.0001;
 				this.sizeTarget = this.sizeConfig;
+				this.mesh.material.opacity = this.calc.rand(0.1, 1);
 			}
 		}
 

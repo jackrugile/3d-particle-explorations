@@ -13,18 +13,19 @@ PL.Particle = class {
 		this.baseY = config.y;
 		this.baseZ = config.z;
 		this.baseRadius = config.radius;
+		this.baseSize = config.size;
 
 		this.color = config.color;
 		this.angle = this.baseAngle;
 
 		this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
 		this.material = new THREE.MeshBasicMaterial({
-			//blending: THREE.AdditiveBlending,
 			color: this.color,
 			transparent: true,
 			opacity: 1,
 			depthTest: false,
-			precision: 'lowp'
+			precision: 'lowp',
+			side: THREE.DoubleSide
 		});
 		this.geometry = this.geometry;
 		this.material = this.material;
@@ -37,11 +38,15 @@ PL.Particle = class {
 	}
 
 	update() {
-		this.angle -= 0.001 + this.loader.dtN * 0.0003 * (15 - this.baseRadius);
+		this.angle -= this.loader.dtN * Math.cos(this.loader.elapsedMs * 0.0025 - this.baseRadius * 0.15) * 0.02;
 
-		//this.mesh.position.z = Math.sin(this.loader.elapsedMs * 0.002) * this.baseZ;
 		this.mesh.position.x = Math.cos(this.angle) * this.baseRadius;
 		this.mesh.position.y = Math.sin(this.angle) * this.baseRadius;
+
+		let freeScale = Math.cos(this.loader.elapsedMs * 0.005 - this.baseRadius * 0.6);
+		let lockScale = this.calc.clamp(freeScale, 0, 1);
+		let scale = this.baseSize + lockScale * 0.15;
+		this.mesh.scale.set(scale, scale, scale);
 	}
 
 }

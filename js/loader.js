@@ -41,7 +41,7 @@ PL.Loader = class {
 	}
 
 	setupCamera() {
-		this.camera = new THREE.PerspectiveCamera(45, 0, 0.1, 10000);
+		this.camera = new THREE.PerspectiveCamera(45, 0, 0.0001, 10000);
 		this.camera.position.x = 0;
 		this.camera.position.y = 0;
 		this.camera.position.z = 100;

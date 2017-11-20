@@ -155,6 +155,39 @@ main {
 	min-height: 100vh;
 }
 
+.content-outer {
+	background: white;
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 0 auto;
+	min-height: 100vh;
+	opacity: 0;
+	perspective: 300px;
+}
+
+.complete .content-outer {
+	opacity: 1;
+}
+
+.content-inner {
+	opacity: 0;
+	transform: translate3d(0, 0, -200px);
+	transition: opacity 800ms cubic-bezier(0.19, 1, 0.22, 1), transform 800ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.complete .content-inner {
+	opacity: 1;
+	transform: translate3d(0, 0, 0);
+}
+
+.content-inner h1 {
+	font-size: 128px;
+	letter-spacing: -0.025em;
+	line-height: 1;
+}
+
 .content--fixed {
 	position: fixed;
 	z-index: 10000;

@@ -6,52 +6,49 @@ PL.System = class {
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
+		this.lines = [];
 		this.loader.scene.add(this.particleGroup);
 
 		//this.count = 40;
-		this.count = 100;
-		this.height = 20;
+		this.count = 24;
+		this.height = 10;
 
 		for(let i = 0; i < this.count; i++) {
-			let radius = 4;
-			let angle = this.calc.map(i, 0, this.count, 0, Math.PI * 5);
-			let x = Math.cos(angle) * radius;
-			let y = this.calc.map(i, 0, this.count, -this.height , this.height );
-			let z = Math.sin(angle) * radius;
+			this.particles.push(new PL.Particle({
+				group: this.particleGroup,
+				prog: i / this.count,
+				alt: false,
+				color: 0xffffff,
+				opacity: 1,
+				size: this.calc.map(i, 0, this.count, 0.1, 0.3),
+				radius: 4,
+			}, this, this.loader));
 
 			this.particles.push(new PL.Particle({
 				group: this.particleGroup,
-				color: new THREE.Color('magenta'),
+				prog: i / this.count,
+				alt: true,
+				color: 0xffffff,
 				opacity: 1,
-				x: x,
-				y: y,
-				z: z,
-				//size: 0.25 + (Math.sin(i / 5)) * 0.2,
-				size: this.calc.rand(0.05, 0.45),
-				radius: radius,
-				angle: angle
+				size: this.calc.map(i, 0, this.count, 0.3, 0.1),
+				radius: 4,
 			}, this, this.loader));
 		}
 
 		for(let i = 0; i < this.count; i++) {
-			let radius = 4;
-			let angle = this.calc.map(i, 0, this.count, 0, Math.PI * 5) + Math.PI;
-			let x = Math.cos(angle) * radius;
-			let y = this.calc.map(i, 0, this.count, -this.height , this.height );
-			let z = Math.sin(angle) * radius;
-
-			this.particles.push(new PL.Particle({
-				group: this.particleGroup,
-				color: new THREE.Color('red'),
-				opacity: 1,
-				x: x,
-				y: y,
-				z: z,
-				//size: 0.25 + (Math.cos(i / 5)) * 0.2,
-				size: this.calc.rand(0.05, 0.45),
-				radius: radius,
-				angle: angle
-			}, this, this.loader));
+			let lineMaterial = new THREE.LineBasicMaterial({
+				color: 0xffffff,
+				opacity: 0.5,
+				transparent: true
+			});
+			let lineGeometry = new THREE.Geometry();
+			lineGeometry.vertices.push(
+				new THREE.Vector3(),
+				new THREE.Vector3()
+			);
+			let lineMesh = new THREE.Line(lineGeometry, lineMaterial);
+			this.particleGroup.add(lineMesh);
+			this.lines.push(lineMesh);
 		}
 	}
 
@@ -61,7 +58,29 @@ PL.System = class {
 			this.particles[i].update();
 		}
 
-		this.particleGroup.rotation.y += 0.02 * this.loader.dtN;
+		let j = this.lines.length;
+		while(j--) {
+			let p1 = this.particles[j * 2];
+			let p2 = this.particles[j * 2 + 1];
+			let line = this.lines[j];
+			line.geometry.vertices[0].x = p1.mesh.position.x;
+			line.geometry.vertices[0].y = p1.mesh.position.y;
+			line.geometry.vertices[0].z = p1.mesh.position.z;
+			line.geometry.vertices[1].x = p2.mesh.position.x;
+			line.geometry.vertices[1].y = p2.mesh.position.y;
+			line.geometry.vertices[1].z = p2.mesh.position.z;
+			line.geometry.verticesNeedUpdate = true;
+
+			//console.log(line.geometry);
+		}
+
+		// this.particleGroup.rotation.y += 0.02 * this.loader.dtN;
+
+		//this.particleGroup.rotation.y += Math.abs(Math.sin(this.loader.elapsedMs * 0.0015) * -0.1);
+		//this.particleGroup.rotation.y += Math.sin(this.loader.elapsedMs * 0.0015) * Math.PI * 0.01;
+		//this.particleGroup.rotation.z = Math.PI * -0.25;
+
+		this.particleGroup.rotation.z = Math.sin(this.loader.elapsedMs * 0.0015) * Math.PI * 0.25;
 
 		//this.particleGroup.rotation.y += ((1 + Math.sin(this.loader.elapsedMs * 0.01)) / 2) * 0.2;
 

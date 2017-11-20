@@ -31,7 +31,7 @@ PL.Particle = class {
 		// centered
 		let div = 0.04 + Math.sin(this.loader.elapsedMs / 500) * 0.035;
 		let amp = ((this.system.visW / 2) - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
-		this.mesh.position.y = this.system.simplex.noise2D(this.mesh.position.x * div, this.loader.elapsedMs / 1000) * 20 * amp;
+		this.mesh.position.y = this.system.simplex.noise2D(this.mesh.position.x * div, this.loader.elapsedMs / 1000) * 10 * amp;
 
 		// left lock
 		// let div = 0.04 + Math.sin(this.loader.elapsed * 3) * 0.04;

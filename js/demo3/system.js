@@ -1,8 +1,6 @@
 /*
-	- push apart based on size
 	- set life span for this, by system? or by particle?
 	- set opacity to fade out at end when zooming
-	- find a way to still separate while zooming at end?
 */
 
 PL.System = class {
@@ -10,6 +8,9 @@ PL.System = class {
 	constructor(loader) {
 		this.loader = loader;
 		this.calc = new PL.Calc();
+
+		this.total = 5000;
+		this.completed = false;
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
@@ -23,7 +24,7 @@ PL.System = class {
 				x: 0,
 				y: 0,
 				z: 0,
-				size: this.calc.rand(0.2, 1.2),
+				size: this.calc.rand(0.1, 0.8),
 				delay: i
 			}, this, this.loader));
 		}
@@ -48,19 +49,13 @@ PL.System = class {
 
 		for(let i = 0, l = this.particles.length; i < l; i++) {
 			let c1 = this.particles[i];
-			if(!c1.active) {
-				break;
-			}
 			let c1pos = c1.mesh.position;
 			for(let j = i + 1; j < l; j++) {
 				let c2 = this.particles[j];
-				if(!c2.active) {
-					break;
-				}
 				let c2pos = c2.mesh.position;
 				let dx = c1pos.x - c2pos.x;
 				let dy = c1pos.y - c2pos.y;
-				let dist = dx * dx + dy * dy - 7;
+				let dist = dx * dx + dy * dy - 8;
 				let radii = (c1.size + c2.size) * (c1.size + c2.size);
 				if(dist < radii) {
 					let angle = Math.atan2(dy, dx) + this.calc.rand(-0.05, 0.05);
@@ -75,6 +70,15 @@ PL.System = class {
 			}
 		}
 
+		if(!this.completed && this.loader.elapsedMs > this.total) {
+			this.complete();
+		}
+
+	}
+
+	complete() {
+		this.completed = true;
+		console.log('complete');
 	}
 
 }
