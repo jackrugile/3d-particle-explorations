@@ -38,3 +38,4 @@
 - [ ] test 1 fill/complete method
 - [ ] test usage of lines
 - [ ] should I use dtn or not alongslide mainloop?
+- [ ] handle unfocused tab and timing.
