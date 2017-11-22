@@ -9,7 +9,6 @@ PL.System = class {
 		this.lines = [];
 		this.loader.scene.add(this.particleGroup);
 
-		//this.count = 40;
 		this.count = 24;
 		this.height = 10;
 
@@ -70,20 +69,9 @@ PL.System = class {
 			line.geometry.vertices[1].y = p2.mesh.position.y;
 			line.geometry.vertices[1].z = p2.mesh.position.z;
 			line.geometry.verticesNeedUpdate = true;
-
-			//console.log(line.geometry);
 		}
 
-		// this.particleGroup.rotation.y += 0.02 * this.loader.dtN;
-
-		//this.particleGroup.rotation.y += Math.abs(Math.sin(this.loader.elapsedMs * 0.0015) * -0.1);
-		//this.particleGroup.rotation.y += Math.sin(this.loader.elapsedMs * 0.0015) * Math.PI * 0.01;
-		//this.particleGroup.rotation.z = Math.PI * -0.25;
-
 		this.particleGroup.rotation.z = Math.sin(this.loader.elapsedMs * 0.0015) * Math.PI * 0.25;
-
-		//this.particleGroup.rotation.y += ((1 + Math.sin(this.loader.elapsedMs * 0.01)) / 2) * 0.2;
-
 	}
 
 }

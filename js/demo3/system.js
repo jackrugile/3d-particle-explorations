@@ -55,7 +55,7 @@ PL.System = class {
 				let c2pos = c2.mesh.position;
 				let dx = c1pos.x - c2pos.x;
 				let dy = c1pos.y - c2pos.y;
-				let dist = dx * dx + dy * dy - 8;
+				let dist = dx * dx + dy * dy - 6;
 				let radii = (c1.size + c2.size) * (c1.size + c2.size);
 				if(dist < radii) {
 					let angle = Math.atan2(dy, dx) + this.calc.rand(-0.05, 0.05);

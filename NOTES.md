@@ -39,3 +39,4 @@
 - [ ] test usage of lines
 - [ ] should I use dtn or not alongslide mainloop?
 - [ ] handle unfocused tab and timing.
+- [ ] lines are flashing on demo 4, double helix, get stacking order correct
