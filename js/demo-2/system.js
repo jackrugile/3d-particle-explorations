@@ -8,7 +8,7 @@ PL.System = class extends PL.SystemBase {
 		this.lines = [];
 
 		//this.count = Math.round(window.innerWidth / 10);
-		this.count = 150;
+		this.count = 350;
 		//this.visW = this.calc.visibleWidthAtZDepth(0, this.loader.camera) / 1;
 		this.visW = 30;
 
@@ -26,15 +26,16 @@ PL.System = class extends PL.SystemBase {
 				y: y,
 				z: z,
 				size: this.calc.map(Math.abs(x), 0, this.visW / 2, 0.2, 0.01),
-				color: i % 2 === 0 ? 0xffffff: 0xffffff,
-				opacity: 1
+				color: 0xffffff,
+				opacity: 1,
+				alt: i % 2 === 0
 			}, this, this.loader));
 		}
 
 		for(let i = 0; i < this.count; i++) {
 			let lineMaterial = new THREE.LineBasicMaterial({
 				color: 0xffffff,
-				opacity: 0.25,
+				opacity: 0.15,
 				transparent: true
 			});
 			let lineGeometry = new THREE.Geometry();
@@ -63,8 +64,8 @@ PL.System = class extends PL.SystemBase {
 			line.geometry.vertices[0].x = p1.mesh.position.x;
 			line.geometry.vertices[0].y = p1.mesh.position.y;
 			line.geometry.vertices[0].z = p1.mesh.position.z;
-			line.geometry.vertices[1].x = p2.mesh.position.x;
-			line.geometry.vertices[1].y = p2.mesh.position.y;
+			line.geometry.vertices[1].x = p1.mesh.position.x;
+			line.geometry.vertices[1].y = 0;
 			line.geometry.vertices[1].z = p2.mesh.position.z;
 			line.geometry.verticesNeedUpdate = true;
 		}
