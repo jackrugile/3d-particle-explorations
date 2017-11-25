@@ -2,6 +2,7 @@ PL.Loader = class {
 
 	constructor() {
 		this.calc = new PL.Calc();
+		this.ease = new PL.Ease();
 
 		this.container = document.querySelector('.loader');
 		this.width = null;
@@ -122,3 +123,5 @@ PL.Loader = class {
 	}
 
 }
+
+let loader = new PL.Loader();

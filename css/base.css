@@ -22,19 +22,23 @@ body {
 
 /* Color schemes */
 .demo-1 {
-	--color-text: #333333;
-	--color-bg: #333333;
-	--color-link: #333333;
-	--color-link-hover: #ffffff;
-	--color-info: #333333;
+	--color-text: #333;
+	--color-bg: #333;
+	--color-link: #333;
+	--color-link-hover: #333;
+	--color-info: #333;
+	--color-top-right: limegreen;
+	--color-bottom-left: cyan;
 }
 
 .demo-2 {
-	--color-text: #333;
-	--color-bg: #333333;
-	--color-link: #333333;
-	--color-link-hover: #ffffff;
-	--color-info: #333333;
+	--color-text: #fff;
+	--color-bg: #fff;
+	--color-link: #fff;
+	--color-link-hover: #fff;
+	--color-info: #fff;
+	--color-top-right: red;
+	--color-bottom-left: orange;
 }
 
 .demo-3 {
@@ -43,6 +47,8 @@ body {
 	--color-link: #333333;
 	--color-link-hover: #ffffff;
 	--color-info: #333333;
+	--color-top-right: blue;
+	--color-bottom-left: magenta;
 }
 
 .demo-4 {
@@ -51,6 +57,48 @@ body {
 	--color-link: #333333;
 	--color-link-hover: #ffffff;
 	--color-info: #333333;
+	--color-top-right: magenta;
+	--color-bottom-left: red;
+}
+
+.demo-5 {
+	--color-text: #333333;
+	--color-bg: #333333;
+	--color-link: #333333;
+	--color-link-hover: #ffffff;
+	--color-info: #333333;
+	--color-top-right: #333;
+	--color-bottom-left: #000;
+}
+
+.demo-6 {
+	--color-text: #333333;
+	--color-bg: #333333;
+	--color-link: #333333;
+	--color-link-hover: #ffffff;
+	--color-info: #333333;
+	--color-top-right: white;
+	--color-bottom-left: black;
+}
+
+.demo-7 {
+	--color-text: #333333;
+	--color-bg: #333333;
+	--color-link: #333333;
+	--color-link-hover: #ffffff;
+	--color-info: #333333;
+	--color-top-right: white;
+	--color-bottom-left: black;
+}
+
+.demo-8 {
+	--color-text: #333333;
+	--color-bg: #333333;
+	--color-link: #333333;
+	--color-link-hover: #ffffff;
+	--color-info: #333333;
+	--color-top-right: white;
+	--color-bottom-left: back;
 }
 
 /* Fade effect */
@@ -146,6 +194,15 @@ main {
 	width: 100%;
 }
 
+.loader {
+	background: linear-gradient(-135deg, var(--color-top-right), var(--color-bottom-left));
+	bottom: 0;
+	left: 0;
+	position: fixed;
+	right: 0;
+	top: 0;
+}
+
 .content {
 	position: relative;
 	display: flex;
@@ -172,7 +229,11 @@ main {
 }
 
 .content-inner {
+	box-sizing: border-box;
+	margin: 0 auto;
+	max-width: 600px;
 	opacity: 0;
+	padding: 0 40px;
 	transform: translate3d(0, 0, -200px);
 	transition: opacity 800ms cubic-bezier(0.19, 1, 0.22, 1), transform 800ms cubic-bezier(0.19, 1, 0.22, 1);
 }
@@ -185,12 +246,34 @@ main {
 .content-inner h1 {
 	font-size: 128px;
 	letter-spacing: -0.025em;
-	line-height: 1;
+	line-height: 1.2;
+	margin: 0 0 40px;
+}
+
+.content-inner p {
+	font-size: 18px;
+	line-height: 1.5;
+	margin-bottom: 40px;
+}
+
+.content-inner .replay-loader {
+	background: #fff;
+	box-shadow: inset 0 0 0 3px #333;
+	color: #333;
+	display: inline-block;
+	font-weight: bold;
+	padding: 15px 25px;
+	transition: all 300ms;
+}
+
+.content-inner .replay-loader:hover {
+	background: #333;
+	color: #fff;
 }
 
 .content--fixed {
 	position: fixed;
-	z-index: 10000;
+	z-index: 9999;
 	top: 0;
 	left: 0;
 	display: grid;
@@ -254,6 +337,7 @@ main {
 
 .demo {
 	margin: 0 0.15em;
+	transition: all 300ms;
 }
 
 .demo:hover,
@@ -308,15 +392,15 @@ a.demo--current {
 		justify-self: end;
 	}
 	.demo {
+		box-shadow: inset 0 0 0 3px var(--color-link);
 		display: block;
 		width: 17px;
 		height: 17px;
 		margin: 0 4px;
 		border-radius: 50%;
-		background: var(--color-link);
 	}
 	a.demo--current {
-		background: var(--color-link-hover);
+		background: var(--color-link);
 	}
 	.demo span {
 		line-height: 1;
@@ -339,6 +423,9 @@ a.demo--current {
 		height: auto;
 		min-height: 0;
 		padding-bottom: 10em;
+	}
+	.content-inner h1 {
+		font-size: 64px;
 	}
 	.content--fixed {
 		position: relative;

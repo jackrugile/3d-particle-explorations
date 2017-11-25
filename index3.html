@@ -9,7 +9,6 @@
 		<meta name="author" content="Codrops" />
 		<link rel="shortcut icon" href="favicon.ico">
 		<link rel="stylesheet" type="text/css" href="css/base.css" />
-		<link rel="stylesheet" type="text/css" href="css/demo3.css" />
 		<script>document.documentElement.className="js";var supportsCssVars=function(){var e,t=document.createElement("style");return t.innerHTML="root: { --tmp-var: bold; }",document.head.appendChild(t),e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),t.parentNode.removeChild(t),e};supportsCssVars()||alert("Please view this demo in a modern browser that supports CSS Variables.");</script>
 	</head>
 	<body class="demo-3">
@@ -36,7 +35,6 @@
 			</symbol>
 		</svg>
 		<main>
-			<div class="message">Some message for mobile if needed.</div>
 			<div class="content content--fixed">
 				<header class="codrops-header">
 					<div class="codrops-links">
@@ -53,6 +51,10 @@
 					<a class="demo" href="index2.html"><span>Demo 2</span></a>
 					<a class="demo demo--current" href="index3.html"><span>Demo 3</span></a>
 					<a class="demo" href="index4.html"><span>Demo 4</span></a>
+					<a class="demo" href="index5.html"><span>Demo 5</span></a>
+					<a class="demo" href="index6.html"><span>Demo 6</span></a>
+					<a class="demo" href="index7.html"><span>Demo 7</span></a>
+					<a class="demo" href="index8.html"><span>Demo 8</span></a>
 				</nav>
 				<!-- Pater 
 				<a class="pater" href="" rel="nofollow" onClick="recordOutboundLink(this, 'Outbound Links', 'CODEHERE');return false;">
@@ -61,8 +63,13 @@
 					<p class="pater__description"></p>
 				</a>-->
 			</div>
-			<div class="content">
-				<div class="loader"></div>
+			<div class="loader"></div>
+			<div class="content-outer">
+				<div class="content-inner">
+					<h1>Codrops</h1>
+					<p>Codrops is a web design and development blog that publishes articles and tutorials about the latest web trends, techniques and new possibilities. The team of Codrops is dedicated to provide useful, inspiring and innovative content that is free of charge.</p>
+					<a href="#" class="replay-loader">Replay Loader</a>
+				</div>
 			</div>
 		</main>
 		<script>let PL = {};</script>
@@ -70,12 +77,15 @@
 		<script src="js/vendor/mainloop.min.js"></script>
 		<script src="js/vendor/three.min.js"></script>
 		<script src="js/vendor/OrbitControls.js"></script>
+		<script src="js/vendor/simplex-noise.js"></script>
 		<script src="js/utils/axis.js"></script>
 		<script src="js/utils/ease.js"></script>
 		<script src="js/utils/calc.js"></script>
-		<script src="js/demo3/system.js"></script>
-		<script src="js/demo3/particle.js"></script>
+		<script src="js/utils/osc.js"></script>
+		<script src="js/system-base.js"></script>
+		<script src="js/particle-base.js"></script>
+		<script src="js/demo-3/system.js"></script>
+		<script src="js/demo-3/particle.js"></script>
 		<script src="js/loader.js"></script>
-		<script>let loader = new PL.Loader();</script>
 	</body>
 </html>

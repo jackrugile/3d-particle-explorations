@@ -1,6 +1,27 @@
+#### WORKING
+
+- [ ] setup stubs for all demos
+- [ ] setup colors change for transition after loader hides
+- [ ] use calc and ease from loader
+- [ ] finish animation parts of other demos, that's most important
+- [ ] setup replay loader button
+- [ ] responsive content working on mobile (seeing background color, width with scrollbars)
+- [ ] auto count down of loader?
+- [ ] document code
+- [ ] breakout oscillating 0 to 1 into it's own util
+- [ ] use base particle
+
 #### THEMES
 
-- [x] bubbles
+- [x] #1 - ring spin
+- [x] #2 - simplex noise line
+- [x] #3 - bubble separator
+- [x] #4 - double helix
+- [x] #5 - ***
+- [x] #6 - ***
+- [x] #7 - ***
+- [x] #8 - ***
+
 - [ ] ripple
 - [ ] spiral
 - [ ] grid
@@ -15,9 +36,9 @@
 - [ ] wanderers
 - [ ] game of life
 - [ ] simplex noise
-- [x] double helix
-- [x] simplex noise line across center
 - [ ] HITS of simplex noise (actual noise), then settle back down to zero
+- [ ] audio levels / equalizer
+- [ ] exploded noise in x, y, z space (like white particles on black demo)
 
 #### EXITS
 
@@ -30,13 +51,10 @@
 
 #### MISC
 
-- [ ] make sure noise is scaled based on width for the simplex noise demo, doesn't look the same on diff widths
-- [ ] exploded noise in x, y, z space (like white particles on black demo)
 - [ ] test on mobile
 - [ ] test on browsers
 - [ ] handle viewport width changes, getting cut off now, how can we maintain this?
-- [ ] test 1 fill/complete method
-- [ ] test usage of lines
-- [ ] should I use dtn or not alongslide mainloop?
-- [ ] handle unfocused tab and timing.
+- [ ] handle unfocused tab and timing
+- [ ] handle memory clean up and stopping
+- [ ] add replay loader button
 - [ ] lines are flashing on demo 4, double helix, get stacking order correct

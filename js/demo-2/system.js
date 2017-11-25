@@ -1,25 +1,19 @@
-PL.System = class {
+PL.System = class extends PL.SystemBase {
 
 	constructor(loader) {
-		this.loader = loader;
-		this.calc = new PL.Calc();
-		this.ease = new PL.Ease();
+		super(loader);
+
 		this.simplex = new SimplexNoise();
 
-		this.particles = [];
-		this.particleGroup = new THREE.Object3D();
 		this.lines = [];
-		this.loader.scene.add(this.particleGroup);
 
 		//this.count = Math.round(window.innerWidth / 10);
 		this.count = 150;
 		//this.visW = this.calc.visibleWidthAtZDepth(0, this.loader.camera) / 1;
 		this.visW = 30;
 
-		this.prog = 0;
-		this.progRate = 0.015;
-		this.progDir = true;
-		this.progEased = 0;
+		this.osc = new PL.Osc(0, 0.015);
+		this.oscEased = 0;
 
 		for(let i = 0; i < this.count; i++) {
 			let x = this.calc.map(i, 0, this.count , -this.visW / 2, this.visW / 2) + (this.visW / this.count / 2);
@@ -31,8 +25,9 @@ PL.System = class {
 				x: x,
 				y: y,
 				z: z,
+				size: this.calc.map(Math.abs(x), 0, this.visW / 2, 0.2, 0.01),
 				color: i % 2 === 0 ? 0xffffff: 0xffffff,
-				size: this.calc.map(Math.abs(x), 0, this.visW / 2, 0.2, 0.01)
+				opacity: 1
 			}, this, this.loader));
 		}
 
@@ -55,27 +50,10 @@ PL.System = class {
 	}
 
 	update() {
-		if(this.progDir) {
-			if(this.prog < 1) {
-				this.prog += this.progRate;
-			} else {
-				this.prog = 1;
-				this.progDir = !this.progDir;
-			}
-		} else {
-			if(this.prog > 0) {
-				this.prog -= this.progRate;
-			} else {
-				this.prog = 0;
-				this.progDir = !this.progDir;
-			}
-		}
-		this.progEased = this.ease.inOutExpo(this.prog, 0, 1, 1);
+		super.update();
 
-		let i = this.particles.length;
-		while(i--) {
-			this.particles[i].update();
-		}
+		this.osc.update();
+		this.oscEased = this.osc.val(this.ease.inOutExpo);
 
 		let j = this.lines.length - 1;
 		while(j--) {
