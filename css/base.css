@@ -107,13 +107,20 @@ body {
 }
 
 .demo-6 {
-	--color-text: #333333;
-	--color-bg: #333333;
-	--color-link: #333333;
-	--color-link-hover: #ffffff;
-	--color-info: #333333;
-	--color-top-right: white;
-	--color-bottom-left: black;
+	--color-text: #fff;
+	--color-bg: #111;
+	--color-link: #fff;
+	--color-link-hover: #fff;
+	--color-info: #fff;
+	--color-top-right: #333;
+	--color-bottom-left: #000;
+}
+
+.completed .demo-6 {
+	--color-text: #fff;
+	--color-link: #fff;
+	--color-link-hover: #fff;
+	--color-info: #fff;
 }
 
 .demo-7 {
@@ -258,7 +265,7 @@ main {
 }
 
 .content-outer {
-	background: white;
+	background: var(--color-bg);
 	position: relative;
 	display: flex;
 	justify-content: center;

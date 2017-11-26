@@ -13,7 +13,7 @@
 - [x] #3 - bubble separator
 - [x] #4 - double helix
 - [x] #5 - ***
-- [x] #6 - ***
+- [x] #6 - spinning orbitals
 - [x] #7 - ***
 - [x] #8 - ***
 

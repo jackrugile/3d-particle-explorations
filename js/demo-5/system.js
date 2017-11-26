@@ -21,7 +21,7 @@ PL.System = class extends PL.SystemBase {
 				size: size,
 				radius: radius,
 				color: 0xffffff,
-				opacity: this.loader.calc.rand(0.1, 1)
+				opacity: this.calc.rand(0.1, 1)
 			}, this, this.loader));
 		}
 	}

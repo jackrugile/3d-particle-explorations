@@ -15,6 +15,10 @@ PL.ParticleBase = class {
 		this.color = config.color;
 		this.opacity = config.opacity;
 
+		this.createMesh();
+	}
+
+	createMesh() {
 		this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
 
 		this.material = new THREE.MeshBasicMaterial({
