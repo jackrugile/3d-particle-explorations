@@ -26,7 +26,7 @@ PL.System = class extends PL.SystemBase {
 					size: size,
 					radius: this.radius,
 					angle: angle,
-					color: i % 2 === 0 ? 0xffffff: 0xffffff,
+					color: 0xffffff,
 					opacity: 1
 				}, this, this.loader));
 			}

@@ -18,19 +18,15 @@
 - [x] #8 - ***
 
 - [ ] ripple
-- [ ] spiral
 - [ ] grid
-- [ ] chaos
+- [ ] chaos/noise
 - [ ] accelerator
-- [ ] metaballs
 - [ ] eclipse
 - [ ] star trails
 - [ ] starfield
 - [ ] planets orbiting (space)
-- [ ] spiral
 - [ ] wanderers
 - [ ] game of life
-- [ ] simplex noise
 - [ ] HITS of simplex noise (actual noise), then settle back down to zero
 - [ ] audio levels / equalizer
 - [ ] exploded noise in x, y, z space (like white particles on black demo)
