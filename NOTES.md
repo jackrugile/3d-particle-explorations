@@ -1,15 +1,10 @@
 #### WORKING
 
-- [ ] setup stubs for all demos
-- [ ] setup colors change for transition after loader hides
-- [ ] use calc and ease from loader
 - [ ] finish animation parts of other demos, that's most important
 - [ ] setup replay loader button
 - [ ] responsive content working on mobile (seeing background color, width with scrollbars)
 - [ ] auto count down of loader?
 - [ ] document code
-- [ ] breakout oscillating 0 to 1 into it's own util
-- [ ] use base particle
 
 #### THEMES
 
@@ -56,5 +51,6 @@
 - [ ] handle viewport width changes, getting cut off now, how can we maintain this?
 - [ ] handle unfocused tab and timing
 - [ ] handle memory clean up and stopping
-- [ ] add replay loader button
 - [ ] lines are flashing on demo 4, double helix, get stacking order correct
+- [ ] entrance animation scale
+- [ ] weird issue on replay, sometimes ends fast

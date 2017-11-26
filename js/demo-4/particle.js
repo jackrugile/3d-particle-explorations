@@ -1,6 +1,8 @@
-PL.Particle = class {
+PL.Particle = class extends PL.ParticleBase {
 
 	constructor(config, system, loader) {
+		super(config, system, loader);
+
 		this.system = system;
 		this.loader = loader;
 		this.calc = new PL.Calc();
@@ -12,19 +14,6 @@ PL.Particle = class {
 		this.alt = config.alt;
 		this.opacity = config.opacity;
 		this.opacityBase = config.opacity;
-
-		this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
-		this.material = new THREE.MeshBasicMaterial({
-			color: config.color,
-			transparent: true,
-			opacity: config.opacity,
-			precision: 'lowp'
-		});
-		this.geometry = this.geometry;
-		this.material = this.material;
-		this.mesh = new THREE.Mesh(this.geometry, this.material);
-		this.mesh.scale.set(this.size, this.size, this.size);
-		this.group.add(this.mesh);
 	}
 
 	update() {

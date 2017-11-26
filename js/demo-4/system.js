@@ -1,14 +1,11 @@
-PL.System = class {
+PL.System = class extends PL.SystemBase {
 
 	constructor(loader) {
-		this.loader = loader;
-		this.calc = new PL.Calc();
+		super(loader);
 
-		this.particles = [];
-		this.particleGroup = new THREE.Object3D();
 		this.lines = [];
-		this.loader.scene.add(this.particleGroup);
 
+		this.duration = 3500;
 		this.count = 24;
 		this.height = 10;
 
@@ -52,6 +49,8 @@ PL.System = class {
 	}
 
 	update() {
+		super.update();
+
 		let i = this.particles.length;
 		while(i--) {
 			this.particles[i].update();
@@ -72,6 +71,10 @@ PL.System = class {
 		}
 
 		this.particleGroup.rotation.z = Math.sin(this.loader.elapsedMs * 0.0015) * Math.PI * 0.25;
+
+		if(this.exiting) {
+			this.loader.camera.position.z = 100 - this.ease.inExpo(this.exitProg, 0, 1, 1) * 100;
+		}
 	}
 
 }

@@ -1,22 +1,10 @@
-/*
-	- set life span for this, by system? or by particle?
-	- set opacity to fade out at end when zooming
-*/
-
-PL.System = class {
+PL.System = class extends PL.SystemBase {
 
 	constructor(loader) {
-		this.loader = loader;
-		this.calc = new PL.Calc();
-
-		this.total = 5000;
-		this.completed = false;
-
-		this.particles = [];
-		this.particleGroup = new THREE.Object3D();
-		this.loader.scene.add(this.particleGroup);
+		super(loader);
 
 		this.count = 75;
+		this.duration = 3500;
 
 		for(let i = 0; i < this.count; i++) {
 			this.particles.push(new PL.Particle({
@@ -25,16 +13,19 @@ PL.System = class {
 				y: 0,
 				z: 0,
 				size: this.calc.rand(0.1, 0.8),
-				delay: i
+				delay: i,
+				color: 0xffffff,
+				opacity: this.calc.rand(0.1, 1)
 			}, this, this.loader));
 		}
 	}
 
 	update() {
+		super.update();
+
 		let i = this.particles.length;
 		let initiatedCount = 0;
 		while(i--) {
-			this.particles[i].update();
 			if(this.particles[i].initiated) {
 				initiatedCount++;
 			}
@@ -70,15 +61,9 @@ PL.System = class {
 			}
 		}
 
-		if(!this.completed && this.loader.elapsedMs > this.total) {
-			this.complete();
+		if(this.exiting) {
+			this.loader.camera.position.z = 100 - this.ease.inExpo(this.exitProg, 0, 1, 1) * 100;
 		}
-
-	}
-
-	complete() {
-		this.completed = true;
-		console.log('complete');
 	}
 
 }

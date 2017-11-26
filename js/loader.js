@@ -5,8 +5,10 @@ PL.Loader = class {
 		this.ease = new PL.Ease();
 
 		this.container = document.querySelector('.loader');
+		this.replayButton = document.querySelector('.replay-loader');
 		this.width = null;
 		this.height = null;
+		this.completed = false;
 
 		this.isGrid = location.hash.indexOf('grid') > 0;
 		this.isGridDark = location.hash.indexOf('dark') > 0
@@ -22,6 +24,8 @@ PL.Loader = class {
 		this.listen();
 		this.onResize();
 		this.setupSystem();
+
+		document.documentElement.classList.add('loading');
 		MainLoop
 			.setUpdate((delta) => this.update(delta))
 			.setDraw(() => this.render())
@@ -108,7 +112,37 @@ PL.Loader = class {
 	}
 
 	listen() {
-		window.addEventListener('resize', this.onResize.bind(this));
+		window.addEventListener('resize', (e) => this.onResize(e));
+		this.replayButton.addEventListener('click', (e) => this.onReplayButtonClick(e));
+	}
+
+	replay() {
+		document.documentElement.classList.remove('completed');
+		document.documentElement.classList.add('loading');
+		this.camera.position.x = 0;
+		this.camera.position.y = 0;
+		this.camera.position.z = 100;
+		if(this.isOrbit) {
+			this.camera.position.x = -100;
+			this.camera.position.y = 50;
+			this.camera.position.z = 100;
+		}
+		this.elapsedMs = 0;
+		this.system.replay();
+		setTimeout(() => {
+			this.completed = false;
+			this.clock.start();
+			MainLoop.resetFrameDelta();
+			MainLoop.start();
+		}, 600);
+	}
+
+	complete() {
+		this.clock.stop();
+		MainLoop.stop();
+		this.completed = true;
+		document.documentElement.classList.remove('loading');
+		document.documentElement.classList.add('completed');
 	}
 
 	onResize() {
@@ -120,6 +154,11 @@ PL.Loader = class {
 
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(this.width, this.height);
+	}
+
+	onReplayButtonClick(e) {
+		e.preventDefault();
+		this.replay();
 	}
 
 }

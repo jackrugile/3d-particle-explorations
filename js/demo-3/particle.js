@@ -1,41 +1,26 @@
-PL.Particle = class {
+PL.Particle = class extends PL.ParticleBase{
 
 	constructor(config, system, loader) {
-		this.system = system;
-		this.loader = loader;
-		this.calc = new PL.Calc();
-		this.group = config.group;
+		super(config, system, loader);
 
 		this.size = 0.0001;
 		this.sizeTarget = config.size;
 		this.sizeConfig = config.size;
 
-		this.elapsed = 0;
 		this.delay = config.delay;
+		this.elapsed = 0;
 		this.initiated = true;
 		this.active = false;
 		this.dying = false;
+	}
 
-		//this.decay = 0;
-		//this.dying = false;
-
-		this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
-		this.material = new THREE.MeshBasicMaterial({
-			//blending: THREE.AdditiveBlending,
-			color: 0xffffff,
-			transparent: true,
-			opacity: this.calc.rand(0.1, 1),
-			depthTest: false,
-			precision: 'lowp'
-		});
-		this.geometry = this.geometry;
-		this.material = this.material;
-		this.mesh = new THREE.Mesh(this.geometry, this.material);
-		this.mesh.position.x = config.x;
-		this.mesh.position.y = config.y;
-		this.mesh.position.z = config.z;
-		this.mesh.scale.set(this.size, this.size, this.size);
-		this.group.add(this.mesh);
+	reset() {
+		super.reset();
+		this.size = 0.0001;
+		this.elapsed = 0;
+		this.initiated = true;
+		this.active = false;
+		this.dying = false;
 	}
 
 	update() {
@@ -54,7 +39,7 @@ PL.Particle = class {
 			this.size = this.calc.lerp(this.size, this.sizeTarget, 0.1);
 		}
 
-		if(!this.dying && this.elapsed > 1500 + this.delay * 3) {
+		if(!this.dying && this.elapsed > 1500 + this.delay * 4) {
 			this.dying = true;
 			this.mesh.position.z += 1.1;
 		}

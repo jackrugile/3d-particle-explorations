@@ -1,9 +1,19 @@
 PL.Osc = class {
 
 	constructor(val, rate, dir = true) {
+		this._baseVal = val;
+		this._baseRate = rate;
+		this._baseDir = dir;
+
 		this._val = val;
 		this._rate = rate;
 		this._dir = dir;
+	}
+
+	reset() {
+		this._val = this._baseVal;
+		this._rate = this._baseRate;
+		this._dir = this._baseDir;
 	}
 
 	update() {

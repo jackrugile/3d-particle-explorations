@@ -37,4 +37,7 @@ PL.ParticleBase = class {
 		this.group.add(this.mesh);
 	}
 
+	reset() {
+	}
+
 }

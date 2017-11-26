@@ -10,10 +10,13 @@ PL.SystemBase = class {
 		this.particleGroup = new THREE.Object3D();
 		this.loader.scene.add(this.particleGroup);
 
+		this.entering = true;
+		this.enterProg = 0;
+		this.enterRate = 0.015;
+
 		this.exiting = false;
 		this.exitProg = 0;
 		this.exitRate = 0.01;
-		this.completed = false;
 		this.duration = Infinity;
 	}
 
@@ -23,22 +26,46 @@ PL.SystemBase = class {
 			this.particles[i].update();
 		}
 
+		if(this.entering && this.enterProg < 1) {
+			this.enterProg += this.enterRate;
+			if(this.enterProg > 1) {
+				this.enterProg = 1;
+				this.entering = false;
+			}
+			let scale = this.ease.inOutExpo(this.enterProg, 0, 1, 1);
+			this.particleGroup.scale.set(scale, scale, scale);
+		}
+
 		if(!this.exiting && this.loader.elapsedMs > this.duration) {
 			this.exiting = true;
 		}
 
 		if(this.exiting) {
 			this.exitProg += this.exitRate;
-			if(this.exitProg >= 1 && !this.completed) {
+			if(this.exitProg >= 1 && !this.loader.completed) {
 				this.exitProg = 1;
-				this.complete();
+				this.loader.complete();
 			}
 		}
 	}
 
-	complete() {
-		this.completed = true;
-		document.documentElement.classList.add('complete');
+	replay() {
+		this.particleGroup.scale.set(0.0001, 0.0001, 0.0001);
+
+		let i = this.particles.length;
+		while(i--) {
+			this.particles[i].reset();
+		}
+
+		this.entering = true;
+		this.enterProg = 0;
+
+		this.exiting = false;
+		this.exitProg = 0;
+
+		if(this.osc) {
+			this.osc.reset();
+		}
 	}
 
 }
