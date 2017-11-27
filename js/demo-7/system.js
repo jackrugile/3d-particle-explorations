@@ -10,8 +10,8 @@ PL.System = class extends PL.SystemBase {
 		this.osc1 = new PL.Osc(0, 0.02, true, false);
 		this.color = new THREE.Color();
 
-		//this.texture = new THREE.TextureLoader().load('../../images/circle.png');
-		this.texture = new THREE.TextureLoader().load('../../images/orb.png');
+		//this.texture = new THREE.TextureLoader().load('/images/circle.png');
+		this.texture = new THREE.TextureLoader().load('./images/orb.png');
 		this.size = 10;
 		this.scale = 1;
 		this.base = 20;
