@@ -38,8 +38,8 @@ PL.System = class extends PL.SystemBase {
 	update() {
 		super.update();
 
-		if(this.exiting) {
-			this.loader.camera.position.z = 100 - this.ease.inExpo(this.exitProg, 0, 1, 1) * 100;
+		if(this.exiting && !this.loader.isOrbit) {
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 	}
 

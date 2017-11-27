@@ -5,6 +5,9 @@
 - [ ] responsive content working on mobile (seeing background color, width with scrollbars)
 - [ ] auto count down of loader?
 - [ ] document code
+- [ ] add 3d rotations and force perspective more to drive 3d feel more
+- [ ] make load times longer to show animation more
+- [ ] shit is still showing when I go to replay...
 
 #### THEMES
 
@@ -22,7 +25,6 @@
 - [ ] chaos/noise
 - [ ] accelerator
 - [ ] eclipse
-- [ ] star trails
 - [ ] starfield
 - [ ] planets orbiting (space)
 - [ ] wanderers
@@ -30,6 +32,10 @@
 - [ ] HITS of simplex noise (actual noise), then settle back down to zero
 - [ ] audio levels / equalizer
 - [ ] exploded noise in x, y, z space (like white particles on black demo)
+
+10x10 grid with lines going through it in a burst almost electrical looking
+
+use more performant buffer shit?
 
 #### EXITS
 

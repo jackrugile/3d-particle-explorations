@@ -124,13 +124,13 @@ body {
 }
 
 .demo-7 {
-	--color-text: #333333;
-	--color-bg: #333333;
-	--color-link: #333333;
-	--color-link-hover: #ffffff;
-	--color-info: #333333;
-	--color-top-right: white;
-	--color-bottom-left: black;
+	--color-text: #fff;
+	--color-bg: #111;
+	--color-link: #fff;
+	--color-link-hover: #fff;
+	--color-info: #fff;
+	--color-top-right: #333;
+	--color-bottom-left: #000;
 }
 
 .demo-8 {
@@ -139,8 +139,8 @@ body {
 	--color-link: #333333;
 	--color-link-hover: #ffffff;
 	--color-info: #333333;
-	--color-top-right: white;
-	--color-bottom-left: back;
+	--color-top-right: #333;
+	--color-bottom-left: #000;
 }
 
 /* Fade effect */
@@ -274,11 +274,13 @@ main {
 	min-height: 100vh;
 	opacity: 0;
 	perspective: 300px;
+	pointer-events: none;
 	transition: opacity 600ms;
 }
 
 .completed .content-outer {
 	opacity: 1;
+	pointer-events: auto;
 	transition-duration: 0ms;
 }
 

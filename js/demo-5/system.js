@@ -3,31 +3,36 @@ PL.System = class extends PL.SystemBase {
 	constructor(loader) {
 		super(loader);
 
-		this.count = 300;
+		this.simplex = new SimplexNoise();
+
+		this.count = 1000;
+		this.duration = 3500;
+		this.size = 10;
 
 		for(let i = 0; i < this.count; i++) {
-			let x = 0;
-			let y = 0;
-			let z = 0;
-			let size = this.calc.map(i, 0, this.count - 1, 0.05, 0.3);
-			let radius = this.calc.map(i, 0, this.count - 1, -20, 0);
+			let x = this.calc.rand(-this.size / 2, this.size / 2);
+			let y = this.calc.rand(-this.size / 2, this.size / 2);
+			let z = this.calc.rand(-this.size / 2, this.size / 2);
+			let size = this.calc.rand(0.02, 0.3);
 
 			this.particles.push(new PL.Particle({
 				group: this.particleGroup,
-				prog: i / (this.count - 1),
 				x: x,
 				y: y,
 				z: z,
 				size: size,
-				radius: radius,
 				color: 0xffffff,
-				opacity: this.calc.rand(0.1, 1)
+				opacity: this.calc.rand(1, 1)
 			}, this, this.loader));
 		}
 	}
 
 	update() {
 		super.update();
+
+		if(this.exiting && !this.loader.isOrbit) {
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+		}
 	}
 
 }

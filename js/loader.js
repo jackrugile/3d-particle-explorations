@@ -46,15 +46,18 @@ PL.Loader = class {
 	}
 
 	setupCamera() {
-		this.camera = new THREE.PerspectiveCamera(45, 0, 0.0001, 10000);
-		this.camera.position.x = 0;
-		this.camera.position.y = 0;
-		this.camera.position.z = 100;
-		if(this.isOrbit) {
-			this.camera.position.x = -100;
-			this.camera.position.y = 50;
-			this.camera.position.z = 100;
-		}
+		// this.camera = new THREE.PerspectiveCamera(45, 0, 0.0001, 10000);
+		// this.camera.position.x = 0;
+		// this.camera.position.y = 0;
+		// this.camera.position.z = 100;
+
+		this.camera = new THREE.PerspectiveCamera(100, 0, 0.0001, 10000);
+		this.cameraBaseX = 0;
+		this.cameraBaseY = 0;
+		this.cameraBaseZ = 35;
+		this.camera.position.x = this.cameraBaseX;
+		this.camera.position.y = this.cameraBaseY;
+		this.camera.position.z = this.cameraBaseZ;
 	}
 
 	setupRenderer() {
@@ -68,6 +71,8 @@ PL.Loader = class {
 	setupControls() {
 		if(this.isOrbit) {
 			this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+			this.controls.enableDamping = true;
+			this.controls.dampingFactor = 0.1;
 		}
 	}
 
@@ -119,14 +124,9 @@ PL.Loader = class {
 	replay() {
 		document.documentElement.classList.remove('completed');
 		document.documentElement.classList.add('loading');
-		this.camera.position.x = 0;
-		this.camera.position.y = 0;
-		this.camera.position.z = 100;
-		if(this.isOrbit) {
-			this.camera.position.x = -100;
-			this.camera.position.y = 50;
-			this.camera.position.z = 100;
-		}
+		this.camera.position.x = this.cameraBaseX;
+		this.camera.position.y = this.cameraBaseY;
+		this.camera.position.z = this.cameraBaseZ;
 		this.elapsedMs = 0;
 		this.system.replay();
 		setTimeout(() => {
@@ -138,6 +138,9 @@ PL.Loader = class {
 	}
 
 	complete() {
+		if(this.isOrbit) {
+			return;
+		}
 		this.clock.stop();
 		MainLoop.stop();
 		this.completed = true;
