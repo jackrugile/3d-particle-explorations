@@ -1,4 +1,8 @@
-PL.System = class extends PL.SystemBase {
+const SystemBase = require('../system-base');
+const Particle = require('./particle');
+const Osc = require('../utils/osc');
+
+class System extends SystemBase {
 
 	constructor(loader) {
 		super(loader);
@@ -11,7 +15,7 @@ PL.System = class extends PL.SystemBase {
 		//this.visW = this.calc.visibleWidthAtZDepth(0, this.loader.camera) / 1;
 		this.visW = 30;
 
-		this.osc = new PL.Osc(0.2, 0.0125);
+		this.osc = new Osc(0.2, 0.0125);
 		this.oscEased = 0;
 		this.duration = 3500;
 
@@ -20,7 +24,7 @@ PL.System = class extends PL.SystemBase {
 			let y = 0;
 			let z = 0;
 
-			this.particles.push(new PL.Particle({
+			this.particles.push(new Particle({
 				group: this.particleGroup,
 				x: x,
 				y: y,
@@ -75,3 +79,5 @@ PL.System = class extends PL.SystemBase {
 	}
 
 }
+
+module.exports = System;

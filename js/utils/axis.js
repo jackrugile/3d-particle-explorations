@@ -1,4 +1,4 @@
-PL.AxisHelper = class {
+class AxisHelper {
 
 	constructor(axisLength, opacity) {
 		this.object3d = new THREE.Object3D();
@@ -40,3 +40,4 @@ PL.AxisHelper = class {
 
 }
 
+module.exports = AxisHelper;

@@ -1,4 +1,7 @@
-PL.Particle = class extends PL.ParticleBase {
+const ParticleBase = require('../particle-base');
+const Osc = require('../utils/osc');
+
+class Particle extends ParticleBase {
 
 	constructor(config, system, loader) {
 		super(config, system, loader);
@@ -7,14 +10,14 @@ PL.Particle = class extends PL.ParticleBase {
 		this.alt = config.alt;
 		this.index = config.index;
 		this.radius = config.radius;
-		this.osc1 = new PL.Osc(1 - this.prog / 6, 0.015, true, false);
+		this.osc1 = new Osc(1 - this.prog / 6, 0.015, true, false);
 		this.createTail();
 		this.createHead();
 	}
 
 	reset() {
 		super.reset();
-		this.osc1 = new PL.Osc(1 - this.prog / 6, 0.015, true, false);
+		this.osc1 = new Osc(1 - this.prog / 6, 0.015, true, false);
 	}
 
 	createMesh() {
@@ -86,3 +89,5 @@ PL.Particle = class extends PL.ParticleBase {
 	}
 
 }
+
+module.exports = Particle;

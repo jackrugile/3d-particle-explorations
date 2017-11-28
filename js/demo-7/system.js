@@ -1,4 +1,7 @@
-PL.System = class extends PL.SystemBase {
+const SystemBase = require('../system-base');
+const Particle = require('./particle');
+
+class System extends SystemBase {
 
 	constructor(loader) {
 		super(loader);
@@ -9,3 +12,5 @@ PL.System = class extends PL.SystemBase {
 	}
 
 }
+
+module.exports = System;

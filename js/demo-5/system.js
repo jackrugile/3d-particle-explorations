@@ -1,4 +1,8 @@
-PL.System = class extends PL.SystemBase {
+const SystemBase = require('../system-base');
+const Particle = require('./particle');
+const Line = require('./line');
+
+class System extends SystemBase {
 
 	constructor(loader) {
 		super(loader);
@@ -22,7 +26,7 @@ PL.System = class extends PL.SystemBase {
 				let size = this.calc.rand(0.02, 0.3);
 				size = 0.05;
 
-				this.particles.push(new PL.Particle({
+				this.particles.push(new Particle({
 					group: this.particleGroup,
 					x: x,
 					y: y,
@@ -78,7 +82,7 @@ PL.System = class extends PL.SystemBase {
 		super.update();
 
 		if(this.grid_line_tick >= this.grid_line_tick_max) {
-			this.grid_lines.push(new PL.Line({
+			this.grid_lines.push(new Line({
 					group: this.particleGroup,
 					points: this.getGridLineSet(30)
 				},
@@ -107,3 +111,5 @@ PL.System = class extends PL.SystemBase {
 	}
 
 }
+
+module.exports = System;

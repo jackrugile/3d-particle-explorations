@@ -1,4 +1,6 @@
-PL.Particle = class extends PL.ParticleBase {
+const ParticleBase = require('../particle-base');
+
+class Particle extends ParticleBase {
 
 	constructor(config, system, loader) {
 		super(config, system, loader);
@@ -27,3 +29,5 @@ PL.Particle = class extends PL.ParticleBase {
 	}
 
 }
+
+module.exports = Particle;

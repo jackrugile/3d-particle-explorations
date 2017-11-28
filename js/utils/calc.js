@@ -1,4 +1,4 @@
-PL.Calc = class {
+class Calc {
 
 	/*
 	------------------------------------------
@@ -203,3 +203,5 @@ PL.Calc = class {
 	};
 
 }
+
+module.exports = Calc;

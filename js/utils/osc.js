@@ -1,4 +1,4 @@
-PL.Osc = class {
+class Osc {
 
 	constructor(val, rate, dir = true, flip = false) {
 		this._baseVal = val;
@@ -54,3 +54,5 @@ PL.Osc = class {
 	}
 
 }
+
+module.exports = Osc;

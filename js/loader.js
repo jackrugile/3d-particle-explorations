@@ -1,8 +1,12 @@
-PL.Loader = class {
+const Calc = require('./utils/calc');
+const Ease = require('./utils/ease');
+const Axis = require('./utils/axis');
 
-	constructor() {
-		this.calc = new PL.Calc();
-		this.ease = new PL.Ease();
+class Loader {
+
+	constructor(System) {
+		this.calc = new Calc();
+		this.ease = new Ease();
 
 		this.container = document.querySelector('.loader');
 		this.replayButton = document.querySelector('.replay-loader');
@@ -23,7 +27,7 @@ PL.Loader = class {
 
 		this.listen();
 		this.onResize();
-		this.setupSystem();
+		this.system = new System(this);
 
 		document.documentElement.classList.add('loading');
 		MainLoop
@@ -87,10 +91,6 @@ PL.Loader = class {
 			this.axisHelper = new PL.AxisHelper(500, 0.5);
 			this.scene.add(this.axisHelper);
 		}
-	}
-
-	setupSystem() {
-		this.system = new PL.System(this);
 	}
 
 	update() {
@@ -166,4 +166,6 @@ PL.Loader = class {
 
 }
 
-let loader = new PL.Loader();
+module.exports = Loader;
+
+//let loader = new PL.Loader();

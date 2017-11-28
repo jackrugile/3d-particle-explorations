@@ -8,6 +8,8 @@
 - [ ] refactor and clean up for #8
 - [ ] Spin individual noise particles while spinning
 - [ ] stick with BEM style
+- [ ] setup process for es6 processing?
+- [ ] optimize geometry and material usage (especially on lines)
 
 #### THEMES
 

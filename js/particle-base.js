@@ -1,4 +1,4 @@
-PL.ParticleBase = class {
+class ParticleBase {
 
 	constructor(config, system, loader) {
 		this.system = system;
@@ -45,3 +45,5 @@ PL.ParticleBase = class {
 	}
 
 }
+
+module.exports = ParticleBase;

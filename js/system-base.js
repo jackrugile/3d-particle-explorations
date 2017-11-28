@@ -1,4 +1,4 @@
-PL.SystemBase = class {
+class SystemBase {
 
 	constructor(loader) {
 		this.loader = loader;
@@ -69,3 +69,5 @@ PL.SystemBase = class {
 	}
 
 }
+
+module.exports = SystemBase;

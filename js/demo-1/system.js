@@ -1,4 +1,7 @@
-PL.System = class extends PL.SystemBase {
+const SystemBase = require('../system-base');
+const Particle = require('./particle');
+
+class System extends SystemBase {
 
 	constructor(loader) {
 		super(loader);
@@ -18,7 +21,7 @@ PL.System = class extends PL.SystemBase {
 				let z = 0;
 				let size = this.calc.map(i, 0, this.rings, 0.2, 0.05);
 
-				this.particles.push(new PL.Particle({
+				this.particles.push(new Particle({
 					group: this.particleGroup,
 					x: x,
 					y: y,
@@ -44,3 +47,5 @@ PL.System = class extends PL.SystemBase {
 	}
 
 }
+
+module.exports = System;

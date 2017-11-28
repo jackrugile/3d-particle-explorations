@@ -1,4 +1,4 @@
-PL.Line = class {
+class Line {
 
 	constructor(config, system, loader) {
 		this.loader = loader;
@@ -74,3 +74,5 @@ PL.Line = class {
 	}
 
 }
+
+module.exports = Line;

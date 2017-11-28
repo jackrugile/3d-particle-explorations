@@ -1,4 +1,4 @@
-PL.Ease = class {
+class Ease {
 
 	/*
 	------------------------------------------
@@ -488,3 +488,5 @@ PL.Ease = class {
 	}
 
 }
+
+module.exports = Ease;

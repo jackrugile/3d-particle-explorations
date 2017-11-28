@@ -1,4 +1,8 @@
-PL.System = class extends PL.SystemBase {
+const SystemBase = require('../system-base');
+const Particle = require('./particle');
+const Osc = require('../utils/osc');
+
+class System extends SystemBase {
 
 	constructor(loader) {
 		super(loader);
@@ -7,7 +11,7 @@ PL.System = class extends PL.SystemBase {
 
 		//this.duration = 3500;
 
-		this.osc1 = new PL.Osc(0, 0.02, true, false);
+		this.osc1 = new Osc(0, 0.02, true, false);
 		this.color = new THREE.Color();
 
 		//this.texture = new THREE.TextureLoader().load('/images/circle.png');
@@ -209,3 +213,5 @@ PL.System = class extends PL.SystemBase {
 	}
 
 }
+
+module.exports = System;

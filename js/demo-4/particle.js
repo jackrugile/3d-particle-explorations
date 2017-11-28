@@ -1,18 +1,20 @@
-PL.Particle = class extends PL.ParticleBase {
+const ParticleBase = require('../particle-base');
+
+class Particle extends ParticleBase {
 
 	constructor(config, system, loader) {
 		super(config, system, loader);
 
-		this.system = system;
-		this.loader = loader;
-		this.calc = new PL.Calc();
-		this.group = config.group;
+		// this.system = system;
+		// this.loader = loader;
+		// this.calc = new PL.Calc();
+		// this.group = config.group;
 
-		this.size = config.size;
+		//this.size = config.size;
 		this.radius = config.radius;
 		this.prog = config.prog;
 		this.alt = config.alt;
-		this.opacity = config.opacity;
+		//this.opacity = config.opacity;
 		this.opacityBase = config.opacity;
 	}
 
@@ -38,3 +40,5 @@ PL.Particle = class extends PL.ParticleBase {
 	}
 
 }
+
+module.exports = Particle;
