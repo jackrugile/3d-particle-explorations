@@ -95,8 +95,8 @@ body {
 	--color-link: #fff;
 	--color-link-hover: #fff;
 	--color-info: #fff;
-	--color-top-right: #333;
-	--color-bottom-left: #000;
+	--color-top-right: purple;
+	--color-bottom-left: darkblue;
 }
 
 .completed .demo-5 {
@@ -134,13 +134,13 @@ body {
 }
 
 .demo-8 {
-	--color-text: #333;
-	--color-bg: #fff;
-	--color-link: #333;
-	--color-link-hover: #333;
-	--color-info: #333;
-	--color-top-right: limegreen;
-	--color-bottom-left: cyan;
+	--color-text: #fff;
+	--color-bg: #111;
+	--color-link: #fff;
+	--color-link-hover: #fff;
+	--color-info: #fff;
+	--color-top-right: #222;
+	--color-bottom-left: #000;
 }
 
 .completed .demo-8 {

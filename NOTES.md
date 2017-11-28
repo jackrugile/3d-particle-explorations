@@ -1,10 +1,11 @@
 #### WORKING
 
-- [ ] finish animation parts of other demos, that's most important
 - [ ] document code
 - [ ] add 3d rotations and force perspective more to drive 3d feel more
 - [ ] make load times longer to show animation more
 - [ ] shit is still showing when I go to replay...
+- [ ] preload images for #8
+- [ ] refactor and clean up for #8
 
 #### THEMES
 
@@ -12,28 +13,24 @@
 - [x] #2 - simplex noise line
 - [x] #3 - bubble separator
 - [x] #4 - double helix
-- [x] #5 - ***
+- [ ] #5 - grid
 - [x] #6 - spinning orbitals
-- [x] #7 - ***
-- [x] #8 - ***
+- [ ] #7 - ***
+- [x] #8 - simplex noise flow
 
 - [ ] ripple
 - [ ] grid
-- [ ] chaos/noise
 - [ ] accelerator
 - [ ] eclipse
 - [ ] starfield
 - [ ] planets orbiting (space)
 - [ ] wanderers
 - [ ] audio levels / equalizer
+- [ ] 10x10 grid with lines going through it in a burst almost electrical looking
 
-10x10 grid with lines going through it in a burst almost electrical looking
 
-use more performant buffer shit?
-
-turn number 1 into buffer access mode as a test
-
-preload images
+grid simplex wave
+grid with line jolts going through
 
 #### EXITS
 
@@ -52,4 +49,3 @@ preload images
 - [ ] handle unfocused tab and timing
 - [ ] handle memory clean up and stopping
 - [ ] lines are flashing on demo 4, double helix, get stacking order correct
-- [ ] entrance animation scale
