@@ -134,13 +134,20 @@ body {
 }
 
 .demo-8 {
-	--color-text: #333333;
-	--color-bg: #333333;
-	--color-link: #333333;
-	--color-link-hover: #ffffff;
-	--color-info: #333333;
-	--color-top-right: #333;
-	--color-bottom-left: #000;
+	--color-text: #333;
+	--color-bg: #fff;
+	--color-link: #333;
+	--color-link-hover: #333;
+	--color-info: #333;
+	--color-top-right: limegreen;
+	--color-bottom-left: cyan;
+}
+
+.completed .demo-8 {
+	--color-text: #333;
+	--color-link: #333;
+	--color-link-hover: #333;
+	--color-info: #333;
 }
 
 /* Fade effect */

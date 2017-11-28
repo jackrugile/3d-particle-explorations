@@ -1,9 +1,6 @@
 #### WORKING
 
 - [ ] finish animation parts of other demos, that's most important
-- [ ] setup replay loader button
-- [ ] responsive content working on mobile (seeing background color, width with scrollbars)
-- [ ] auto count down of loader?
 - [ ] document code
 - [ ] add 3d rotations and force perspective more to drive 3d feel more
 - [ ] make load times longer to show animation more
@@ -28,14 +25,15 @@
 - [ ] starfield
 - [ ] planets orbiting (space)
 - [ ] wanderers
-- [ ] game of life
-- [ ] HITS of simplex noise (actual noise), then settle back down to zero
 - [ ] audio levels / equalizer
-- [ ] exploded noise in x, y, z space (like white particles on black demo)
 
 10x10 grid with lines going through it in a burst almost electrical looking
 
 use more performant buffer shit?
+
+turn number 1 into buffer access mode as a test
+
+preload images
 
 #### EXITS
 
@@ -55,4 +53,3 @@ use more performant buffer shit?
 - [ ] handle memory clean up and stopping
 - [ ] lines are flashing on demo 4, double helix, get stacking order correct
 - [ ] entrance animation scale
-- [ ] weird issue on replay, sometimes ends fast

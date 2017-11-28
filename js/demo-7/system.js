@@ -28,7 +28,7 @@ PL.System = class extends PL.SystemBase {
 		this.geometry.addAttribute('size', new THREE.BufferAttribute(this.sizes, 1));
 
 		for(let i = 0; i < this.count; i++) {
-			let size = this.calc.rand(0.05, 0.6);
+			let size = this.calc.rand(0.1, 0.8);
 			this.objs.push({
 				offset: 0,
 				pos: new THREE.Vector3(
@@ -164,9 +164,9 @@ PL.System = class extends PL.SystemBase {
 				100 + noiseTime
 			) * 0.5 + 0.5;
 
-			obj.pos.x += Math.sin(noise1 * Math.PI * 2) * noiseVel;
-			obj.pos.y += Math.sin(noise2 * Math.PI * 2) * noiseVel;
-			obj.pos.z += Math.sin(noise3 * Math.PI * 2) * noiseVel;
+			obj.pos.x += Math.sin(noise1 * Math.PI * 2) * noiseVel * this.loader.dtN;
+			obj.pos.y += Math.sin(noise2 * Math.PI * 2) * noiseVel * this.loader.dtN;
+			obj.pos.z += Math.sin(noise3 * Math.PI * 2) * noiseVel * this.loader.dtN;
 
 			if(obj.life > 0 ) {
 				obj.life -= obj.decay * this.osc1.val(this.ease.inOutExpo);
