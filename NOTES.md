@@ -6,6 +6,8 @@
 - [ ] shit is still showing when I go to replay...
 - [ ] preload images for #8
 - [ ] refactor and clean up for #8
+- [ ] Spin individual noise particles while spinning
+- [ ] stick with BEM style
 
 #### THEMES
 
