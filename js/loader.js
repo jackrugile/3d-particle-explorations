@@ -167,5 +167,3 @@ class Loader {
 }
 
 module.exports = Loader;
-
-//let loader = new PL.Loader();
