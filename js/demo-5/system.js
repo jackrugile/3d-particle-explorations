@@ -11,7 +11,7 @@ class System extends SystemBase {
 		this.simplex = new SimplexNoise();
 
 		//this.duration = 3500;
-		this.size = 35;
+		this.size = 30;
 		this.cols = 25;
 		this.rows = 25;
 
@@ -30,15 +30,15 @@ class System extends SystemBase {
 					x: x,
 					y: y,
 					z: z,
-					size: 1,
+					size: 0.01,
 					color: 0xffffff,
-					opacity: 1
+					opacity: 0.01
 				}, this, this.loader));
 			}
 		}
 
-		//this.particleGroup.rotation.x = Math.PI * -0.4;
-		//this.particleGroup.rotation.z = Math.PI / 4;
+		this.particleGroup.rotation.x = Math.PI * -0.4;
+		this.particleGroup.rotation.z = Math.PI * 0.25;
 	}
 
 	createDrop() {
@@ -81,7 +81,7 @@ class System extends SystemBase {
 	update() {
 		super.update();
 
-		if(this.tick % 10 === 0) {
+		if(this.tick % 20 === 0) {
 			this.createDrop();
 		}
 
@@ -101,7 +101,7 @@ class System extends SystemBase {
 			}
 		}
 
-		this.particleGroup.rotation.z += 0.005;
+		//this.particleGroup.rotation.z += 0.005;
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;

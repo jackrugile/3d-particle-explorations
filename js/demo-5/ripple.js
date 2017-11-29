@@ -10,9 +10,9 @@ class Ripple {
 		this.array = config.array;
 		this.group = config.group;
 		this.sphere = new THREE.Sphere(new THREE.Vector3(config.x, config.y, config.z), 0);
-		this.strength = this.calc.rand(8, 8);
-		this.threshold = this.calc.rand(2, 8);
-		this.growth = this.calc.rand(0.3, 0.3);
+		this.strength = this.calc.rand(4, 8);
+		this.threshold = this.calc.rand(4, 8);
+		this.growth = this.calc.rand(0.1, 0.3);
 		this.life = 1;
 		this.decay = this.calc.rand(0.01, 0.02);
 		this.influence = new THREE.Vector3();
@@ -53,9 +53,10 @@ class Ripple {
 		this.life -= this.decay;
 
 		// CIRCLE
+		this.mesh.position.z = (1 - this.life) * -2;
 		let newScale = 0.001 + this.sphere.radius;
 		this.mesh.scale.set(newScale, newScale, newScale);
-		this.mesh.material.opacity = this.life / 3;
+		this.mesh.material.opacity = this.life / 4;
 
 		if(this.life <= 0) {
 			this.destroy(i);

@@ -21,7 +21,7 @@ class Drop {
 		this.baseZ = config.z;
 
 		this.prog = 0;
-		this.rate = 0.02;
+		this.rate = 0.015;
 
 		this.createMesh();
 	}
