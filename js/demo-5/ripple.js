@@ -20,6 +20,7 @@ class Ripple {
 		// CIRCLE
 		this.geometry = new THREE.CircleGeometry(1, 36);
 		this.geometry.vertices.shift();
+		this.geometry.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI / 2));
 
 		this.material = new THREE.LineBasicMaterial({
 			color: 0xffffff,
@@ -30,8 +31,8 @@ class Ripple {
 		});
 		this.mesh = new THREE.LineLoop(this.geometry, this.material);
 		this.mesh.position.x = this.sphere.center.x;
-		this.mesh.position.y = this.sphere.center.y;
-		this.mesh.position.z = 0;
+		this.mesh.position.y = 0;
+		this.mesh.position.z = this.sphere.center.z;
 		this.group.add(this.mesh);
 	}
 
@@ -53,7 +54,7 @@ class Ripple {
 		this.life -= this.decay;
 
 		// CIRCLE
-		this.mesh.position.z = (1 - this.life) * -2;
+		this.mesh.position.y = (1 - this.life) * -2;
 		let newScale = 0.001 + this.sphere.radius;
 		this.mesh.scale.set(newScale, newScale, newScale);
 		this.mesh.material.opacity = this.life / 4;

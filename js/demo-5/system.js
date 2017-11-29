@@ -11,7 +11,7 @@ class System extends SystemBase {
 		this.simplex = new SimplexNoise();
 
 		//this.duration = 3500;
-		this.size = 30;
+		this.size = 35;
 		this.cols = 25;
 		this.rows = 25;
 
@@ -19,11 +19,16 @@ class System extends SystemBase {
 		this.ripples = [];
 		this.tick = 0;
 
+		if(!this.grid) {
+			this.loader.camera.position.y = 20;
+			this.loader.camera.lookAt(new THREE.Vector3());
+		}
+
 		for(let col = 0; col < this.cols; col++) {
 			for(let row = 0; row < this.rows; row++) {
 				let x = this.calc.map(col, 0, this.cols - 1, -this.size / 2, this.size / 2);
-				let y = this.calc.map(row, 0, this.rows - 1, -this.size / 2, this.size / 2);
-				let z = 0;
+				let y = 0;
+				let z = this.calc.map(row, 0, this.rows - 1, -this.size / 2, this.size / 2);
 
 				this.particles.push(new Particle({
 					group: this.particleGroup,
@@ -37,8 +42,8 @@ class System extends SystemBase {
 			}
 		}
 
-		this.particleGroup.rotation.x = Math.PI * -0.4;
-		this.particleGroup.rotation.z = Math.PI * 0.25;
+		//this.particleGroup.rotation.x = Math.PI * -0.4;
+		//this.particleGroup.rotation.z = Math.PI * 0.25;
 	}
 
 	createDrop() {
@@ -46,8 +51,8 @@ class System extends SystemBase {
 			array: this.drops,
 			group: this.particleGroup,
 			x: this.calc.rand(-this.size / 2, this.size / 2),
-			y: this.calc.rand(-this.size / 2, this.size / 2),
-			z: this.calc.rand(15, 20),
+			y: this.calc.rand(15, 20),
+			z: this.calc.rand(-this.size / 2, this.size / 2),
 			size: 0.1,
 			color: 0xffffff,
 			opacity: 0
@@ -61,13 +66,13 @@ class System extends SystemBase {
 		}
 	}
 
-	createRipple(x, y) {
+	createRipple(x, z) {
 		this.ripples.push(new Ripple({
 			array: this.ripples,
 			group: this.particleGroup,
 			x: x,
-			y: y,
-			z: -0.1
+			y: -0.1,
+			z: z
 		}, this, this.loader));
 	}
 
@@ -96,12 +101,15 @@ class System extends SystemBase {
 				let ripple = this.ripples[j];
 				let influence = ripple.getInfluenceVector(particle.base);
 				influence.setX(0);
-				influence.setY(0);
+				influence.setZ(0);
 				particle.velocity.add(influence);
 			}
 		}
 
-		//this.particleGroup.rotation.z += 0.005;
+		// this.particleGroup.rotation.y = this.loader.elapsedMs * 0.00025;
+
+		this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMs * 0.0005) * 0.1;
+		this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMs * 0.0005) * -0.2;
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;

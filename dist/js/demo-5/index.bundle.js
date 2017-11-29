@@ -63,14 +63,14 @@ var Drop = function () {
 		value: function update(i) {
 			// ease
 			this.prog += this.rate;
-			this.mesh.position.z = this.baseZ - this.ease.inExpo(this.prog, 0, 1, 1) * this.baseZ;
-			this.mesh.scale.set(this.size, this.size, this.size + this.size * 16 * this.ease.inExpo(this.prog, 0, 1, 1));
+			this.mesh.position.y = this.baseY - this.ease.inExpo(this.prog, 0, 1, 1) * this.baseY;
+			this.mesh.scale.set(this.size, this.size + this.size * 16 * this.ease.inExpo(this.prog, 0, 1, 1), this.size);
 			this.mesh.material.opacity = this.ease.inExpo(this.prog, 0, 1, 1);
 
 			if (this.prog > 1) {
 				this.array.splice(i, 1);
 				this.group.remove(this.mesh);
-				this.system.createRipple(this.mesh.position.x, this.mesh.position.y);
+				this.system.createRipple(this.mesh.position.x, this.mesh.position.z);
 			}
 		}
 	}]);
@@ -130,15 +130,15 @@ var Particle = function (_ParticleBase) {
 
 			// this.mesh.position.z = this.baseZ + offset;
 
-			var scale = 0.05 + Math.abs(this.velocity.z) / 30;
+			var scale = 0.05 + Math.abs(this.velocity.y) / 30;
 			this.mesh.scale.set(scale, scale, scale);
 
-			var opacity = 0.1 + Math.abs(this.velocity.z) / 2;
+			var opacity = 0.1 + Math.abs(this.velocity.y) / 2;
 			this.mesh.material.opacity = this.calc.clamp(opacity, 0.1, 1);
 
-			this.velocity.x += (this.base.x - this.mesh.position.x) * this.lerpFactor;
+			//this.velocity.x += (this.base.x - this.mesh.position.x) * this.lerpFactor;
 			this.velocity.y += (this.base.y - this.mesh.position.y) * this.lerpFactor;
-			this.velocity.z += (this.base.z - this.mesh.position.z) * this.lerpFactor;
+			//this.velocity.z += (this.base.z - this.mesh.position.z) * this.lerpFactor;
 			this.velocity.multiplyScalar(this.dampFactor);
 			this.mesh.position.add(this.velocity);
 		}
@@ -179,6 +179,7 @@ var Ripple = function () {
 		// CIRCLE
 		this.geometry = new THREE.CircleGeometry(1, 36);
 		this.geometry.vertices.shift();
+		this.geometry.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI / 2));
 
 		this.material = new THREE.LineBasicMaterial({
 			color: 0xffffff,
@@ -189,8 +190,8 @@ var Ripple = function () {
 		});
 		this.mesh = new THREE.LineLoop(this.geometry, this.material);
 		this.mesh.position.x = this.sphere.center.x;
-		this.mesh.position.y = this.sphere.center.y;
-		this.mesh.position.z = 0;
+		this.mesh.position.y = 0;
+		this.mesh.position.z = this.sphere.center.z;
 		this.group.add(this.mesh);
 	}
 
@@ -215,7 +216,7 @@ var Ripple = function () {
 			this.life -= this.decay;
 
 			// CIRCLE
-			this.mesh.position.z = (1 - this.life) * -2;
+			this.mesh.position.y = (1 - this.life) * -2;
 			var newScale = 0.001 + this.sphere.radius;
 			this.mesh.scale.set(newScale, newScale, newScale);
 			this.mesh.material.opacity = this.life / 4;
@@ -268,7 +269,7 @@ var System = function (_SystemBase) {
 		_this.simplex = new SimplexNoise();
 
 		//this.duration = 3500;
-		_this.size = 30;
+		_this.size = 35;
 		_this.cols = 25;
 		_this.rows = 25;
 
@@ -276,11 +277,16 @@ var System = function (_SystemBase) {
 		_this.ripples = [];
 		_this.tick = 0;
 
+		if (!_this.grid) {
+			_this.loader.camera.position.y = 20;
+			_this.loader.camera.lookAt(new THREE.Vector3());
+		}
+
 		for (var col = 0; col < _this.cols; col++) {
 			for (var row = 0; row < _this.rows; row++) {
 				var x = _this.calc.map(col, 0, _this.cols - 1, -_this.size / 2, _this.size / 2);
-				var y = _this.calc.map(row, 0, _this.rows - 1, -_this.size / 2, _this.size / 2);
-				var z = 0;
+				var y = 0;
+				var z = _this.calc.map(row, 0, _this.rows - 1, -_this.size / 2, _this.size / 2);
 
 				_this.particles.push(new Particle({
 					group: _this.particleGroup,
@@ -294,8 +300,8 @@ var System = function (_SystemBase) {
 			}
 		}
 
-		_this.particleGroup.rotation.x = Math.PI * -0.4;
-		_this.particleGroup.rotation.z = Math.PI * 0.25;
+		//this.particleGroup.rotation.x = Math.PI * -0.4;
+		//this.particleGroup.rotation.z = Math.PI * 0.25;
 		return _this;
 	}
 
@@ -306,8 +312,8 @@ var System = function (_SystemBase) {
 				array: this.drops,
 				group: this.particleGroup,
 				x: this.calc.rand(-this.size / 2, this.size / 2),
-				y: this.calc.rand(-this.size / 2, this.size / 2),
-				z: this.calc.rand(15, 20),
+				y: this.calc.rand(15, 20),
+				z: this.calc.rand(-this.size / 2, this.size / 2),
 				size: 0.1,
 				color: 0xffffff,
 				opacity: 0
@@ -323,13 +329,13 @@ var System = function (_SystemBase) {
 		}
 	}, {
 		key: 'createRipple',
-		value: function createRipple(x, y) {
+		value: function createRipple(x, z) {
 			this.ripples.push(new Ripple({
 				array: this.ripples,
 				group: this.particleGroup,
 				x: x,
-				y: y,
-				z: -0.1
+				y: -0.1,
+				z: z
 			}, this, this.loader));
 		}
 	}, {
@@ -360,12 +366,15 @@ var System = function (_SystemBase) {
 					var ripple = this.ripples[j];
 					var influence = ripple.getInfluenceVector(particle.base);
 					influence.setX(0);
-					influence.setY(0);
+					influence.setZ(0);
 					particle.velocity.add(influence);
 				}
 			}
 
-			//this.particleGroup.rotation.z += 0.005;
+			// this.particleGroup.rotation.y = this.loader.elapsedMs * 0.00025;
+
+			this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMs * 0.0005) * 0.1;
+			this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMs * 0.0005) * -0.2;
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;

@@ -23,15 +23,15 @@ class Particle extends ParticleBase {
 
 		// this.mesh.position.z = this.baseZ + offset;
 
-		let scale = 0.05 + (Math.abs(this.velocity.z) / 30)
+		let scale = 0.05 + (Math.abs(this.velocity.y) / 30)
 		this.mesh.scale.set(scale, scale, scale);
 
-		let opacity = 0.1 + (Math.abs(this.velocity.z) / 2)
+		let opacity = 0.1 + (Math.abs(this.velocity.y) / 2)
 		this.mesh.material.opacity = this.calc.clamp(opacity, 0.1, 1);
 
-		this.velocity.x += (this.base.x - this.mesh.position.x) * this.lerpFactor;
+		//this.velocity.x += (this.base.x - this.mesh.position.x) * this.lerpFactor;
 		this.velocity.y += (this.base.y - this.mesh.position.y) * this.lerpFactor;
-		this.velocity.z += (this.base.z - this.mesh.position.z) * this.lerpFactor;
+		//this.velocity.z += (this.base.z - this.mesh.position.z) * this.lerpFactor;
 		this.velocity.multiplyScalar(this.dampFactor);
 		this.mesh.position.add(this.velocity);
 	}
