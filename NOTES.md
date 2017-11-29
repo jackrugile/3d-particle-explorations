@@ -17,6 +17,7 @@
 - [ ] enter debug mode button
 - [ ] switch to uglified version when complete
 - [ ] setup water drops for #5
+- [ ] possibly use line, line-strip, or line loop to improve perf on lines
 
 #### THEMES
 

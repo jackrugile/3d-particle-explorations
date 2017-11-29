@@ -1,6 +1,7 @@
 const SystemBase = require('../system-base');
 const Particle = require('./particle');
 const Ripple = require('./ripple');
+const Drop = require('./drop');
 
 class System extends SystemBase {
 
@@ -10,10 +11,11 @@ class System extends SystemBase {
 		this.simplex = new SimplexNoise();
 
 		//this.duration = 3500;
-		this.size = 30;
-		this.cols = 30;
-		this.rows = 30;
+		this.size = 35;
+		this.cols = 25;
+		this.rows = 25;
 
+		this.drops = []
 		this.ripples = [];
 		this.tick = 0;
 
@@ -22,45 +24,68 @@ class System extends SystemBase {
 				let x = this.calc.map(col, 0, this.cols - 1, -this.size / 2, this.size / 2);
 				let y = this.calc.map(row, 0, this.rows - 1, -this.size / 2, this.size / 2);
 				let z = 0;
-				let size = this.calc.rand(0.02, 0.3);
-				size = 0.05;
 
 				this.particles.push(new Particle({
 					group: this.particleGroup,
 					x: x,
 					y: y,
 					z: z,
-					size: size,
+					size: 1,
 					color: 0xffffff,
-					opacity: this.calc.rand(0.1, 1)
+					opacity: 1
 				}, this, this.loader));
 			}
 		}
+
+		//this.particleGroup.rotation.x = Math.PI * -0.4;
+		//this.particleGroup.rotation.z = Math.PI / 4;
 	}
 
-	createRipple() {
-		this.ripples.push(new Ripple({
-			group: this.ripples,
+	createDrop() {
+		this.drops.push(new Drop({
+			array: this.drops,
+			group: this.particleGroup,
 			x: this.calc.rand(-this.size / 2, this.size / 2),
 			y: this.calc.rand(-this.size / 2, this.size / 2),
-			z: -1
+			z: this.calc.rand(15, 20),
+			size: 0.1,
+			color: 0xffffff,
+			opacity: 0
 		}, this, this.loader));
 	}
 
-	 updateRipples() {
+	updateDrops() {
+		let i = this.drops.length;
+		while(i--) {
+			this.drops[i].update(i);
+		}
+	}
+
+	createRipple(x, y) {
+		this.ripples.push(new Ripple({
+			array: this.ripples,
+			group: this.particleGroup,
+			x: x,
+			y: y,
+			z: -0.1
+		}, this, this.loader));
+	}
+
+	updateRipples() {
 		let i = this.ripples.length;
 		while(i--) {
-			this.ripples[i].update();
+			this.ripples[i].update(i);
 		}
 	}
 
 	update() {
 		super.update();
 
-		if(this.tick % 15 === 0) {
-			this.createRipple();
+		if(this.tick % 10 === 0) {
+			this.createDrop();
 		}
 
+		this.updateDrops();
 		this.updateRipples();
 
 		let i = this.particles.length;
@@ -76,7 +101,7 @@ class System extends SystemBase {
 			}
 		}
 
-		this.particleGroup.rotation.z = Math.PI / 4;
+		this.particleGroup.rotation.z += 0.005;
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;

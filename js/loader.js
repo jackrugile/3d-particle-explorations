@@ -22,9 +22,11 @@ class Loader {
 		this.debugHash += this.isGrid ? 'grid' : '';
 		this.debugHash += this.isGridDark ? 'dark' : '';
 		this.debugHash += this.isOrbit ? 'orbit' : '';
-		[].slice.call(document.querySelectorAll('.demo')).forEach((elem, i, arr) => {
-			elem.setAttribute('href', `${elem.getAttribute('href')}#${this.debugHash}`);
-		});
+		if(this.debugHash) {
+			[].slice.call(document.querySelectorAll('.demo')).forEach((elem, i, arr) => {
+				elem.setAttribute('href', `${elem.getAttribute('href')}#${this.debugHash}`);
+			});
+		}
 
 		this.setupTime();
 		this.setupScene();

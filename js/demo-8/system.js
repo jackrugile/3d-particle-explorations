@@ -11,7 +11,7 @@ class System extends SystemBase {
 
 		//this.duration = 3500;
 
-		this.osc1 = new Osc(0, 0.02, true, false);
+		this.osc1 = new Osc(0, 0.015, true, false);
 		this.color = new THREE.Color();
 
 		//this.texture = new THREE.TextureLoader().load('/images/circle.png');
@@ -206,7 +206,7 @@ class System extends SystemBase {
 		this.updateSizes();
 		this.updateColors();
 
-		this.particleGroup.rotation.y += 0.003 + this.osc1.val(this.ease.inOutExpo) * 0.04;
+		this.particleGroup.rotation.y += 0.005 + this.osc1.val(this.ease.inOutExpo) * 0.04;
 		this.particleGroup.position.z = 5 - this.osc1.val(this.ease.inOutExpo) * 15;
 		//let scale = 1 - this.osc1.val(this.ease.inOutExpo) * 0.5;
 		//this.particleGroup.scale.set(scale, scale, scale);
