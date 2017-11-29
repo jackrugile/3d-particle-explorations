@@ -36,12 +36,13 @@ class System extends SystemBase {
 			}, this, this.loader));
 		}
 
+		let lineMaterial = new THREE.LineBasicMaterial({
+			color: 0xffffff,
+			opacity: 0.15,
+			transparent: true
+		});
+
 		for(let i = 0; i < this.count; i++) {
-			let lineMaterial = new THREE.LineBasicMaterial({
-				color: 0xffffff,
-				opacity: 0.15,
-				transparent: true
-			});
 			let lineGeometry = new THREE.Geometry();
 			lineGeometry.vertices.push(
 				new THREE.Vector3(),
@@ -73,7 +74,7 @@ class System extends SystemBase {
 			line.geometry.verticesNeedUpdate = true;
 		}
 
-		if(this.exiting && !this.loader.isOrbit) {
+		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 	}

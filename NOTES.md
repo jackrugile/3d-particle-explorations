@@ -6,10 +6,15 @@
 - [ ] shit is still showing when I go to replay...
 - [ ] preload images for #8
 - [ ] refactor and clean up for #8
-- [ ] Spin individual noise particles while spinning
+- [ ] Spin individual noise particles while spinning #8
+- [ ] move particles own class for #8
 - [ ] stick with BEM style
-- [ ] setup process for es6 processing?
-- [ ] optimize geometry and material usage (especially on lines)
+- [ ] optimize geometry and material usage (especially on lines) don't creae multiple when not needed
+- [ ] lines are flashing on demo 4, double helix, get stacking order correct
+- [ ] article write up
+- [ ] mention debug tools in article write up
+- [ ] find way to apply manual offset to Osc, so that hundreds don't have to be created
+- [ ] enter debug mode button
 
 #### THEMES
 
@@ -32,7 +37,7 @@
 - [ ] audio levels / equalizer
 - [ ] 10x10 grid with lines going through it in a burst almost electrical looking
 
-
+circuit board
 grid simplex wave
 grid with line jolts going through
 
@@ -52,4 +57,3 @@ grid with line jolts going through
 - [ ] handle viewport width changes, getting cut off now, how can we maintain this?
 - [ ] handle unfocused tab and timing
 - [ ] handle memory clean up and stopping
-- [ ] lines are flashing on demo 4, double helix, get stacking order correct

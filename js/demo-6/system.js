@@ -37,7 +37,7 @@ class System extends SystemBase {
 	update() {
 		super.update();
 
-		if(this.exiting && !this.loader.isOrbit) {
+		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 	}

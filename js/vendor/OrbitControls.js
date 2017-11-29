@@ -160,7 +160,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			spherical.makeSafe();
 
-
 			spherical.radius *= scale;
 
 			// restrict radius to be between desired limits
@@ -189,7 +188,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			}
 
-			scale = 1;
+			scale += (1 - scale) * scope.dampingFactor;
 			panOffset.set( 0, 0, 0 );
 
 			// update condition is:

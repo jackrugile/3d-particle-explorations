@@ -8,6 +8,7 @@ class SystemBase {
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
+
 		this.loader.scene.add(this.particleGroup);
 
 		this.entering = true;

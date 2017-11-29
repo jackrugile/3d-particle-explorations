@@ -131,7 +131,7 @@ class System extends SystemBase {
 
 		this.osc1.update();
 
-		// if(this.exiting && !this.loader.isOrbit) {
+		// if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 		// 	this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 		// }
 
@@ -194,7 +194,7 @@ class System extends SystemBase {
 
 			obj.a = obj.life > 1 ? 2 - obj.life : obj.life;
 
-			obj.size = this.calc.map(this.osc1.val(this.ease.inOutQuad), 0, 1, obj.baseSize * 6, obj.baseSize * 1);
+			obj.size = this.calc.map(this.osc1.val(this.ease.inOutExpo), 0, 1, obj.baseSize * 6, obj.baseSize * 1);
 
 			this.positions[i * 3 + 0] = obj.pos.x;
 			this.positions[i * 3 + 1] = obj.pos.y;

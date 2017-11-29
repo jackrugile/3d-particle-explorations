@@ -1,6 +1,6 @@
 const Calc = require('./utils/calc');
 const Ease = require('./utils/ease');
-const Axis = require('./utils/axis');
+const AxisHelper = require('./utils/axis');
 
 class Loader {
 
@@ -17,6 +17,14 @@ class Loader {
 		this.isGrid = location.hash.indexOf('grid') > 0;
 		this.isGridDark = location.hash.indexOf('dark') > 0
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
+
+		this.debugHash = '';
+		this.debugHash += this.isGrid ? 'grid' : '';
+		this.debugHash += this.isGridDark ? 'dark' : '';
+		this.debugHash += this.isOrbit ? 'orbit' : '';
+		[].slice.call(document.querySelectorAll('.demo')).forEach((elem, i, arr) => {
+			elem.setAttribute('href', `${elem.getAttribute('href')}#${this.debugHash}`);
+		});
 
 		this.setupTime();
 		this.setupScene();
@@ -50,15 +58,11 @@ class Loader {
 	}
 
 	setupCamera() {
-		// this.camera = new THREE.PerspectiveCamera(45, 0, 0.0001, 10000);
-		// this.camera.position.x = 0;
-		// this.camera.position.y = 0;
-		// this.camera.position.z = 100;
-
 		this.camera = new THREE.PerspectiveCamera(75, 0, 0.0001, 10000);
-		this.cameraBaseX = 0;
-		this.cameraBaseY = 0;
-		this.cameraBaseZ = 50;
+		this.cameraBaseX = this.isGrid ? -40 : 0;
+		this.cameraBaseY = this.isGrid ? 20 : 0;
+		this.cameraBaseZ = this.isGrid ? 40 : 50;
+
 		this.camera.position.x = this.cameraBaseX;
 		this.camera.position.y = this.cameraBaseY;
 		this.camera.position.z = this.cameraBaseZ;
@@ -69,6 +73,8 @@ class Loader {
 			alpha: true,
 			antialias: true
 		});
+		this.renderer.shadowMapEnabled = true;
+		this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
 		this.container.appendChild(this.renderer.domElement);
 	}
 
@@ -76,20 +82,23 @@ class Loader {
 		if(this.isOrbit) {
 			this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 			this.controls.enableDamping = true;
-			this.controls.dampingFactor = 0.1;
+			this.controls.dampingFactor = 0.25;
+			this.controls.enableKeys = false;
 		}
 	}
 
 	setupHelpers() {
 		if(this.isGrid) {
 			let color = this.isGridDark ? 0x000000 : 0xffffff
-			this.gridHelper = new THREE.GridHelper(1000, 100, color, color);
+			this.gridHelper = new THREE.GridHelper(300, 30, color, color);
 			this.gridHelper.material.transparent = true;
 			this.gridHelper.material.opacity = this.isGridDark ? 0.15 : 0.25;
 			this.scene.add(this.gridHelper);
 
-			this.axisHelper = new PL.AxisHelper(500, 0.5);
+			this.axisHelper = new AxisHelper(150, 0.5);
 			this.scene.add(this.axisHelper);
+
+			this.camera.lookAt(new THREE.Vector3());
 		}
 	}
 
@@ -138,7 +147,7 @@ class Loader {
 	}
 
 	complete() {
-		if(this.isOrbit) {
+		if(this.isOrbit || this.isGrid) {
 			return;
 		}
 		this.clock.stop();
@@ -151,11 +160,12 @@ class Loader {
 	onResize() {
 		this.width = window.innerWidth;
 		this.height = window.innerHeight;
+		this.dpr = window.devicePixelRatio > 1 ? 2 : 1
 
 		this.camera.aspect = this.width / this.height;
 		this.camera.updateProjectionMatrix();
 
-		this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setPixelRatio(this.dpr);
 		this.renderer.setSize(this.width, this.height);
 	}
 
