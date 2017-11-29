@@ -85,7 +85,6 @@ class Particle extends ParticleBase {
 		this.pMesh.position.y = Math.sin(this.angle) * this.radius;
 
 		this.cMesh.rotation.z = this.angle - (this.cAngle * (1-this.osc1.val(this.ease.inOutExpo)));
-
 	}
 
 }

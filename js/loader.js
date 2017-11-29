@@ -73,8 +73,6 @@ class Loader {
 			alpha: true,
 			antialias: true
 		});
-		this.renderer.shadowMapEnabled = true;
-		this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
 		this.container.appendChild(this.renderer.domElement);
 	}
 

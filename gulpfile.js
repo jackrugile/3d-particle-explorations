@@ -18,7 +18,7 @@ gulp.task('build', function(done) {
 				.transform('babelify', {presets: ['es2015']})
 				.bundle()
 				.pipe(source(entry))
-				.pipe(streamify(uglify()))
+				//.pipe(streamify(uglify()))
 				.pipe(rename({
 					extname: '.bundle.js'
 				}))

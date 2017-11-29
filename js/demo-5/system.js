@@ -1,6 +1,6 @@
 const SystemBase = require('../system-base');
 const Particle = require('./particle');
-const Line = require('./line');
+const Ripple = require('./ripple');
 
 class System extends SystemBase {
 
@@ -11,12 +11,11 @@ class System extends SystemBase {
 
 		//this.duration = 3500;
 		this.size = 30;
-		this.cols = 20;
-		this.rows = 20;
+		this.cols = 30;
+		this.rows = 30;
 
-		this.grid_lines = [];
-		this.grid_line_tick = 0;
-		this.grid_line_tick_max = this.calc.randInt(30, 60);
+		this.ripples = [];
+		this.tick = 0;
 
 		for(let col = 0; col < this.cols; col++) {
 			for(let row = 0; row < this.rows; row++) {
@@ -37,77 +36,53 @@ class System extends SystemBase {
 				}, this, this.loader));
 			}
 		}
-
-		//this.particleGroup.rotation.x = -Math.PI / 2;
-		//this.particleGroup.rotation.z = Math.PI / 4;
 	}
 
-	getAdjacentPoint(point) {
-		let _point = [point[0], point[1]];
-		if(Math.random() > 0.5) {
-			if(Math.random() > 0.5) {
-				_point[0] += 1;
-			} else {
-				_point[0] -= 1;
-			}
-		}
-		if(Math.random() > 0.5) {
-			_point[1] += 1;
-		}
-		_point[0] = this.calc.clamp(_point[0], 0, this.cols - 1);
-		_point[1] = this.calc.clamp(_point[1], 0, this.rows - 1);
-		return _point;
+	createRipple() {
+		this.ripples.push(new Ripple({
+			group: this.ripples,
+			x: this.calc.rand(-this.size / 2, this.size / 2),
+			y: this.calc.rand(-this.size / 2, this.size / 2),
+			z: -1
+		}, this, this.loader));
 	}
 
-	getGridLineSet(total) {
-		let _coords = [];
-		let _count = 1;
-		let _total = total;
-		_coords.push([this.calc.randInt(1, this.cols - 2), 0]);
-		let _adjPoint = this.getAdjacentPoint(_coords[_count - 1]);
-		while(_adjPoint[1] < this.cols - 1) {
-			_adjPoint = this.getAdjacentPoint(_coords[_count - 1]);
-			_coords.push(_adjPoint);
-			_count++;
+	 updateRipples() {
+		let i = this.ripples.length;
+		while(i--) {
+			this.ripples[i].update();
 		}
-		let _set = [];
-		for(let i = 0, length = _coords.length; i < length; i++) {
-			let _grid_particle = this.particles[this.calc.getIndexFromCoords(_coords[i][0], _coords[i][1], this.cols)];
-			_set.push(_grid_particle);
-		}
-		return _set;
 	}
 
 	update() {
 		super.update();
 
-		if(this.grid_line_tick >= this.grid_line_tick_max) {
-			this.grid_lines.push(new Line({
-					group: this.particleGroup,
-					points: this.getGridLineSet(30)
-				},
-				this.system,
-				this.loader
-			));
-			this.grid_line_tick = 0;
-			this.grid_line_tick_max = this.calc.randInt(30, 80);
+		if(this.tick % 15 === 0) {
+			this.createRipple();
 		}
 
-		let i = this.grid_lines.length;
+		this.updateRipples();
+
+		let i = this.particles.length;
 		while(i--) {
-			let _grid_line = this.grid_lines[i];
-			_grid_line.update();
-			if(_grid_line.removeFlag) {
-				this.particleGroup.remove(_grid_line.mesh);
-				this.grid_lines.splice(i, 1);
+			let j = this.ripples.length;
+			while(j--) {
+				let particle = this.particles[i];
+				let ripple = this.ripples[j];
+				let influence = ripple.getInfluenceVector(particle.base);
+				influence.setX(0);
+				influence.setY(0);
+				particle.velocity.add(influence);
 			}
 		}
 
-		this.grid_line_tick++;
+		this.particleGroup.rotation.z = Math.PI / 4;
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
+
+		this.tick++;
 	}
 
 }

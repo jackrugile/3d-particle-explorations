@@ -41,8 +41,7 @@ class ParticleBase {
 		this.group.add(this.mesh);
 	}
 
-	reset() {
-	}
+	reset() {}
 
 }
 

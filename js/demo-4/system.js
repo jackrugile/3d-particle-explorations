@@ -15,31 +15,32 @@ class System extends SystemBase {
 		for(let i = 0; i < this.count; i++) {
 			this.particles.push(new Particle({
 				group: this.particleGroup,
-				prog: i / this.count,
+				prog: i / (this.count - 1),
 				alt: false,
 				color: 0xffffff,
 				opacity: 1,
-				size: this.calc.map(i, 0, this.count, 0.1, 0.3),
+				size: 0.1,
 				radius: 4,
 			}, this, this.loader));
 
 			this.particles.push(new Particle({
 				group: this.particleGroup,
-				prog: i / this.count,
+				prog: i / (this.count - 1),
 				alt: true,
 				color: 0xffffff,
 				opacity: 1,
-				size: this.calc.map(i, 0, this.count, 0.3, 0.1),
+				size: 0.1,
 				radius: 4,
 			}, this, this.loader));
 		}
 
+		let lineMaterial = new THREE.LineBasicMaterial({
+			color: 0xffffff,
+			opacity: 0.5,
+			transparent: true
+		});
+
 		for(let i = 0; i < this.count; i++) {
-			let lineMaterial = new THREE.LineBasicMaterial({
-				color: 0xffffff,
-				opacity: 0.5,
-				transparent: true
-			});
 			let lineGeometry = new THREE.Geometry();
 			lineGeometry.vertices.push(
 				new THREE.Vector3(),

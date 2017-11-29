@@ -15,6 +15,8 @@
 - [ ] mention debug tools in article write up
 - [ ] find way to apply manual offset to Osc, so that hundreds don't have to be created
 - [ ] enter debug mode button
+- [ ] switch to uglified version when complete
+- [ ] setup water drops for #5
 
 #### THEMES
 
@@ -22,7 +24,7 @@
 - [x] #2 - simplex noise line
 - [x] #3 - bubble separator
 - [x] #4 - double helix
-- [ ] #5 - grid
+- [ ] #5 - grid water drops and ripples
 - [x] #6 - spinning orbitals
 - [ ] #7 - ***
 - [x] #8 - simplex noise flow
