@@ -28,7 +28,7 @@ class System extends SystemBase {
 				z: z,
 				size: size,
 				radius: radius,
-				color: 0xffffff,
+				color: 0x4e6131,
 				opacity: opacity
 			}, this, this.loader));
 		}

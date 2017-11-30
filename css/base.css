@@ -22,98 +22,98 @@ body {
 
 /* Color schemes */
 .demo-1 {
-	--color-text: #333;
+	--color-text: #fff;
 	--color-bg: #fff;
-	--color-link: #333;
-	--color-link-hover: #333;
-	--color-info: #333;
+	--color-link: #236554;
+	--color-link-hover: #fff;
+	--color-info: #236554;
 	--color-top-right: limegreen;
 	--color-bottom-left: cyan;
 }
 
 .completed .demo-1 {
-	--color-text: #333;
-	--color-link: #333;
-	--color-link-hover: #333;
-	--color-info: #333;
+	--color-text: #222;
+	--color-link: #222;
+	--color-link-hover: #222;
+	--color-info: #222;
 }
 
 .demo-2 {
-	--color-text: #333;
+	--color-text: #fff;
 	--color-bg: #fff;
-	--color-link: #333;
-	--color-link-hover: #333;
-	--color-info: #333;
+	--color-link: #56311e;
+	--color-link-hover: #fff;
+	--color-info: #56311e;
 	--color-top-right: red;
 	--color-bottom-left: orange;
 }
 
 .completed .demo-2 {
-	--color-text: #333;
-	--color-link: #333;
-	--color-link-hover: #333;
-	--color-info: #333;
+	--color-text: #222;
+	--color-link: #222;
+	--color-link-hover: #222;
+	--color-info: #222;
 }
 
 .demo-3 {
 	--color-text: #fff;
 	--color-bg: #fff;
-	--color-link: #fff;
+	--color-link: #391d5f;
 	--color-link-hover: #fff;
-	--color-info: #fff;
+	--color-info: #391d5f;
 	--color-top-right: blue;
 	--color-bottom-left: magenta;
 }
 
 .completed .demo-3 {
-	--color-text: #333;
-	--color-link: #333;
-	--color-link-hover: #333;
-	--color-info: #333;
+	--color-text: #222;
+	--color-link: #222;
+	--color-link-hover: #222;
+	--color-info: #222;
 }
 
 .demo-4 {
 	--color-text: #fff;
 	--color-bg: #fff;
-	--color-link: #fff;
+	--color-link: #711d55;
 	--color-link-hover: #fff;
-	--color-info: #fff;
+	--color-info: #711d55;
 	--color-top-right: magenta;
 	--color-bottom-left: red;
 }
 
 .completed .demo-4 {
-	--color-text: #333;
-	--color-link: #333;
-	--color-link-hover: #333;
-	--color-info: #333;
+	--color-text: #222;
+	--color-link: #222;
+	--color-link-hover: #222;
+	--color-info: #222;
 }
 
 .demo-5 {
 	--color-text: #fff;
 	--color-bg: #fff;
-	--color-link: #fff;
+	--color-link: #00bfff;
 	--color-link-hover: #fff;
-	--color-info: #fff;
-	--color-top-right: purple;
+	--color-info: #00bfff;
+	--color-top-right: #006f79;
 	--color-bottom-left: darkblue;
 }
 
 .completed .demo-5 {
-	--color-text: #333;
-	--color-link: #333;
-	--color-link-hover: #333;
-	--color-info: #333;
+	--color-text: #222;
+	--color-link: #222;
+	--color-link-hover: #222;
+	--color-info: #222;
 }
 
 .demo-6 {
 	--color-text: #fff;
-	--color-bg: #111;
-	--color-link: #fff;
+	--color-bg: #fff;
+	--color-link: #4e6131;
 	--color-link-hover: #fff;
-	--color-info: #fff;
-	--color-top-right: #333;
-	--color-bottom-left: #000;
+	--color-info: #4e6131;
+	--color-top-right: #ffff00;
+	--color-bottom-left: #00ff00;
 }
 
 .completed .demo-6 {
@@ -124,13 +124,13 @@ body {
 }
 
 .demo-7 {
-	--color-text: #fff;
-	--color-bg: #111;
-	--color-link: #fff;
-	--color-link-hover: #fff;
-	--color-info: #fff;
-	--color-top-right: #333;
-	--color-bottom-left: #000;
+	--color-text: #222;
+	--color-bg: #fff;
+	--color-link: #222;
+	--color-link-hover: #222;
+	--color-info: #222;
+	--color-top-right: #fff;
+	--color-bottom-left: #ccc;
 }
 
 .demo-8 {
@@ -144,10 +144,10 @@ body {
 }
 
 .completed .demo-8 {
-	--color-text: #333;
-	--color-link: #333;
-	--color-link-hover: #333;
-	--color-info: #333;
+	--color-text: #222;
+	--color-link: #222;
+	--color-link-hover: #222;
+	--color-info: #222;
 }
 
 /* Fade effect */
@@ -465,7 +465,7 @@ a.demo--current {
 		justify-self: end;
 	}
 	.demo {
-		box-shadow: inset 0 0 0 3px var(--color-link);
+		background: var(--color-link);
 		display: block;
 		width: 17px;
 		height: 17px;
@@ -473,7 +473,7 @@ a.demo--current {
 		border-radius: 50%;
 	}
 	a.demo--current {
-		background: var(--color-link);
+		background: var(--color-link-hover);
 	}
 	.demo span {
 		line-height: 1;

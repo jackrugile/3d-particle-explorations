@@ -25,12 +25,56 @@ var Particle = function (_ParticleBase) {
 	function Particle(config, system, loader) {
 		_classCallCheck(this, Particle);
 
-		return _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
+		var _this = _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
+
+		_this.baseX = config.x;
+		_this.baseY = config.y;
+		_this.baseZ = config.z;
+		_this.dummyVec = new THREE.Vector3();
+		_this.velocity = new THREE.Vector3();
+		return _this;
 	}
 
 	_createClass(Particle, [{
 		key: 'update',
-		value: function update() {}
+		value: function update() {
+			this.thresh = 5;
+			this.distance = this.mesh.position.distanceTo(this.system.wanderer.position);
+
+			this.scale = this.calc.map(this.distance, 0, this.thresh, this.size, 0.1);
+			this.scale = this.calc.clamp(this.scale, 0.1, this.size);
+			this.mesh.scale.set(this.scale, this.scale, this.scale);
+
+			this.opacity = this.calc.map(this.distance, 0, this.thresh, 1, 0.15);
+			this.opacity = this.calc.clamp(this.opacity, 0.15, 1);
+			this.mesh.material.opacity = this.opacity;
+
+			// this.pull = this.calc.map(this.distance, 0, this.thresh, 0.1, 0);
+			// this.pull = this.calc.clamp(this.pull, 0, 0.1);
+			// this.velocity.x += this.baseX + (this.system.wanderer.position.x - this.baseX) * this.pull;
+			// this.velocity.y += this.baseY + (this.system.wanderer.position.y - this.baseY) * this.pull;
+			// this.velocity.z += this.baseZ + (this.system.wanderer.position.z - this.baseZ) * this.pull;
+
+			if (this.distance <= this.thresh) {
+				this.velocity.x += (this.baseX - this.system.wanderer.position.x) * 0.25;
+				this.velocity.y += (this.baseY - this.system.wanderer.position.y) * 0.25;
+				this.velocity.z += (this.baseZ - this.system.wanderer.position.z) * 0.25;
+			} else {
+				this.velocity.x += (this.baseX - this.mesh.position.x) * 0.25;
+				this.velocity.y += (this.baseY - this.mesh.position.y) * 0.25;
+				this.velocity.z += (this.baseZ - this.mesh.position.z) * 0.25;
+			}
+			this.velocity.multiplyScalar(0.25);
+
+			this.mesh.position.add(this.velocity);
+
+			// this.velocity.x += (this.origin.x - this.position.x) * this.lerpFactor;
+			// this.velocity.y += (this.origin.y - this.position.y) * this.lerpFactor;
+			// this.velocity.z += (this.origin.z - this.position.z) * this.lerpFactor;
+			// this.velocity.multiplyScalar(this.dampFactor);
+			// OU.threeVec3.copy(this.velocity).multiplyScalar(OU.delta);
+			// this.position.add(OU.threeVec3);
+		}
 	}]);
 
 	return Particle;
@@ -60,13 +104,71 @@ var System = function (_SystemBase) {
 	function System(loader) {
 		_classCallCheck(this, System);
 
-		return _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
+		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
+
+		_this.count = 1200;
+		_this.size = 10;
+		_this.center = new THREE.Vector3();
+
+		for (var i = 0; i < _this.count; i++) {
+			var x = _this.calc.rand(-_this.size / 2, _this.size / 2);
+			var y = _this.calc.rand(-_this.size / 2, _this.size / 2);
+			var z = _this.calc.rand(-_this.size / 2, _this.size / 2);
+			var pos = new THREE.Vector3(x, y, z);
+			var color = 0x333333;
+			var size = 0.3;
+			var opacity = 1;
+			if (pos.distanceTo(_this.center) > _this.size / 2) {
+				continue;
+			}
+
+			_this.particles.push(new Particle({
+				group: _this.particleGroup,
+				x: x,
+				y: y,
+				z: z,
+				size: size,
+				color: color,
+				opacity: opacity
+			}, _this, _this.loader));
+		}
+
+		_this.wanderer = {
+			position: new THREE.Vector3(),
+			size: 1,
+			color: 0xffffff,
+			opacity: 1
+		};
+		_this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
+		_this.material = new THREE.MeshBasicMaterial({
+			color: _this.wanderer.color,
+			transparent: true,
+			opacity: _this.wanderer.opacity,
+			depthTest: false,
+			precision: 'lowp',
+			side: THREE.DoubleSide
+		});
+		_this.mesh = new THREE.Mesh(_this.geometry, _this.material);
+		_this.mesh.position.x = _this.wanderer.position.x;
+		_this.mesh.position.y = _this.wanderer.position.y;
+		_this.mesh.position.z = _this.wanderer.position.z;
+		_this.mesh.scale.set(_this.wanderer.size, _this.wanderer.size, _this.wanderer.size);
+		_this.particleGroup.add(_this.mesh);
+		return _this;
 	}
 
 	_createClass(System, [{
 		key: 'update',
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
+
+			this.wanderer.position.x = Math.cos(this.loader.elapsedMs * 0.0025) * this.size / -2;
+			this.wanderer.position.y = Math.sin(this.loader.elapsedMs * 0.0025) * this.size / 2;
+			this.wanderer.position.z = Math.sin(this.loader.elapsedMs * 0.0013) * this.size / 2;
+
+			this.mesh.position.x = this.wanderer.position.x;
+			this.mesh.position.y = this.wanderer.position.y;
+			this.mesh.position.z = this.wanderer.position.z;
 		}
 	}]);
 

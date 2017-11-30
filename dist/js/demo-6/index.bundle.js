@@ -64,7 +64,7 @@ var Particle = function (_ParticleBase) {
 			this.cMaterial = new THREE.LineBasicMaterial({
 				color: this.color,
 				transparent: true,
-				opacity: this.radius / this.system.outer * 0.25
+				opacity: this.radius / this.system.outer * 1
 			});
 
 			this.cMesh = new THREE.Line(this.cGeometry, this.cMaterial);
@@ -161,7 +161,7 @@ var System = function (_SystemBase) {
 				z: z,
 				size: size,
 				radius: radius,
-				color: 0xffffff,
+				color: 0x4e6131,
 				opacity: opacity
 			}, _this, _this.loader));
 		}

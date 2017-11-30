@@ -44,7 +44,7 @@ class Particle extends ParticleBase {
 		this.cMaterial = new THREE.LineBasicMaterial({
 			color: this.color,
 			transparent: true,
-			opacity: ((this.radius) / this.system.outer) * 0.25
+			opacity: ((this.radius) / this.system.outer) * 1
 		});
 
 		this.cMesh = new THREE.Line(this.cGeometry, this.cMaterial);

@@ -25,13 +25,11 @@
 - [x] #2 - simplex noise line
 - [x] #3 - bubble separator
 - [x] #4 - double helix
-- [ ] #5 - grid water drops and ripples
+- [x] #5 - grid water drops and ripples
 - [x] #6 - spinning orbitals
 - [ ] #7 - ***
 - [x] #8 - simplex noise flow
 
-- [ ] ripple
-- [ ] grid
 - [ ] accelerator
 - [ ] eclipse
 - [ ] starfield
@@ -39,10 +37,9 @@
 - [ ] wanderers
 - [ ] audio levels / equalizer
 - [ ] 10x10 grid with lines going through it in a burst almost electrical looking
-
-circuit board
-grid simplex wave
-grid with line jolts going through
+- [ ] circuit board
+- [ ] phyllotaxis
+- [ ] scatter grid, subtle magnet ball
 
 #### EXITS
 
