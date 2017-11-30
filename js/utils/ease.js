@@ -1,5 +1,9 @@
 class Ease {
 
+	constructor() {
+
+	}
+
 	/*
 	------------------------------------------
 	| inQuad:float - returns eased float value
@@ -431,60 +435,6 @@ class Ease {
 		if (s == undefined) s = 1.70158;
 		if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
 		return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
-	}
-
-	/*
-	------------------------------------------
-	| inBounce:float - returns eased float value
-	|
-	| t:number - current time
-	| b:number - beginning value
-	| c:number - change in value
-	| d:number - duration
-	|
-	| Get an eased float value based on outBounce.
-	------------------------------------------ */
-	inBounce(t, b, c, d) {
-		return c - this.outBounce (d-t, 0, c, d) + b;
-	}
-
-	/*
-	------------------------------------------
-	| outBounce:float - returns eased float value
-	|
-	| t:number - current time
-	| b:number - beginning value
-	| c:number - change in value
-	| d:number - duration
-	|
-	| Get an eased float value based on outBounce.
-	------------------------------------------ */
-	outBounce(t, b, c, d) {
-		if ((t/=d) < (1/2.75)) {
-			return c*(7.5625*t*t) + b;
-		} else if (t < (2/2.75)) {
-			return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
-		} else if (t < (2.5/2.75)) {
-			return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
-		} else {
-			return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
-		}
-	}
-
-	/*
-	------------------------------------------
-	| inOutBounce:float - returns eased float value
-	|
-	| t:number - current time
-	| b:number - beginning value
-	| c:number - change in value
-	| d:number - duration
-	|
-	| Get an eased float value based on inOutBounce.
-	------------------------------------------ */
-	inOutBounce(t, b, c, d) {
-		if (t < d/2) return this.inBounce (t*2, 0, c, d) * .5 + b;
-		return this.outBounce (t*2-d, 0, c, d) * .5 + c*.5 + b;
 	}
 
 }

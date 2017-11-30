@@ -1,71 +1,189 @@
 const SystemBase = require('../system-base');
 const Particle = require('./particle');
+const Osc = require('../utils/osc');
 
 class System extends SystemBase {
 
 	constructor(loader) {
 		super(loader);
 
-		this.count = 1200;
-		this.size = 10;
-		this.center = new THREE.Vector3();
+		this.count = 15;
+		this.spread = 20;
+		this.osc1 = new Osc(0, 0.015, true, false);
+
+		this.particleGroup.rotation.z = Math.PI / 4;
+
+		//this.particleGroup.rotation.x = 0;
+		this.rotationTarget = Math.PI / 4;
 
 		for(let i = 0; i < this.count; i++) {
-			let x = this.calc.rand(-this.size / 2, this.size / 2);
-			let y = this.calc.rand(-this.size / 2, this.size / 2);
-			let z = this.calc.rand(-this.size / 2, this.size / 2);
+			let x = this.calc.map(i, 0, this.count - 1, -this.spread / 2, this.spread / 2);
+			let y = 0;
+			let z = 0;
 			let pos = new THREE.Vector3(x, y, z);
-			let color = 0x333333;
+			let color = 0x222222;
 			let size = 0.3;
 			let opacity = 1;
-			if(pos.distanceTo(this.center) > this.size / 2) {
-				continue;
-			}
+
+			color = 0xff00ff;
 
 			this.particles.push(new Particle({
 				group: this.particleGroup,
+				offset: 0,
 				x: x,
 				y: y,
 				z: z,
 				size: size,
 				color: color,
-				opacity: opacity
+				opacity: opacity,
+				prog: i / (this.count - 1),
+				alt: 0
+			}, this, this.loader));
+
+			this.particles.push(new Particle({
+				group: this.particleGroup,
+				offset: 0,
+				x: y,
+				y: x,
+				z: z,
+				size: size,
+				color: color,
+				opacity: opacity,
+				prog: i / (this.count - 1),
+				alt: 1
 			}, this, this.loader));
 		}
 
-		this.wanderer = {
-			position: new THREE.Vector3(),
-			size: 1,
-			color: 0xffffff,
-			opacity: 1
-		};
-		this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
-		this.material = new THREE.MeshBasicMaterial({
-			color: this.wanderer.color,
-			transparent: true,
-			opacity: this.wanderer.opacity,
-			depthTest: false,
-			precision: 'lowp',
-			side: THREE.DoubleSide
-		});
-		this.mesh = new THREE.Mesh(this.geometry, this.material);
-		this.mesh.position.x = this.wanderer.position.x;
-		this.mesh.position.y = this.wanderer.position.y;
-		this.mesh.position.z = this.wanderer.position.z;
-		this.mesh.scale.set(this.wanderer.size, this.wanderer.size, this.wanderer.size);
-		this.particleGroup.add(this.mesh);
+		for(let i = 0; i < this.count; i++) {
+			let x = this.calc.map(i, 0, this.count - 1, -this.spread / 2, this.spread / 2);
+			let y = 0;
+			let z = 0;
+			let pos = new THREE.Vector3(x, y, z);
+			let color = 0x222222;
+			let size = 0.3;
+			let opacity = 1;
+
+			color = 0xff0000;
+
+			this.particles.push(new Particle({
+				group: this.particleGroup,
+				offset: 0.05,
+				x: x,
+				y: y,
+				z: z,
+				size: size,
+				color: color,
+				opacity: opacity,
+				prog: i / (this.count - 1),
+				alt: 0
+			}, this, this.loader));
+
+			this.particles.push(new Particle({
+				group: this.particleGroup,
+				offset: 0.05,
+				x: y,
+				y: x,
+				z: z,
+				size: size,
+				color: color,
+				opacity: opacity,
+				prog: i / (this.count - 1),
+				alt: 1
+			}, this, this.loader));
+		}
+
+		for(let i = 0; i < this.count; i++) {
+			let x = this.calc.map(i, 0, this.count - 1, -this.spread / 2, this.spread / 2);
+			let y = 0;
+			let z = 0;
+			let pos = new THREE.Vector3(x, y, z);
+			let color = 0x222222;
+			let size = 0.3;
+			let opacity = 1;
+
+			color = 0x00ff00;
+
+			this.particles.push(new Particle({
+				group: this.particleGroup,
+				offset: 0.1,
+				x: x,
+				y: y,
+				z: z,
+				size: size,
+				color: color,
+				opacity: opacity,
+				prog: i / (this.count - 1),
+				alt: 0
+			}, this, this.loader));
+
+			this.particles.push(new Particle({
+				group: this.particleGroup,
+				offset: 0.1,
+				x: y,
+				y: x,
+				z: z,
+				size: size,
+				color: color,
+				opacity: opacity,
+				prog: i / (this.count - 1),
+				alt: 1
+			}, this, this.loader));
+		}
+
+		for(let i = 0; i < this.count; i++) {
+			let x = this.calc.map(i, 0, this.count - 1, -this.spread / 2, this.spread / 2);
+			let y = 0;
+			let z = 0;
+			let pos = new THREE.Vector3(x, y, z);
+			let color = 0x222222;
+			let size = 0.3;
+			let opacity = 1;
+
+			color = 0x0000ff;
+
+			this.particles.push(new Particle({
+				group: this.particleGroup,
+				offset: 0.15,
+				x: x,
+				y: y,
+				z: z,
+				size: size,
+				color: color,
+				opacity: opacity,
+				prog: i / (this.count - 1),
+				alt: 0
+			}, this, this.loader));
+
+			this.particles.push(new Particle({
+				group: this.particleGroup,
+				offset: 0.15,
+				x: y,
+				y: x,
+				z: z,
+				size: size,
+				color: color,
+				opacity: opacity,
+				prog: i / (this.count - 1),
+				alt: 1
+			}, this, this.loader));
+		}
 	}
 
 	update() {
 		super.update();
 
-		this.wanderer.position.x = Math.cos(this.loader.elapsedMs * 0.0025) * this.size / -2;
-		this.wanderer.position.y = Math.sin(this.loader.elapsedMs * 0.0025) * this.size / 2;
-		this.wanderer.position.z = Math.sin(this.loader.elapsedMs * 0.0013) * this.size / 2;
+		this.osc1.update();
 
-		this.mesh.position.x = this.wanderer.position.x;
-		this.mesh.position.y = this.wanderer.position.y;
-		this.mesh.position.z = this.wanderer.position.z;
+		if(this.osc1._triggerBot) {
+			this.rotationTarget += Math.PI / -4;
+		}
+
+		this.particleGroup.rotation.z = Math.PI / 4 + Math.sin(this.loader.elapsedMs * 0.001) * Math.PI / 4
+
+		//this.particleGroup.rotation.z += (this.rotationTarget - this.particleGroup.rotation.z) * 0.1;
+
+		// SHOW LINES?
+
 	}
 
 }

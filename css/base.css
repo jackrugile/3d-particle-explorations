@@ -124,13 +124,13 @@ body {
 }
 
 .demo-7 {
-	--color-text: #222;
-	--color-bg: #fff;
-	--color-link: #222;
-	--color-link-hover: #222;
-	--color-info: #222;
-	--color-top-right: #fff;
-	--color-bottom-left: #ccc;
+	--color-text: #fff;
+	--color-bg: #111;
+	--color-link: #fff;
+	--color-link-hover: #fff;
+	--color-info: #fff;
+	--color-top-right: #222;
+	--color-bottom-left: #000;
 }
 
 .demo-8 {

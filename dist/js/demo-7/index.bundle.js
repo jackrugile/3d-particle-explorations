@@ -18,6 +18,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ParticleBase = require('../particle-base');
+var Osc = require('../utils/osc');
 
 var Particle = function (_ParticleBase) {
 	_inherits(Particle, _ParticleBase);
@@ -30,50 +31,79 @@ var Particle = function (_ParticleBase) {
 		_this.baseX = config.x;
 		_this.baseY = config.y;
 		_this.baseZ = config.z;
-		_this.dummyVec = new THREE.Vector3();
-		_this.velocity = new THREE.Vector3();
+
+		_this.lastX = config.x;
+		_this.lastY = config.y;
+		_this.lastZ = config.z;
+
+		_this.prog = config.prog;
+		_this.alt = config.alt;
+		_this.offset = config.offset;
+
+		if (_this.alt) {
+			_this.osc1 = new Osc(_this.prog * 0.75 + _this.offset, 0.015, true, false);
+		} else {
+			_this.osc1 = new Osc(_this.prog * 0.75 + _this.offset, 0.015, true, false);
+		}
 		return _this;
 	}
 
 	_createClass(Particle, [{
+		key: 'createMesh',
+		value: function createMesh() {
+			this.geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+
+			this.material = new THREE.MeshBasicMaterial({
+				blending: THREE.AdditiveBlending,
+				color: this.color,
+				transparent: true,
+				opacity: this.opacity,
+				depthTest: false,
+				precision: 'lowp',
+				side: THREE.DoubleSide
+			});
+
+			this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+			this.mesh.position.x = this.x;
+			this.mesh.position.y = this.y;
+			this.mesh.position.z = this.z;
+
+			this.mesh.scale.set(this.size, this.size, this.size);
+
+			this.group.add(this.mesh);
+		}
+	}, {
 		key: 'update',
 		value: function update() {
-			this.thresh = 5;
-			this.distance = this.mesh.position.distanceTo(this.system.wanderer.position);
+			this.osc1.update();
 
-			this.scale = this.calc.map(this.distance, 0, this.thresh, this.size, 0.1);
-			this.scale = this.calc.clamp(this.scale, 0.1, this.size);
-			this.mesh.scale.set(this.scale, this.scale, this.scale);
+			var val1 = void 0;
+			var val2 = void 0;
+			var val3 = void 0;
 
-			this.opacity = this.calc.map(this.distance, 0, this.thresh, 1, 0.15);
-			this.opacity = this.calc.clamp(this.opacity, 0.15, 1);
-			this.mesh.material.opacity = this.opacity;
-
-			// this.pull = this.calc.map(this.distance, 0, this.thresh, 0.1, 0);
-			// this.pull = this.calc.clamp(this.pull, 0, 0.1);
-			// this.velocity.x += this.baseX + (this.system.wanderer.position.x - this.baseX) * this.pull;
-			// this.velocity.y += this.baseY + (this.system.wanderer.position.y - this.baseY) * this.pull;
-			// this.velocity.z += this.baseZ + (this.system.wanderer.position.z - this.baseZ) * this.pull;
-
-			if (this.distance <= this.thresh) {
-				this.velocity.x += (this.baseX - this.system.wanderer.position.x) * 0.25;
-				this.velocity.y += (this.baseY - this.system.wanderer.position.y) * 0.25;
-				this.velocity.z += (this.baseZ - this.system.wanderer.position.z) * 0.25;
+			if (this.alt) {
+				val1 = this.osc1.val(this.ease.inOutExpo);
+				val2 = Math.abs(this.lastX - this.mesh.position.x) * 3;
+				val3 = Math.abs(this.lastX - this.mesh.position.x) / 6;
 			} else {
-				this.velocity.x += (this.baseX - this.mesh.position.x) * 0.25;
-				this.velocity.y += (this.baseY - this.mesh.position.y) * 0.25;
-				this.velocity.z += (this.baseZ - this.mesh.position.z) * 0.25;
+				val1 = this.osc1.val(this.ease.inOutExpo);
+				val2 = Math.abs(this.lastY - this.mesh.position.y) * 3;
+				val3 = Math.abs(this.lastY - this.mesh.position.y) / 6;
 			}
-			this.velocity.multiplyScalar(0.25);
 
-			this.mesh.position.add(this.velocity);
+			this.lastX = this.mesh.position.x;
+			this.lastY = this.mesh.position.y;
+			this.lastZ = this.mesh.position.z;
 
-			// this.velocity.x += (this.origin.x - this.position.x) * this.lerpFactor;
-			// this.velocity.y += (this.origin.y - this.position.y) * this.lerpFactor;
-			// this.velocity.z += (this.origin.z - this.position.z) * this.lerpFactor;
-			// this.velocity.multiplyScalar(this.dampFactor);
-			// OU.threeVec3.copy(this.velocity).multiplyScalar(OU.delta);
-			// this.position.add(OU.threeVec3);
+			if (this.alt) {
+				this.mesh.position.x = this.calc.map(val1, 0, 1, this.baseX - this.system.spread / 2, this.baseX + this.system.spread / 2);
+				this.mesh.scale.set(this.size + val2, this.size - val3, this.size);
+			} else {
+				this.mesh.position.y = this.calc.map(val1, 0, 1, this.baseY - this.system.spread / 2, this.baseY + this.system.spread / 2);
+				this.mesh.scale.set(this.size - val3, this.size + val2, this.size);
+				//this.mesh.material.opacity = 0;
+			}
 		}
 	}]);
 
@@ -82,7 +112,7 @@ var Particle = function (_ParticleBase) {
 
 module.exports = Particle;
 
-},{"../particle-base":5}],3:[function(require,module,exports){
+},{"../particle-base":5,"../utils/osc":10}],3:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -97,6 +127,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var SystemBase = require('../system-base');
 var Particle = require('./particle');
+var Osc = require('../utils/osc');
 
 var System = function (_SystemBase) {
 	_inherits(System, _SystemBase);
@@ -106,54 +137,166 @@ var System = function (_SystemBase) {
 
 		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
 
-		_this.count = 1200;
-		_this.size = 10;
-		_this.center = new THREE.Vector3();
+		_this.count = 15;
+		_this.spread = 20;
+		_this.osc1 = new Osc(0, 0.015, true, false);
+
+		_this.particleGroup.rotation.z = Math.PI / 4;
+
+		//this.particleGroup.rotation.x = 0;
+		_this.rotationTarget = Math.PI / 4;
 
 		for (var i = 0; i < _this.count; i++) {
-			var x = _this.calc.rand(-_this.size / 2, _this.size / 2);
-			var y = _this.calc.rand(-_this.size / 2, _this.size / 2);
-			var z = _this.calc.rand(-_this.size / 2, _this.size / 2);
+			var x = _this.calc.map(i, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
+			var y = 0;
+			var z = 0;
 			var pos = new THREE.Vector3(x, y, z);
-			var color = 0x333333;
+			var color = 0x222222;
 			var size = 0.3;
 			var opacity = 1;
-			if (pos.distanceTo(_this.center) > _this.size / 2) {
-				continue;
-			}
+
+			color = 0xff00ff;
 
 			_this.particles.push(new Particle({
 				group: _this.particleGroup,
+				offset: 0,
 				x: x,
 				y: y,
 				z: z,
 				size: size,
 				color: color,
-				opacity: opacity
+				opacity: opacity,
+				prog: i / (_this.count - 1),
+				alt: 0
+			}, _this, _this.loader));
+
+			_this.particles.push(new Particle({
+				group: _this.particleGroup,
+				offset: 0,
+				x: y,
+				y: x,
+				z: z,
+				size: size,
+				color: color,
+				opacity: opacity,
+				prog: i / (_this.count - 1),
+				alt: 1
 			}, _this, _this.loader));
 		}
 
-		_this.wanderer = {
-			position: new THREE.Vector3(),
-			size: 1,
-			color: 0xffffff,
-			opacity: 1
-		};
-		_this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
-		_this.material = new THREE.MeshBasicMaterial({
-			color: _this.wanderer.color,
-			transparent: true,
-			opacity: _this.wanderer.opacity,
-			depthTest: false,
-			precision: 'lowp',
-			side: THREE.DoubleSide
-		});
-		_this.mesh = new THREE.Mesh(_this.geometry, _this.material);
-		_this.mesh.position.x = _this.wanderer.position.x;
-		_this.mesh.position.y = _this.wanderer.position.y;
-		_this.mesh.position.z = _this.wanderer.position.z;
-		_this.mesh.scale.set(_this.wanderer.size, _this.wanderer.size, _this.wanderer.size);
-		_this.particleGroup.add(_this.mesh);
+		for (var _i = 0; _i < _this.count; _i++) {
+			var _x = _this.calc.map(_i, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
+			var _y = 0;
+			var _z = 0;
+			var _pos = new THREE.Vector3(_x, _y, _z);
+			var _color = 0x222222;
+			var _size = 0.3;
+			var _opacity = 1;
+
+			_color = 0xff0000;
+
+			_this.particles.push(new Particle({
+				group: _this.particleGroup,
+				offset: 0.05,
+				x: _x,
+				y: _y,
+				z: _z,
+				size: _size,
+				color: _color,
+				opacity: _opacity,
+				prog: _i / (_this.count - 1),
+				alt: 0
+			}, _this, _this.loader));
+
+			_this.particles.push(new Particle({
+				group: _this.particleGroup,
+				offset: 0.05,
+				x: _y,
+				y: _x,
+				z: _z,
+				size: _size,
+				color: _color,
+				opacity: _opacity,
+				prog: _i / (_this.count - 1),
+				alt: 1
+			}, _this, _this.loader));
+		}
+
+		for (var _i2 = 0; _i2 < _this.count; _i2++) {
+			var _x2 = _this.calc.map(_i2, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
+			var _y2 = 0;
+			var _z2 = 0;
+			var _pos2 = new THREE.Vector3(_x2, _y2, _z2);
+			var _color2 = 0x222222;
+			var _size2 = 0.3;
+			var _opacity2 = 1;
+
+			_color2 = 0x00ff00;
+
+			_this.particles.push(new Particle({
+				group: _this.particleGroup,
+				offset: 0.1,
+				x: _x2,
+				y: _y2,
+				z: _z2,
+				size: _size2,
+				color: _color2,
+				opacity: _opacity2,
+				prog: _i2 / (_this.count - 1),
+				alt: 0
+			}, _this, _this.loader));
+
+			_this.particles.push(new Particle({
+				group: _this.particleGroup,
+				offset: 0.1,
+				x: _y2,
+				y: _x2,
+				z: _z2,
+				size: _size2,
+				color: _color2,
+				opacity: _opacity2,
+				prog: _i2 / (_this.count - 1),
+				alt: 1
+			}, _this, _this.loader));
+		}
+
+		for (var _i3 = 0; _i3 < _this.count; _i3++) {
+			var _x3 = _this.calc.map(_i3, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
+			var _y3 = 0;
+			var _z3 = 0;
+			var _pos3 = new THREE.Vector3(_x3, _y3, _z3);
+			var _color3 = 0x222222;
+			var _size3 = 0.3;
+			var _opacity3 = 1;
+
+			_color3 = 0x0000ff;
+
+			_this.particles.push(new Particle({
+				group: _this.particleGroup,
+				offset: 0.15,
+				x: _x3,
+				y: _y3,
+				z: _z3,
+				size: _size3,
+				color: _color3,
+				opacity: _opacity3,
+				prog: _i3 / (_this.count - 1),
+				alt: 0
+			}, _this, _this.loader));
+
+			_this.particles.push(new Particle({
+				group: _this.particleGroup,
+				offset: 0.15,
+				x: _y3,
+				y: _x3,
+				z: _z3,
+				size: _size3,
+				color: _color3,
+				opacity: _opacity3,
+				prog: _i3 / (_this.count - 1),
+				alt: 1
+			}, _this, _this.loader));
+		}
 		return _this;
 	}
 
@@ -162,13 +305,17 @@ var System = function (_SystemBase) {
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
 
-			this.wanderer.position.x = Math.cos(this.loader.elapsedMs * 0.0025) * this.size / -2;
-			this.wanderer.position.y = Math.sin(this.loader.elapsedMs * 0.0025) * this.size / 2;
-			this.wanderer.position.z = Math.sin(this.loader.elapsedMs * 0.0013) * this.size / 2;
+			this.osc1.update();
 
-			this.mesh.position.x = this.wanderer.position.x;
-			this.mesh.position.y = this.wanderer.position.y;
-			this.mesh.position.z = this.wanderer.position.z;
+			if (this.osc1._triggerBot) {
+				this.rotationTarget += Math.PI / -4;
+			}
+
+			this.particleGroup.rotation.z = Math.PI / 4 + Math.sin(this.loader.elapsedMs * 0.001) * Math.PI / 4;
+
+			//this.particleGroup.rotation.z += (this.rotationTarget - this.particleGroup.rotation.z) * 0.1;
+
+			// SHOW LINES?
 		}
 	}]);
 
@@ -177,7 +324,7 @@ var System = function (_SystemBase) {
 
 module.exports = System;
 
-},{"../system-base":6,"./particle":2}],4:[function(require,module,exports){
+},{"../system-base":6,"../utils/osc":10,"./particle":2}],4:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -852,21 +999,21 @@ var Ease = function () {
 		_classCallCheck(this, Ease);
 	}
 
+	/*
+ ------------------------------------------
+ | inQuad:float - returns eased float value
+ |
+ | t:number - current time
+ | b:number - beginning value
+ | c:number - change in value
+ | d:number - duration
+ |
+ | Get an eased float value based on inQuad.
+ ------------------------------------------ */
+
+
 	_createClass(Ease, [{
 		key: "inQuad",
-
-
-		/*
-  ------------------------------------------
-  | inQuad:float - returns eased float value
-  |
-  | t:number - current time
-  | b:number - beginning value
-  | c:number - change in value
-  | d:number - duration
-  |
-  | Get an eased float value based on inQuad.
-  ------------------------------------------ */
 		value: function inQuad(t, b, c, d) {
 			return c * (t /= d) * t + b;
 		}
@@ -1369,74 +1516,98 @@ var Ease = function () {
 			if ((t /= d / 2) < 1) return c / 2 * (t * t * (((s *= 1.525) + 1) * t - s)) + b;
 			return c / 2 * ((t -= 2) * t * (((s *= 1.525) + 1) * t + s) + 2) + b;
 		}
-
-		/*
-  ------------------------------------------
-  | inBounce:float - returns eased float value
-  |
-  | t:number - current time
-  | b:number - beginning value
-  | c:number - change in value
-  | d:number - duration
-  |
-  | Get an eased float value based on outBounce.
-  ------------------------------------------ */
-
-	}, {
-		key: "inBounce",
-		value: function inBounce(t, b, c, d) {
-			return c - this.outBounce(d - t, 0, c, d) + b;
-		}
-
-		/*
-  ------------------------------------------
-  | outBounce:float - returns eased float value
-  |
-  | t:number - current time
-  | b:number - beginning value
-  | c:number - change in value
-  | d:number - duration
-  |
-  | Get an eased float value based on outBounce.
-  ------------------------------------------ */
-
-	}, {
-		key: "outBounce",
-		value: function outBounce(t, b, c, d) {
-			if ((t /= d) < 1 / 2.75) {
-				return c * (7.5625 * t * t) + b;
-			} else if (t < 2 / 2.75) {
-				return c * (7.5625 * (t -= 1.5 / 2.75) * t + .75) + b;
-			} else if (t < 2.5 / 2.75) {
-				return c * (7.5625 * (t -= 2.25 / 2.75) * t + .9375) + b;
-			} else {
-				return c * (7.5625 * (t -= 2.625 / 2.75) * t + .984375) + b;
-			}
-		}
-
-		/*
-  ------------------------------------------
-  | inOutBounce:float - returns eased float value
-  |
-  | t:number - current time
-  | b:number - beginning value
-  | c:number - change in value
-  | d:number - duration
-  |
-  | Get an eased float value based on inOutBounce.
-  ------------------------------------------ */
-
-	}, {
-		key: "inOutBounce",
-		value: function inOutBounce(t, b, c, d) {
-			if (t < d / 2) return this.inBounce(t * 2, 0, c, d) * .5 + b;
-			return this.outBounce(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
-		}
 	}]);
 
 	return Ease;
 }();
 
 module.exports = Ease;
+
+},{}],10:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Osc = function () {
+	function Osc(val, rate) {
+		var dir = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+		var flip = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+		_classCallCheck(this, Osc);
+
+		this._baseVal = val;
+		this._baseRate = rate;
+		this._baseDir = dir;
+		this._baseFlip = flip;
+
+		this._val = val;
+		this._rate = rate;
+		this._dir = dir;
+		this._flip = flip;
+
+		this._trigger = false;
+		this._triggerTop = false;
+		this._triggerBot = false;
+	}
+
+	_createClass(Osc, [{
+		key: "reset",
+		value: function reset() {
+			this._val = this._baseVal;
+			this._rate = this._baseRate;
+			this._dir = this._baseDir;
+			this._flip = this._baseFlip;
+		}
+	}, {
+		key: "update",
+		value: function update() {
+			this._trigger = false;
+			this._triggerTop = false;
+			this._triggerBot = false;
+			if (this._dir) {
+				if (this._val < 1) {
+					this._val += this._rate;
+				} else {
+					this._trigger = true;
+					this._triggerTop = true;
+					if (this._flip) {
+						this._val = this._val - 1;
+					} else {
+						this._val = 1 - (this._val - 1);
+						this._dir = !this._dir;
+					}
+				}
+			} else {
+				if (this._val > 0) {
+					this._val -= this._rate;
+				} else {
+					this._trigger = true;
+					this._triggerBot = true;
+					if (this._flip) {
+						this._val = 1 + this._val;
+					} else {
+						this._val = -this._val;
+						this._dir = !this._dir;
+					}
+				}
+			}
+		}
+	}, {
+		key: "val",
+		value: function val(ease) {
+			if (ease) {
+				return ease(this._val, 0, 1, 1);
+			} else {
+				return this._val;
+			}
+		}
+	}]);
+
+	return Osc;
+}();
+
+module.exports = Osc;
 
 },{}]},{},[1]);

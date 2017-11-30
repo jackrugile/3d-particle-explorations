@@ -845,21 +845,21 @@ var Ease = function () {
 		_classCallCheck(this, Ease);
 	}
 
+	/*
+ ------------------------------------------
+ | inQuad:float - returns eased float value
+ |
+ | t:number - current time
+ | b:number - beginning value
+ | c:number - change in value
+ | d:number - duration
+ |
+ | Get an eased float value based on inQuad.
+ ------------------------------------------ */
+
+
 	_createClass(Ease, [{
 		key: "inQuad",
-
-
-		/*
-  ------------------------------------------
-  | inQuad:float - returns eased float value
-  |
-  | t:number - current time
-  | b:number - beginning value
-  | c:number - change in value
-  | d:number - duration
-  |
-  | Get an eased float value based on inQuad.
-  ------------------------------------------ */
 		value: function inQuad(t, b, c, d) {
 			return c * (t /= d) * t + b;
 		}
@@ -1362,69 +1362,6 @@ var Ease = function () {
 			if ((t /= d / 2) < 1) return c / 2 * (t * t * (((s *= 1.525) + 1) * t - s)) + b;
 			return c / 2 * ((t -= 2) * t * (((s *= 1.525) + 1) * t + s) + 2) + b;
 		}
-
-		/*
-  ------------------------------------------
-  | inBounce:float - returns eased float value
-  |
-  | t:number - current time
-  | b:number - beginning value
-  | c:number - change in value
-  | d:number - duration
-  |
-  | Get an eased float value based on outBounce.
-  ------------------------------------------ */
-
-	}, {
-		key: "inBounce",
-		value: function inBounce(t, b, c, d) {
-			return c - this.outBounce(d - t, 0, c, d) + b;
-		}
-
-		/*
-  ------------------------------------------
-  | outBounce:float - returns eased float value
-  |
-  | t:number - current time
-  | b:number - beginning value
-  | c:number - change in value
-  | d:number - duration
-  |
-  | Get an eased float value based on outBounce.
-  ------------------------------------------ */
-
-	}, {
-		key: "outBounce",
-		value: function outBounce(t, b, c, d) {
-			if ((t /= d) < 1 / 2.75) {
-				return c * (7.5625 * t * t) + b;
-			} else if (t < 2 / 2.75) {
-				return c * (7.5625 * (t -= 1.5 / 2.75) * t + .75) + b;
-			} else if (t < 2.5 / 2.75) {
-				return c * (7.5625 * (t -= 2.25 / 2.75) * t + .9375) + b;
-			} else {
-				return c * (7.5625 * (t -= 2.625 / 2.75) * t + .984375) + b;
-			}
-		}
-
-		/*
-  ------------------------------------------
-  | inOutBounce:float - returns eased float value
-  |
-  | t:number - current time
-  | b:number - beginning value
-  | c:number - change in value
-  | d:number - duration
-  |
-  | Get an eased float value based on inOutBounce.
-  ------------------------------------------ */
-
-	}, {
-		key: "inOutBounce",
-		value: function inOutBounce(t, b, c, d) {
-			if (t < d / 2) return this.inBounce(t * 2, 0, c, d) * .5 + b;
-			return this.outBounce(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
-		}
 	}]);
 
 	return Ease;
@@ -1455,6 +1392,10 @@ var Osc = function () {
 		this._rate = rate;
 		this._dir = dir;
 		this._flip = flip;
+
+		this._trigger = false;
+		this._triggerTop = false;
+		this._triggerBot = false;
 	}
 
 	_createClass(Osc, [{
@@ -1468,10 +1409,15 @@ var Osc = function () {
 	}, {
 		key: "update",
 		value: function update() {
+			this._trigger = false;
+			this._triggerTop = false;
+			this._triggerBot = false;
 			if (this._dir) {
 				if (this._val < 1) {
 					this._val += this._rate;
 				} else {
+					this._trigger = true;
+					this._triggerTop = true;
 					if (this._flip) {
 						this._val = this._val - 1;
 					} else {
@@ -1483,6 +1429,8 @@ var Osc = function () {
 				if (this._val > 0) {
 					this._val -= this._rate;
 				} else {
+					this._trigger = true;
+					this._triggerBot = true;
 					if (this._flip) {
 						this._val = 1 + this._val;
 					} else {
