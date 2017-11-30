@@ -19,7 +19,7 @@ class ParticleBase {
 	}
 
 	createMesh() {
-		this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
+		this.geometry = this.system.sphereGeometry;
 
 		this.material = new THREE.MeshBasicMaterial({
 			color: this.color,

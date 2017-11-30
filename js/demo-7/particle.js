@@ -18,15 +18,11 @@ class Particle extends ParticleBase {
 		this.alt = config.alt;
 		this.offset = config.offset;
 
-		if(this.alt) {
-			this.osc1 = new Osc(this.prog * 0.75 + this.offset, 0.015, true, false);
-		} else {
-			this.osc1 = new Osc(this.prog * 0.75 + this.offset, 0.015, true, false);
-		}
+		this.osc1 = new Osc(this.prog * 0.5 + this.offset, 0.015, true, false);
 	}
 
 	createMesh() {
-		this.geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+		this.geometry = this.system.boxGeometry;
 
 		this.material = new THREE.MeshBasicMaterial({
 			blending: THREE.AdditiveBlending,
@@ -34,8 +30,7 @@ class Particle extends ParticleBase {
 			transparent: true,
 			opacity: this.opacity,
 			depthTest: false,
-			precision: 'lowp',
-			side: THREE.DoubleSide
+			precision: 'lowp'
 		});
 
 		this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -52,18 +47,18 @@ class Particle extends ParticleBase {
 	update() {
 		this.osc1.update();
 
-		let val1;
-		let val2;
-		let val3;
+		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+		}
+
+		let val1 = this.osc1.val(this.ease.inOutExpo);
+		let val2 = Math.abs(this.lastY - this.mesh.position.y) * 3;
+		let val3 = Math.abs(this.lastY - this.mesh.position.y) / 6;
 
 		if(this.alt) {
 			val1 = this.osc1.val(this.ease.inOutExpo);
 			val2 = Math.abs(this.lastX - this.mesh.position.x) * 3;
 			val3 = Math.abs(this.lastX - this.mesh.position.x) / 6;
-		} else {
-			val1 = this.osc1.val(this.ease.inOutExpo);
-			val2 = Math.abs(this.lastY - this.mesh.position.y) * 3;
-			val3 = Math.abs(this.lastY - this.mesh.position.y) / 6;
 		}
 
 		this.lastX = this.mesh.position.x;

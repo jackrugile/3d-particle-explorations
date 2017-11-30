@@ -83,10 +83,11 @@ var System = function (_SystemBase) {
 
 		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
 
+		_this.duration = 6000;
+
 		_this.rings = 8;
 		_this.radius = 0;
 		_this.radiusGrowth = 1.5;
-		_this.duration = 3500;
 
 		for (var i = 0; i < _this.rings; i++) {
 			var count = i === 0 ? 1 : 1 + Math.ceil(i * 6);
@@ -158,14 +159,21 @@ var Loader = function () {
 		this.height = null;
 		this.completed = false;
 
+		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
 		this.isGridDark = location.hash.indexOf('dark') > 0;
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
 
 		this.debugHash = '';
-		this.debugHash += this.isGrid ? 'grid' : '';
-		this.debugHash += this.isGridDark ? 'dark' : '';
-		this.debugHash += this.isOrbit ? 'orbit' : '';
+		if (this.isDebug) {
+			this.isGrid = true;
+			this.isOrbit = true;
+			this.debugHash += 'debug';
+		} else {
+			this.debugHash += this.isGrid ? 'grid' : '';
+			this.debugHash += this.isGridDark ? 'dark' : '';
+			this.debugHash += this.isOrbit ? 'orbit' : '';
+		}
 		if (this.debugHash) {
 			[].slice.call(document.querySelectorAll('.demo')).forEach(function (elem, i, arr) {
 				elem.setAttribute('href', elem.getAttribute('href') + '#' + _this.debugHash);
@@ -380,7 +388,7 @@ var ParticleBase = function () {
 	_createClass(ParticleBase, [{
 		key: 'createMesh',
 		value: function createMesh() {
-			this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
+			this.geometry = this.system.sphereGeometry;
 
 			this.material = new THREE.MeshBasicMaterial({
 				color: this.color,
@@ -426,6 +434,9 @@ var SystemBase = function () {
 
 		this.calc = this.loader.calc;
 		this.ease = this.loader.ease;
+
+		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
+		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();

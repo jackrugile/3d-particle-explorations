@@ -8,7 +8,8 @@ class System extends SystemBase {
 
 		this.lines = [];
 
-		this.duration = 3500;
+		this.duration = 6000;
+		
 		this.count = 24;
 		this.height = 10;
 

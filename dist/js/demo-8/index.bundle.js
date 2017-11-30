@@ -126,14 +126,13 @@ var System = function (_SystemBase) {
 
 		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
 
-		_this.simplex = new SimplexNoise();
+		_this.simplex = new FastSimplexNoise();
 
-		//this.duration = 3500;
+		_this.duration = 6000;
 
 		_this.osc1 = new Osc(0, 0.015, true, false);
 		_this.color = new THREE.Color();
 
-		//this.texture = new THREE.TextureLoader().load('/images/circle.png');
 		_this.texture = new THREE.TextureLoader().load('./images/orb.png');
 		_this.size = 10;
 		_this.scale = 1;
@@ -184,9 +183,7 @@ var System = function (_SystemBase) {
 		_this.mesh = new THREE.Points(_this.geometry, _this.material);
 		_this.particleGroup.add(_this.mesh);
 
-		_this.updateColors();
-		_this.updateSizes();
-		_this.updatePositions();
+		_this.updateParticles(true, true, true);
 		return _this;
 	}
 
@@ -194,39 +191,36 @@ var System = function (_SystemBase) {
 		key: 'createMesh',
 		value: function createMesh() {}
 	}, {
-		key: 'updateColors',
-		value: function updateColors() {
+		key: 'updateParticles',
+		value: function updateParticles(color, position, size) {
 			var i = this.count;
 			while (i--) {
 				var obj = this.objs[i];
-				this.colors[i * 4 + 0] = obj.r;
-				this.colors[i * 4 + 1] = obj.g;
-				this.colors[i * 4 + 2] = obj.b;
-				this.colors[i * 4 + 3] = obj.a;
+				if (color) {
+					this.colors[i * 4 + 0] = obj.r;
+					this.colors[i * 4 + 1] = obj.g;
+					this.colors[i * 4 + 2] = obj.b;
+					this.colors[i * 4 + 3] = obj.a;
+				}
+				if (position) {
+					this.positions[i * 3 + 0] = obj.pos.x;
+					this.positions[i * 3 + 1] = obj.pos.y;
+					this.positions[i * 3 + 2] = obj.pos.z;
+				}
+				if (size) {
+					this.sizes[i] = obj.size;
+				}
 			}
-			this.geometry.attributes.color.needsUpdate = true;
-		}
-	}, {
-		key: 'updateSizes',
-		value: function updateSizes() {
-			var i = this.count;
-			while (i--) {
-				var obj = this.objs[i];
-				this.sizes[i] = obj.size;
+
+			if (color) {
+				this.geometry.attributes.color.needsUpdate = true;
 			}
-			this.geometry.attributes.size.needsUpdate = true;
-		}
-	}, {
-		key: 'updatePositions',
-		value: function updatePositions() {
-			var i = this.count;
-			while (i--) {
-				var obj = this.objs[i];
-				this.positions[i * 3 + 0] = obj.pos.x;
-				this.positions[i * 3 + 1] = obj.pos.y;
-				this.positions[i * 3 + 2] = obj.pos.z;
+			if (position) {
+				this.geometry.attributes.position.needsUpdate = true;
 			}
-			this.geometry.attributes.position.needsUpdate = true;
+			if (size) {
+				this.geometry.attributes.size.needsUpdate = true;
+			}
 		}
 	}, {
 		key: 'update',
@@ -235,15 +229,14 @@ var System = function (_SystemBase) {
 
 			this.osc1.update();
 
-			// if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-			// 	this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
-			// }
+			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
+				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+			}
 
 			var i = this.count;
 
-			var noiseDiv = 10; //this.calc.map(this.osc1.val(1 - this.ease.inOutExpo), 0, 1, 5, 10);
+			var noiseDiv = 10;
 			var noiseTime = this.loader.elapsedMs * 0.0008;
-			//let noiseTime = this.loader.elapsedMs * this.calc.map(this.osc1.val(this.ease.inOutExpo), 0, 1, 0.0004, 0.0006);
 			var noiseVel = this.calc.map(this.osc1.val(this.ease.inOutExpo), 0, 1, 0.05, 1);
 
 			while (i--) {
@@ -253,9 +246,9 @@ var System = function (_SystemBase) {
 				var yDiv = obj.pos.y / noiseDiv;
 				var zDiv = obj.pos.z / noiseDiv;
 
-				var noise1 = this.simplex.noise4D(xDiv, yDiv, zDiv, noiseTime) * 0.5 + 0.5;
-				var noise2 = this.simplex.noise4D(xDiv + 100, yDiv + 100, zDiv + 100, 50 + noiseTime) * 0.5 + 0.5;
-				var noise3 = this.simplex.noise4D(xDiv + 200, yDiv + 200, zDiv + 200, 100 + noiseTime) * 0.5 + 0.5;
+				var noise1 = this.simplex.getRaw4DNoise(xDiv, yDiv, zDiv, noiseTime) * 0.5 + 0.5;
+				var noise2 = this.simplex.getRaw4DNoise(xDiv + 100, yDiv + 100, zDiv + 100, 50 + noiseTime) * 0.5 + 0.5;
+				var noise3 = this.simplex.getRaw4DNoise(xDiv + 200, yDiv + 200, zDiv + 200, 100 + noiseTime) * 0.5 + 0.5;
 
 				obj.pos.x += Math.sin(noise1 * Math.PI * 2) * noiseVel * this.loader.dtN;
 				obj.pos.y += Math.sin(noise2 * Math.PI * 2) * noiseVel * this.loader.dtN;
@@ -264,6 +257,7 @@ var System = function (_SystemBase) {
 				if (obj.life > 0) {
 					obj.life -= obj.decay * this.osc1.val(this.ease.inOutExpo);
 				}
+
 				if (obj.life <= 0 || obj.firstRun) {
 					obj.life = 2;
 					obj.pos.x = this.calc.rand(-this.size / 2, this.size / 2);
@@ -284,21 +278,12 @@ var System = function (_SystemBase) {
 				obj.a = obj.life > 1 ? 2 - obj.life : obj.life;
 
 				obj.size = this.calc.map(this.osc1.val(this.ease.inOutExpo), 0, 1, obj.baseSize * 6, obj.baseSize * 1);
-
-				this.positions[i * 3 + 0] = obj.pos.x;
-				this.positions[i * 3 + 1] = obj.pos.y;
-				this.positions[i * 3 + 2] = obj.pos.z;
 			}
 
-			this.geometry.attributes.position.needsUpdate = true;
-
-			this.updateSizes();
-			this.updateColors();
+			this.updateParticles(true, true, true);
 
 			this.particleGroup.rotation.y += 0.005 + this.osc1.val(this.ease.inOutExpo) * 0.04;
 			this.particleGroup.position.z = 5 - this.osc1.val(this.ease.inOutExpo) * 15;
-			//let scale = 1 - this.osc1.val(this.ease.inOutExpo) * 0.5;
-			//this.particleGroup.scale.set(scale, scale, scale);
 		}
 	}]);
 
@@ -333,14 +318,21 @@ var Loader = function () {
 		this.height = null;
 		this.completed = false;
 
+		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
 		this.isGridDark = location.hash.indexOf('dark') > 0;
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
 
 		this.debugHash = '';
-		this.debugHash += this.isGrid ? 'grid' : '';
-		this.debugHash += this.isGridDark ? 'dark' : '';
-		this.debugHash += this.isOrbit ? 'orbit' : '';
+		if (this.isDebug) {
+			this.isGrid = true;
+			this.isOrbit = true;
+			this.debugHash += 'debug';
+		} else {
+			this.debugHash += this.isGrid ? 'grid' : '';
+			this.debugHash += this.isGridDark ? 'dark' : '';
+			this.debugHash += this.isOrbit ? 'orbit' : '';
+		}
 		if (this.debugHash) {
 			[].slice.call(document.querySelectorAll('.demo')).forEach(function (elem, i, arr) {
 				elem.setAttribute('href', elem.getAttribute('href') + '#' + _this.debugHash);
@@ -555,7 +547,7 @@ var ParticleBase = function () {
 	_createClass(ParticleBase, [{
 		key: 'createMesh',
 		value: function createMesh() {
-			this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
+			this.geometry = this.system.sphereGeometry;
 
 			this.material = new THREE.MeshBasicMaterial({
 				color: this.color,
@@ -601,6 +593,9 @@ var SystemBase = function () {
 
 		this.calc = this.loader.calc;
 		this.ease = this.loader.ease;
+
+		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
+		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();

@@ -117,28 +117,35 @@ body {
 }
 
 .completed .demo-6 {
-	--color-text: #fff;
-	--color-link: #fff;
-	--color-link-hover: #fff;
-	--color-info: #fff;
+	--color-text: #222;
+	--color-link: #222;
+	--color-link-hover: #222;
+	--color-info: #222;
 }
 
 .demo-7 {
 	--color-text: #fff;
-	--color-bg: #111;
-	--color-link: #fff;
+	--color-bg: #fff;
+	--color-link: #666;
 	--color-link-hover: #fff;
-	--color-info: #fff;
+	--color-info: #666;
 	--color-top-right: #222;
 	--color-bottom-left: #000;
 }
 
+.completed .demo-7 {
+	--color-text: #222;
+	--color-link: #222;
+	--color-link-hover: #222;
+	--color-info: #222;
+}
+
 .demo-8 {
 	--color-text: #fff;
-	--color-bg: #111;
-	--color-link: #fff;
+	--color-bg: #fff;
+	--color-link: #666;
 	--color-link-hover: #fff;
-	--color-info: #fff;
+	--color-info: #666;
 	--color-top-right: #222;
 	--color-bottom-left: #000;
 }

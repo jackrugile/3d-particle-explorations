@@ -6,10 +6,11 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
+		this.duration = 6000;
+
 		this.rings = 8;
 		this.radius = 0;
 		this.radiusGrowth = 1.5;
-		this.duration = 3500;
 
 		for(let i = 0; i < this.rings; i++) {
 			let count = i === 0 ? 1 : 1 + Math.ceil(i * 6);

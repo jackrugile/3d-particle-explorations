@@ -6,10 +6,11 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
+		this.duration = 6000;
+
 		this.count = 60;
 		this.outer = 12;
-		this.duration = 3500;
-
+		
 		for(let i = 0; i < this.count; i++) {
 			let x = 0;
 			let y = 0;

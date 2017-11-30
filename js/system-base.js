@@ -6,6 +6,9 @@ class SystemBase {
 		this.calc = this.loader.calc;
 		this.ease = this.loader.ease;
 
+		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
+		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
+
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
 

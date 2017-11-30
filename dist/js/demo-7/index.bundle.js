@@ -40,18 +40,14 @@ var Particle = function (_ParticleBase) {
 		_this.alt = config.alt;
 		_this.offset = config.offset;
 
-		if (_this.alt) {
-			_this.osc1 = new Osc(_this.prog * 0.75 + _this.offset, 0.015, true, false);
-		} else {
-			_this.osc1 = new Osc(_this.prog * 0.75 + _this.offset, 0.015, true, false);
-		}
+		_this.osc1 = new Osc(_this.prog * 0.5 + _this.offset, 0.015, true, false);
 		return _this;
 	}
 
 	_createClass(Particle, [{
 		key: 'createMesh',
 		value: function createMesh() {
-			this.geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+			this.geometry = this.system.boxGeometry;
 
 			this.material = new THREE.MeshBasicMaterial({
 				blending: THREE.AdditiveBlending,
@@ -59,8 +55,7 @@ var Particle = function (_ParticleBase) {
 				transparent: true,
 				opacity: this.opacity,
 				depthTest: false,
-				precision: 'lowp',
-				side: THREE.DoubleSide
+				precision: 'lowp'
 			});
 
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -78,18 +73,18 @@ var Particle = function (_ParticleBase) {
 		value: function update() {
 			this.osc1.update();
 
-			var val1 = void 0;
-			var val2 = void 0;
-			var val3 = void 0;
+			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
+				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+			}
+
+			var val1 = this.osc1.val(this.ease.inOutExpo);
+			var val2 = Math.abs(this.lastY - this.mesh.position.y) * 3;
+			var val3 = Math.abs(this.lastY - this.mesh.position.y) / 6;
 
 			if (this.alt) {
 				val1 = this.osc1.val(this.ease.inOutExpo);
 				val2 = Math.abs(this.lastX - this.mesh.position.x) * 3;
 				val3 = Math.abs(this.lastX - this.mesh.position.x) / 6;
-			} else {
-				val1 = this.osc1.val(this.ease.inOutExpo);
-				val2 = Math.abs(this.lastY - this.mesh.position.y) * 3;
-				val3 = Math.abs(this.lastY - this.mesh.position.y) / 6;
 			}
 
 			this.lastX = this.mesh.position.x;
@@ -137,14 +132,16 @@ var System = function (_SystemBase) {
 
 		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
 
-		_this.count = 15;
+		_this.duration = 6000;
+		_this.count = 10;
 		_this.spread = 20;
-		_this.osc1 = new Osc(0, 0.015, true, false);
+		_this.osc1 = new Osc(0.3, 0.015, false, false);
 
 		_this.particleGroup.rotation.z = Math.PI / 4;
 
-		//this.particleGroup.rotation.x = 0;
 		_this.rotationTarget = Math.PI / 4;
+		_this.lastRotationTarget = _this.rotationTarget;
+		_this.rotProg = 1;
 
 		for (var i = 0; i < _this.count; i++) {
 			var x = _this.calc.map(i, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
@@ -305,17 +302,24 @@ var System = function (_SystemBase) {
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
 
-			this.osc1.update();
-
-			if (this.osc1._triggerBot) {
-				this.rotationTarget += Math.PI / -4;
+			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
+				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 			}
 
-			this.particleGroup.rotation.z = Math.PI / 4 + Math.sin(this.loader.elapsedMs * 0.001) * Math.PI / 4;
+			this.osc1.update();
 
-			//this.particleGroup.rotation.z += (this.rotationTarget - this.particleGroup.rotation.z) * 0.1;
+			if (this.osc1._triggerTop) {
+				this.lastRotationTarget = this.rotationTarget;
+				this.rotationTarget += Math.PI / -4;
+				this.rotProg = 0;
+			}
 
-			// SHOW LINES?
+			if (this.rotProg < 1) {
+				this.rotProg += 0.02;
+			}
+			this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
+
+			this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTarget, this.rotationTarget);
 		}
 	}]);
 
@@ -350,14 +354,21 @@ var Loader = function () {
 		this.height = null;
 		this.completed = false;
 
+		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
 		this.isGridDark = location.hash.indexOf('dark') > 0;
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
 
 		this.debugHash = '';
-		this.debugHash += this.isGrid ? 'grid' : '';
-		this.debugHash += this.isGridDark ? 'dark' : '';
-		this.debugHash += this.isOrbit ? 'orbit' : '';
+		if (this.isDebug) {
+			this.isGrid = true;
+			this.isOrbit = true;
+			this.debugHash += 'debug';
+		} else {
+			this.debugHash += this.isGrid ? 'grid' : '';
+			this.debugHash += this.isGridDark ? 'dark' : '';
+			this.debugHash += this.isOrbit ? 'orbit' : '';
+		}
 		if (this.debugHash) {
 			[].slice.call(document.querySelectorAll('.demo')).forEach(function (elem, i, arr) {
 				elem.setAttribute('href', elem.getAttribute('href') + '#' + _this.debugHash);
@@ -572,7 +583,7 @@ var ParticleBase = function () {
 	_createClass(ParticleBase, [{
 		key: 'createMesh',
 		value: function createMesh() {
-			this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
+			this.geometry = this.system.sphereGeometry;
 
 			this.material = new THREE.MeshBasicMaterial({
 				color: this.color,
@@ -618,6 +629,9 @@ var SystemBase = function () {
 
 		this.calc = this.loader.calc;
 		this.ease = this.loader.ease;
+
+		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
+		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();

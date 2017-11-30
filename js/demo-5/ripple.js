@@ -57,7 +57,7 @@ class Ripple {
 		this.mesh.position.y = (1 - this.life) * -2;
 		let newScale = 0.001 + this.sphere.radius;
 		this.mesh.scale.set(newScale, newScale, newScale);
-		this.mesh.material.opacity = this.life / 4;
+		this.mesh.material.opacity = this.life / 3;
 
 		if(this.life <= 0) {
 			this.destroy(i);

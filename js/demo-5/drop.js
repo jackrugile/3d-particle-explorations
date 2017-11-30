@@ -27,7 +27,7 @@ class Drop {
 	}
 
 	createMesh() {
-		this.geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+		this.geometry = this.system.boxGeometry;
 
 		this.material = new THREE.MeshBasicMaterial({
 			color: this.color,

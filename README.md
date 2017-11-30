@@ -11,7 +11,7 @@
 ## Credits
 
 - [three.js](https://threejs.org/)
-- [simplex-noise.js](https://github.com/jwagner/simplex-noise.js)
+- [fast-simplex-noise.js](https://github.com/matthiasdv/fast-simplex-noise-js)
 - [MainLoop.js](https://github.com/IceCreamYou/MainLoop.js)
 
 ## License

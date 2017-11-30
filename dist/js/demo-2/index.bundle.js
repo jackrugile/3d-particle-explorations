@@ -42,12 +42,12 @@ var Particle = function (_ParticleBase) {
 				this.amp = (this.system.visW / 2 - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
 				this.amp *= this.system.oscEased;
 				this.speed = this.loader.elapsedMs / 750;
-				this.mesh.position.y = this.system.simplex.noise2D(this.mesh.position.x * this.div + this.speed, 0) * 10 * this.amp;
+				this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.div + this.speed, 0) * 10 * this.amp;
 			} else {
 				this.amp = (this.system.visW / 2 - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
 				this.amp *= 1 - this.system.oscEased;
 				this.speed = this.loader.elapsedMs / 750;
-				this.mesh.position.y = this.system.simplex.noise2D(this.mesh.position.x * this.div + this.speed + 1000, 1000) * 10 * this.amp;
+				this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.div + this.speed + 1000, 1000) * 10 * this.amp;
 			}
 
 			var size = 0.05 + this.size * this.amp;
@@ -86,17 +86,17 @@ var System = function (_SystemBase) {
 
 		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
 
-		_this.simplex = new SimplexNoise();
+		_this.duration = 6000;
+
+		_this.simplex = new FastSimplexNoise();
 
 		_this.lines = [];
 
-		_this.count = 350;
-		//this.visW = this.calc.visibleWidthAtZDepth(0, this.loader.camera) / 1;
+		_this.count = 330;
 		_this.visW = 30;
 
 		_this.osc = new Osc(0.2, 0.0125);
 		_this.oscEased = 0;
-		_this.duration = 3500;
 
 		for (var i = 0; i < _this.count; i++) {
 			var x = _this.calc.map(i, 0, _this.count, -_this.visW / 2, _this.visW / 2) + _this.visW / _this.count / 2;
@@ -109,26 +109,11 @@ var System = function (_SystemBase) {
 				y: y,
 				z: z,
 				size: _this.calc.map(Math.abs(x), 0, _this.visW / 2, 0.2, 0.01),
-				color: 0xffffff,
+				color: i % 2 === 0 ? 0xffffff : 0x56311e,
 				opacity: 1,
 				alt: i % 2 === 0
 			}, _this, _this.loader));
 		}
-
-		var lineMaterial = new THREE.LineBasicMaterial({
-			color: 0xffffff,
-			opacity: 0.15,
-			transparent: true
-		});
-
-		for (var _i = 0; _i < _this.count; _i++) {
-			var lineGeometry = new THREE.Geometry();
-			lineGeometry.vertices.push(new THREE.Vector3(), new THREE.Vector3());
-			var lineMesh = new THREE.Line(lineGeometry, lineMaterial);
-			_this.particleGroup.add(lineMesh);
-			_this.lines.push(lineMesh);
-		}
-
 		return _this;
 	}
 
@@ -139,19 +124,6 @@ var System = function (_SystemBase) {
 
 			this.osc.update();
 			this.oscEased = this.osc.val(this.ease.inOutExpo);
-
-			var j = this.lines.length;
-			while (j--) {
-				var p1 = this.particles[j];
-				var line = this.lines[j];
-				line.geometry.vertices[0].x = p1.mesh.position.x;
-				line.geometry.vertices[0].y = p1.mesh.position.y;
-				line.geometry.vertices[0].z = p1.mesh.position.z;
-				line.geometry.vertices[1].x = p1.mesh.position.x;
-				line.geometry.vertices[1].y = 0;
-				line.geometry.vertices[1].z = p1.mesh.position.z;
-				line.geometry.verticesNeedUpdate = true;
-			}
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
@@ -190,14 +162,21 @@ var Loader = function () {
 		this.height = null;
 		this.completed = false;
 
+		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
 		this.isGridDark = location.hash.indexOf('dark') > 0;
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
 
 		this.debugHash = '';
-		this.debugHash += this.isGrid ? 'grid' : '';
-		this.debugHash += this.isGridDark ? 'dark' : '';
-		this.debugHash += this.isOrbit ? 'orbit' : '';
+		if (this.isDebug) {
+			this.isGrid = true;
+			this.isOrbit = true;
+			this.debugHash += 'debug';
+		} else {
+			this.debugHash += this.isGrid ? 'grid' : '';
+			this.debugHash += this.isGridDark ? 'dark' : '';
+			this.debugHash += this.isOrbit ? 'orbit' : '';
+		}
 		if (this.debugHash) {
 			[].slice.call(document.querySelectorAll('.demo')).forEach(function (elem, i, arr) {
 				elem.setAttribute('href', elem.getAttribute('href') + '#' + _this.debugHash);
@@ -412,7 +391,7 @@ var ParticleBase = function () {
 	_createClass(ParticleBase, [{
 		key: 'createMesh',
 		value: function createMesh() {
-			this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
+			this.geometry = this.system.sphereGeometry;
 
 			this.material = new THREE.MeshBasicMaterial({
 				color: this.color,
@@ -458,6 +437,9 @@ var SystemBase = function () {
 
 		this.calc = this.loader.calc;
 		this.ease = this.loader.ease;
+
+		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
+		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();

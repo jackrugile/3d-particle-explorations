@@ -8,9 +8,8 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
-		this.simplex = new SimplexNoise();
-
-		//this.duration = 3500;
+		this.duration = 6000;
+		
 		this.size = 35;
 		this.cols = 25;
 		this.rows = 25;

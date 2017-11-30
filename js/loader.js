@@ -14,14 +14,21 @@ class Loader {
 		this.height = null;
 		this.completed = false;
 
+		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
 		this.isGridDark = location.hash.indexOf('dark') > 0
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
 
 		this.debugHash = '';
-		this.debugHash += this.isGrid ? 'grid' : '';
-		this.debugHash += this.isGridDark ? 'dark' : '';
-		this.debugHash += this.isOrbit ? 'orbit' : '';
+		if(this.isDebug) {
+			this.isGrid = true;
+			this.isOrbit = true;
+			this.debugHash += 'debug';
+		} else {
+			this.debugHash += this.isGrid ? 'grid' : '';
+			this.debugHash += this.isGridDark ? 'dark' : '';
+			this.debugHash += this.isOrbit ? 'orbit' : '';
+		}
 		if(this.debugHash) {
 			[].slice.call(document.querySelectorAll('.demo')).forEach((elem, i, arr) => {
 				elem.setAttribute('href', `${elem.getAttribute('href')}#${this.debugHash}`);

@@ -17,12 +17,12 @@ class Particle extends ParticleBase {
 			this.amp = ((this.system.visW / 2) - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
 			this.amp *= this.system.oscEased;
 			this.speed = this.loader.elapsedMs / 750;
-			this.mesh.position.y = this.system.simplex.noise2D(this.mesh.position.x * this.div + this.speed, 0) * 10 * this.amp;
+			this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.div + this.speed, 0) * 10 * this.amp;
 		} else {
 			this.amp = ((this.system.visW / 2) - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
 			this.amp *= 1 - this.system.oscEased;
 			this.speed = this.loader.elapsedMs / 750;
-			this.mesh.position.y = this.system.simplex.noise2D(this.mesh.position.x * this.div + this.speed + 1000, 1000) * 10 * this.amp;
+			this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.div + this.speed + 1000, 1000) * 10 * this.amp;
 		}
 
 		let size = 0.05 + this.size * this.amp;

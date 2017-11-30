@@ -37,7 +37,7 @@ var Drop = function () {
 	_createClass(Drop, [{
 		key: 'createMesh',
 		value: function createMesh() {
-			this.geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+			this.geometry = this.system.boxGeometry;
 
 			this.material = new THREE.MeshBasicMaterial({
 				color: this.color,
@@ -124,21 +124,13 @@ var Particle = function (_ParticleBase) {
 	_createClass(Particle, [{
 		key: 'update',
 		value: function update() {
-			//let mult = 0.075;
-			//let noise = this.system.simplex.noise3D(this.baseX * mult, this.baseY * mult, this.loader.elapsedMs * 0.0004);
-			// let offset = noise * 5;
-
-			// this.mesh.position.z = this.baseZ + offset;
-
-			var scale = 0.05 + Math.abs(this.velocity.y) / 30;
+			var scale = 0.075 + Math.abs(this.velocity.y) / 25;
 			this.mesh.scale.set(scale, scale, scale);
 
-			var opacity = 0.1 + Math.abs(this.velocity.y) / 2;
-			this.mesh.material.opacity = this.calc.clamp(opacity, 0.1, 1);
+			var opacity = 0.15 + Math.abs(this.velocity.y) / 1;
+			this.mesh.material.opacity = this.calc.clamp(opacity, 0.15, 1);
 
-			//this.velocity.x += (this.base.x - this.mesh.position.x) * this.lerpFactor;
 			this.velocity.y += (this.base.y - this.mesh.position.y) * this.lerpFactor;
-			//this.velocity.z += (this.base.z - this.mesh.position.z) * this.lerpFactor;
 			this.velocity.multiplyScalar(this.dampFactor);
 			this.mesh.position.add(this.velocity);
 		}
@@ -219,7 +211,7 @@ var Ripple = function () {
 			this.mesh.position.y = (1 - this.life) * -2;
 			var newScale = 0.001 + this.sphere.radius;
 			this.mesh.scale.set(newScale, newScale, newScale);
-			this.mesh.material.opacity = this.life / 4;
+			this.mesh.material.opacity = this.life / 3;
 
 			if (this.life <= 0) {
 				this.destroy(i);
@@ -266,9 +258,8 @@ var System = function (_SystemBase) {
 
 		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
 
-		_this.simplex = new SimplexNoise();
+		_this.duration = 6000;
 
-		//this.duration = 3500;
 		_this.size = 35;
 		_this.cols = 25;
 		_this.rows = 25;
@@ -415,14 +406,21 @@ var Loader = function () {
 		this.height = null;
 		this.completed = false;
 
+		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
 		this.isGridDark = location.hash.indexOf('dark') > 0;
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
 
 		this.debugHash = '';
-		this.debugHash += this.isGrid ? 'grid' : '';
-		this.debugHash += this.isGridDark ? 'dark' : '';
-		this.debugHash += this.isOrbit ? 'orbit' : '';
+		if (this.isDebug) {
+			this.isGrid = true;
+			this.isOrbit = true;
+			this.debugHash += 'debug';
+		} else {
+			this.debugHash += this.isGrid ? 'grid' : '';
+			this.debugHash += this.isGridDark ? 'dark' : '';
+			this.debugHash += this.isOrbit ? 'orbit' : '';
+		}
 		if (this.debugHash) {
 			[].slice.call(document.querySelectorAll('.demo')).forEach(function (elem, i, arr) {
 				elem.setAttribute('href', elem.getAttribute('href') + '#' + _this.debugHash);
@@ -637,7 +635,7 @@ var ParticleBase = function () {
 	_createClass(ParticleBase, [{
 		key: 'createMesh',
 		value: function createMesh() {
-			this.geometry = new THREE.SphereBufferGeometry(1, 12, 12);
+			this.geometry = this.system.sphereGeometry;
 
 			this.material = new THREE.MeshBasicMaterial({
 				color: this.color,
@@ -683,6 +681,9 @@ var SystemBase = function () {
 
 		this.calc = this.loader.calc;
 		this.ease = this.loader.ease;
+
+		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
+		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
