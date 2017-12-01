@@ -10,6 +10,7 @@ class Loader {
 
 		this.container = document.querySelector('.loader');
 		this.replayButton = document.querySelector('.replay-loader');
+		this.debugButton = document.querySelector('.icon--debug');
 		this.width = null;
 		this.height = null;
 		this.completed = false;
@@ -88,7 +89,7 @@ class Loader {
 		if(this.isOrbit) {
 			this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 			this.controls.enableDamping = true;
-			this.controls.dampingFactor = 0.25;
+			this.controls.dampingFactor = 0.2;
 			this.controls.enableKeys = false;
 		}
 	}
@@ -128,6 +129,7 @@ class Loader {
 	listen() {
 		window.addEventListener('resize', (e) => this.onResize(e));
 		this.replayButton.addEventListener('click', (e) => this.onReplayButtonClick(e));
+		this.debugButton.addEventListener('click', (e) => this.onDebugButtonClick(e));
 	}
 
 	replay() {
@@ -171,6 +173,22 @@ class Loader {
 	onReplayButtonClick(e) {
 		e.preventDefault();
 		this.replay();
+	}
+
+	onDebugButtonClick(e) {
+		e.preventDefault();
+		let baseURL = window.location.href.split('#')[0];
+		if(this.isDebug) {
+			if(history) {
+				history.pushState('', document.title, window.location.pathname);
+			} else {
+				location.hash = '';
+			}
+			location.href = baseURL;
+		} else {
+			location.href = `${baseURL}#debug`;
+		}
+		location.reload();
 	}
 
 	loop() {

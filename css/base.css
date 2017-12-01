@@ -465,10 +465,24 @@ a.demo--current {
 		height: 46px;
 		fill: var(--color-link);
 	}
+	.icon--debug {
+		cursor: pointer;
+		position: absolute;
+		right: 6px;
+		bottom: 60px;
+		display: block;
+		width: 60px;
+		height: 42px;
+		fill: var(--color-link);
+		pointer-events: auto;
+		transition: opacity 300ms;
+	}
+	.icon--debug:hover{
+		opacity: 0.5;
+	}
 	.demos {
 		display: flex;
 		padding-right: 80px;
-
 		justify-self: end;
 	}
 	.demo {

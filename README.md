@@ -26,7 +26,7 @@ Follow Codrops: [Twitter](http://www.twitter.com/codrops), [Facebook](http://www
 
 ## Build Tools
 
-The following tools are used to build this project.
+The following tools are used to build this project:
 
 - [Node.js](https://nodejs.org/en/)
 - [npm](https://www.npmjs.com/)

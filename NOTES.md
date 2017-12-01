@@ -7,3 +7,5 @@
 - [ ] mention debug tools in article write up
 - [ ] switch to uglified/minified version when complete
 - [ ] add debug scene button to toggle grid and orbit
+
+- [ ] setup titles in html files, read me, and repo
