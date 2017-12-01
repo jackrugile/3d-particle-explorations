@@ -1,6 +1,6 @@
-# Particle Loader
+# 3D Particle Explorations
 
-*Particle loader with transitions*, *Jack Rugile*
+*Explorations of particle animations in 3D space with three.js.*, *Jack Rugile*
 
 ![Image Title](link)
 

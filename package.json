@@ -1,11 +1,11 @@
 {
-  "name": "codrops-particle-loader",
+  "name": "3d-particle-explorations",
   "version": "1.0.0",
   "description": "",
   "main": "gulpfile.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jackrugile/codrops-particle-loader.git"
+    "url": "git+https://github.com/jackrugile/3d-particle-explorations.git"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

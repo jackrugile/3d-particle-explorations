@@ -6,4 +6,5 @@
 - [ ] article write up
  - [ ] mention debug tools in article write up
 - [ ] switch to uglified/minified version when complete
-- [ ] setup new title in html files, read me, and repo
+
+auto rotate for camera in debug mode, until interaction happens
