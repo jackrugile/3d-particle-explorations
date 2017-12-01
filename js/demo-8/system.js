@@ -9,7 +9,7 @@ class System extends SystemBase {
 
 		this.simplex = new FastSimplexNoise();
 
-		this.duration = 6000;
+		this.duration = 7500;
 
 		this.osc1 = new Osc(0, 0.015, true, false);
 		this.color = new THREE.Color();
@@ -176,7 +176,7 @@ class System extends SystemBase {
 				obj.pos.y = this.calc.rand(-this.size / 2, this.size / 2);
 				obj.pos.z = this.calc.rand(-this.size / 2, this.size / 2);
 
-				let hue = (this.loader.elapsedMs / 20 + this.calc.rand(60)) % 360;
+				let hue = (this.loader.elapsedMs / 25 + this.calc.rand(60)) % 360 + 110;
 				let lightness = Math.round(this.calc.rand(10, 50));
 				this.color.set(`hsl(${hue}, 85%, ${lightness}%)`);
 

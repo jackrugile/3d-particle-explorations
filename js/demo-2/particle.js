@@ -27,7 +27,10 @@ class Particle extends ParticleBase {
 
 		let size = 0.05 + this.size * this.amp;
 		this.mesh.material.opacity = 0.1 + this.amp * 0.9;
+		size = 0.05 + 0.1 * this.amp;
 		this.mesh.scale.set(size, size, size);
+
+		this.mesh.position.z = this.alt ? 0.05 + 10 * this.amp : -(0.05 + 10 * this.amp);
 	}
 
 }

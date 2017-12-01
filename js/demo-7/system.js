@@ -14,8 +14,10 @@ class System extends SystemBase {
 
 		this.particleGroup.rotation.z = Math.PI / 4;
 
-		this.rotationTarget = Math.PI / 4;
-		this.lastRotationTarget = this.rotationTarget;
+		this.rotationTargetX = 0;
+		this.lastRotationTargetX = this.rotationTargetX;
+		this.rotationTargetZ = Math.PI / 4;
+		this.lastRotationTargetZ = this.rotationTargetZ;
 		this.rotProg = 1;
 
 		this.inc = 0.04;
@@ -30,7 +32,7 @@ class System extends SystemBase {
 			for(let i = 0; i < this.count; i++) {
 				let x = this.calc.map(i, 0, this.count - 1, -this.spread / 2, this.spread / 2);
 				let y = 0;
-				let z = 0;
+				let z = this.calc.map(j, 0, 3, -0.25, 0.25);
 				let pos = new THREE.Vector3(x, y, z);
 				let color = this.colors[j];
 				let size = 0.3;
@@ -75,17 +77,22 @@ class System extends SystemBase {
 		this.osc1.update();
 
 		if(this.osc1._triggerTop) {
-			this.lastRotationTarget = this.rotationTarget;
-			this.rotationTarget += Math.PI / -4;
+			this.lastRotationTargetX = this.rotationTargetX;
+			this.rotationTargetX += Math.PI * -2;
+			this.lastRotationTargetZ = this.rotationTargetZ;
+			this.rotationTargetZ += Math.PI / -4;
 			this.rotProg = 0;
 		}
 
 		if(this.rotProg < 1) {
-			this.rotProg += 0.02;
-		} 
+			this.rotProg += 0.015;
+		}
 		this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
 
-		this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTarget, this.rotationTarget);
+		//this.particleGroup.rotation.x = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetX, this.rotationTargetX);
+		this.particleGroup.rotation.y = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetX, this.rotationTargetX);
+		this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetZ, this.rotationTargetZ);
+		
 	}
 
 }

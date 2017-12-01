@@ -52,7 +52,10 @@ var Particle = function (_ParticleBase) {
 
 			var size = 0.05 + this.size * this.amp;
 			this.mesh.material.opacity = 0.1 + this.amp * 0.9;
+			size = 0.05 + 0.1 * this.amp;
 			this.mesh.scale.set(size, size, size);
+
+			this.mesh.position.z = this.alt ? 0.05 + 10 * this.amp : -(0.05 + 10 * this.amp);
 		}
 	}]);
 
@@ -95,8 +98,14 @@ var System = function (_SystemBase) {
 		_this.count = 330;
 		_this.visW = 30;
 
-		_this.osc = new Osc(0.2, 0.0125);
+		_this.osc = new Osc(0.2, 0.015);
 		_this.oscEased = 0;
+
+		_this.osc2 = new Osc(1, 0.015, true, false);
+
+		_this.rotationTarget = 0;
+		_this.lastRotationTarget = _this.rotationTarget;
+		_this.rotProg = 0;
 
 		for (var i = 0; i < _this.count; i++) {
 			var x = _this.calc.map(i, 0, _this.count, -_this.visW / 2, _this.visW / 2) + _this.visW / _this.count / 2;
@@ -124,6 +133,20 @@ var System = function (_SystemBase) {
 
 			this.osc.update();
 			this.oscEased = this.osc.val(this.ease.inOutExpo);
+			this.osc2.update();
+
+			if (this.osc2._triggerBot) {
+				this.lastRotationTarget = this.rotationTarget;
+				this.rotationTarget += Math.PI / -2;
+				this.rotProg = 0;
+			}
+
+			if (this.rotProg < 1) {
+				this.rotProg += 0.02;
+			}
+			this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
+
+			this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTarget, this.rotationTarget);
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
@@ -220,10 +243,10 @@ var Loader = function () {
 	}, {
 		key: 'setupCamera',
 		value: function setupCamera() {
-			this.camera = new THREE.PerspectiveCamera(75, 0, 0.0001, 10000);
+			this.camera = new THREE.PerspectiveCamera(100, 0, 0.0001, 10000);
 			this.cameraBaseX = this.isGrid ? -40 : 0;
 			this.cameraBaseY = this.isGrid ? 20 : 0;
-			this.cameraBaseZ = this.isGrid ? 40 : 50;
+			this.cameraBaseZ = this.isGrid ? 40 : 35;
 
 			this.camera.position.x = this.cameraBaseX;
 			this.camera.position.y = this.cameraBaseY;

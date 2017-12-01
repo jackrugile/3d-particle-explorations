@@ -25,75 +25,12 @@ var Particle = function (_ParticleBase) {
 	function Particle(config, system, loader) {
 		_classCallCheck(this, Particle);
 
-		var _this = _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
-
-		_this.origin = new THREE.Vector3(config.x, config.y, config.z);
-		_this.position = new THREE.Vector3(config.x, config.y, config.z);
-
-		_this.life = 2;
-		_this.decay = _this.calc.rand(0.02, 0.06);
-		return _this;
+		return _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
 	}
 
 	_createClass(Particle, [{
-		key: 'createMesh',
-		value: function createMesh() {
-			this.geometry = new THREE.SphereBufferGeometry(1, 6, 6);
-
-			this.material = new THREE.MeshBasicMaterial({
-				//blending: THREE.AdditiveBlending,
-				color: this.color,
-				transparent: true,
-				opacity: this.opacity,
-				depthTest: false,
-				precision: 'lowp'
-			});
-
-			this.mesh = new THREE.Mesh(this.geometry, this.material);
-
-			this.mesh.position.x = this.x;
-			this.mesh.position.y = this.y;
-			this.mesh.position.z = this.z;
-
-			this.mesh.scale.set(this.size, this.size, this.size);
-
-			this.group.add(this.mesh);
-		}
-	}, {
 		key: 'update',
-		value: function update() {
-			var mult = 0.2;
-
-			var multX = this.position.x * mult;
-			var multY = this.position.y * mult;
-			var multZ = this.position.z * mult;
-
-			var noiseVel = 0.2;
-			var noiseTime = this.loader.elapsedMs * 0.0008;
-
-			var noise1 = this.system.simplex.noise4D(multX, multY, multZ, noiseTime);
-			var noise2 = this.system.simplex.noise4D(multX + 100, multY + 100, multZ + 100, 50 + noiseTime);
-			var noise3 = this.system.simplex.noise4D(multX + 200, multY + 200, multZ + 200, 100 + noiseTime);
-
-			this.position.x += Math.sin(noise1 * Math.PI * 2) * noiseVel;
-			this.position.y += Math.sin(noise2 * Math.PI * 2) * noiseVel;
-			this.position.z += Math.sin(noise3 * Math.PI * 2) * noiseVel;
-
-			if (this.life > 0) {
-				this.life -= this.decay;
-			} else {
-				this.life = 2;
-				this.position.x = this.calc.rand(-this.system.size / 2, this.system.size / 2);
-				this.position.y = this.calc.rand(-this.system.size / 2, this.system.size / 2);
-				this.position.z = this.calc.rand(-this.system.size / 2, this.system.size / 2);
-			}
-
-			this.mesh.material.opacity = this.life > 1 ? 2 - this.life : this.life;
-
-			this.mesh.position.x = this.position.x;
-			this.mesh.position.y = this.position.y;
-			this.mesh.position.z = this.position.z;
-		}
+		value: function update() {}
 	}]);
 
 	return Particle;
@@ -128,7 +65,7 @@ var System = function (_SystemBase) {
 
 		_this.simplex = new FastSimplexNoise();
 
-		_this.duration = 6000;
+		_this.duration = 7500;
 
 		_this.osc1 = new Osc(0, 0.015, true, false);
 		_this.color = new THREE.Color();
@@ -264,7 +201,7 @@ var System = function (_SystemBase) {
 					obj.pos.y = this.calc.rand(-this.size / 2, this.size / 2);
 					obj.pos.z = this.calc.rand(-this.size / 2, this.size / 2);
 
-					var hue = (this.loader.elapsedMs / 20 + this.calc.rand(60)) % 360;
+					var hue = (this.loader.elapsedMs / 25 + this.calc.rand(60)) % 360 + 110;
 					var lightness = Math.round(this.calc.rand(10, 50));
 					this.color.set('hsl(' + hue + ', 85%, ' + lightness + '%)');
 
@@ -376,10 +313,10 @@ var Loader = function () {
 	}, {
 		key: 'setupCamera',
 		value: function setupCamera() {
-			this.camera = new THREE.PerspectiveCamera(75, 0, 0.0001, 10000);
+			this.camera = new THREE.PerspectiveCamera(100, 0, 0.0001, 10000);
 			this.cameraBaseX = this.isGrid ? -40 : 0;
 			this.cameraBaseY = this.isGrid ? 20 : 0;
-			this.cameraBaseZ = this.isGrid ? 40 : 50;
+			this.cameraBaseZ = this.isGrid ? 40 : 35;
 
 			this.camera.position.x = this.cameraBaseX;
 			this.camera.position.y = this.cameraBaseY;

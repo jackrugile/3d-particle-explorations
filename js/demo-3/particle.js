@@ -39,6 +39,7 @@ class Particle extends ParticleBase {
 
 		if(this.active && !this.dying) {
 			this.size = this.calc.lerp(this.size, this.sizeTarget, 0.1);
+			this.mesh.position.z = this.calc.map(this.size / this.sizeTarget, 0, 1, -10, this.z);
 		}
 
 		if(!this.dying && this.elapsed > 1500 + this.delay * 4) {

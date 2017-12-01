@@ -67,6 +67,7 @@ var Particle = function (_ParticleBase) {
 
 			if (this.active && !this.dying) {
 				this.size = this.calc.lerp(this.size, this.sizeTarget, 0.1);
+				this.mesh.position.z = this.calc.map(this.size / this.sizeTarget, 0, 1, -10, this.z);
 			}
 
 			if (!this.dying && this.elapsed > 1500 + this.delay * 4) {
@@ -133,7 +134,7 @@ var System = function (_SystemBase) {
 				group: _this.particleGroup,
 				x: 0,
 				y: 0,
-				z: 0,
+				z: _this.calc.rand(0.01, 5),
 				size: _this.calc.rand(0.1, 0.8),
 				delay: i,
 				color: 0xffffff,
@@ -185,6 +186,8 @@ var System = function (_SystemBase) {
 					}
 				}
 			}
+
+			this.particleGroup.rotation.z = this.loader.elapsedMs * -0.0003;
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
@@ -281,10 +284,10 @@ var Loader = function () {
 	}, {
 		key: 'setupCamera',
 		value: function setupCamera() {
-			this.camera = new THREE.PerspectiveCamera(75, 0, 0.0001, 10000);
+			this.camera = new THREE.PerspectiveCamera(100, 0, 0.0001, 10000);
 			this.cameraBaseX = this.isGrid ? -40 : 0;
 			this.cameraBaseY = this.isGrid ? 20 : 0;
-			this.cameraBaseZ = this.isGrid ? 40 : 50;
+			this.cameraBaseZ = this.isGrid ? 40 : 35;
 
 			this.camera.position.x = this.cameraBaseX;
 			this.camera.position.y = this.cameraBaseY;

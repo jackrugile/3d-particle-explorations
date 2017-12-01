@@ -14,7 +14,7 @@ class System extends SystemBase {
 				group: this.particleGroup,
 				x: 0,
 				y: 0,
-				z: 0,
+				z: this.calc.rand(0.01, 5),
 				size: this.calc.rand(0.1, 0.8),
 				delay: i,
 				color: 0xffffff,
@@ -63,6 +63,8 @@ class System extends SystemBase {
 				}
 			}
 		}
+
+		this.particleGroup.rotation.z = this.loader.elapsedMs * -0.0003;
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;

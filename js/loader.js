@@ -66,10 +66,10 @@ class Loader {
 	}
 
 	setupCamera() {
-		this.camera = new THREE.PerspectiveCamera(75, 0, 0.0001, 10000);
+		this.camera = new THREE.PerspectiveCamera(100, 0, 0.0001, 10000);
 		this.cameraBaseX = this.isGrid ? -40 : 0;
 		this.cameraBaseY = this.isGrid ? 20 : 0;
-		this.cameraBaseZ = this.isGrid ? 40 : 50;
+		this.cameraBaseZ = this.isGrid ? 40 : 35;
 
 		this.camera.position.x = this.cameraBaseX;
 		this.camera.position.y = this.cameraBaseY;
