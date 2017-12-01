@@ -11,12 +11,11 @@ class Particle extends ParticleBase {
 		this.baseZ = config.z;
 		this.baseRadius = config.radius;
 		this.baseSize = config.size;
-
 		this.angle = this.baseAngle;
 	}
 
 	update() {
-		this.angle -= this.loader.dtN * Math.cos(this.loader.elapsedMs * 0.0025 - this.baseRadius * 0.15) * 0.02;
+		this.angle -= (Math.cos(this.loader.elapsedMs * 0.0025 - this.baseRadius * 0.15) * 0.02) * this.loader.dtN;
 
 		this.mesh.position.x = Math.cos(this.angle) * this.baseRadius;
 		this.mesh.position.y = Math.sin(this.angle) * this.baseRadius;

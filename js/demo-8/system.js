@@ -7,11 +7,8 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
+		this.duration = 9300;
 		this.simplex = new FastSimplexNoise();
-
-		this.duration = 7500;
-
-		this.osc1 = new Osc(0, 0.015, true, false);
 		this.color = new THREE.Color();
 
 		this.texture = new THREE.TextureLoader().load('./images/orb.png');
@@ -85,6 +82,12 @@ class System extends SystemBase {
 		this.particleGroup.add(this.mesh);
 
 		this.updateParticles(true, true, true);
+
+		this.reset();
+	}
+
+	reset() {
+		this.osc = new Osc(0, 0.015, true, false);
 	}
 
 	createMesh() {
@@ -121,10 +124,15 @@ class System extends SystemBase {
 		}
 	}
 
+	replay() {
+		super.replay();
+		this.reset();
+	}
+
 	update() {
 		super.update();
 
-		this.osc1.update();
+		this.osc.update(this.loader.dtN);
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
@@ -134,7 +142,7 @@ class System extends SystemBase {
 
 		let noiseDiv = 10;
 		let noiseTime = this.loader.elapsedMs * 0.0008;
-		let noiseVel = this.calc.map(this.osc1.val(this.ease.inOutExpo), 0, 1, 0, 1);
+		let noiseVel = this.calc.map(this.osc.val(this.ease.inOutExpo), 0, 1, 0, 1);
 
 		while(i--) {
 			let obj = this.objs[i];
@@ -167,7 +175,7 @@ class System extends SystemBase {
 			obj.pos.z += Math.sin(noise3 * Math.PI * 2) * noiseVel * this.loader.dtN;
 
 			if(obj.life > 0 ) {
-				obj.life -= obj.decay * this.osc1.val(this.ease.inOutExpo);
+				obj.life -= obj.decay * this.osc.val(this.ease.inOutExpo);
 			}
 			
 			if(obj.life <= 0 || obj.firstRun) {
@@ -189,13 +197,13 @@ class System extends SystemBase {
 
 			obj.a = obj.life > 1 ? 2 - obj.life : obj.life;
 
-			obj.size = this.calc.map(this.osc1.val(this.ease.inOutExpo), 0, 1, obj.baseSize * 6, obj.baseSize * 1);
+			obj.size = this.calc.map(this.osc.val(this.ease.inOutExpo), 0, 1, obj.baseSize * 6, obj.baseSize * 1);
 		}
 
 		this.updateParticles(true, true, true);
 
-		this.particleGroup.rotation.y += 0.005 + this.osc1.val(this.ease.inOutExpo) * 0.04;
-		this.particleGroup.position.z = 5 - this.osc1.val(this.ease.inOutExpo) * 15;
+		this.particleGroup.rotation.y += 0.005 + this.osc.val(this.ease.inOutExpo) * 0.04;
+		this.particleGroup.position.z = 5 - this.osc.val(this.ease.inOutExpo) * 15;
 	}
 
 }

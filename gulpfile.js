@@ -31,7 +31,7 @@ gulp.task('build', function(done) {
 gulp.task('serve', function() {
 	gulp.src('./')
 		.pipe(webserver({
-			'host': 'localhost',
+			'host': '0.0.0.0',
 			'fallback': 'index.html',
 			'livereload': true,
 			'open': true,

@@ -73,7 +73,6 @@ var Particle = function (_ParticleBase) {
 
 			if (!this.dying && this.elapsed > 1500 + this.delay * 4) {
 				this.dying = true;
-				this.mesh.position.z += 1.1;
 			}
 
 			if (this.dying) {
@@ -127,7 +126,7 @@ var System = function (_SystemBase) {
 
 		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
 
-		_this.duration = 6000;
+		_this.duration = 6200;
 		_this.count = 75;
 
 		for (var i = 0; i < _this.count; i++) {
@@ -180,10 +179,10 @@ var System = function (_SystemBase) {
 						var diff = radii - dist;
 						var x = Math.cos(angle) * diff * 0.03;
 						var y = Math.sin(angle) * diff * 0.03;
-						c1pos.x += x;
-						c1pos.y += y;
-						c2pos.x -= x;
-						c2pos.y -= y;
+						c1pos.x += x * this.loader.dtN;
+						c1pos.y += y * this.loader.dtN;
+						c2pos.x -= x * this.loader.dtN;
+						c2pos.y -= y * this.loader.dtN;
 					}
 				}
 			}
@@ -222,8 +221,6 @@ var Loader = function () {
 		this.ease = new Ease();
 
 		this.container = document.querySelector('.loader');
-		this.contentFixed = document.querySelector('.content--fixed');
-		this.contentOuter = document.querySelector('.content-outer');
 		this.replayButton = document.querySelector('.replay-loader');
 		this.width = null;
 		this.height = null;
@@ -282,7 +279,7 @@ var Loader = function () {
 			this.clock = new THREE.Clock();
 			this.dtS = this.clock.getDelta();
 			this.dtMs = this.dtS * 1000;
-			this.dtN = this.dtMs / (1000 / 60);
+			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
 			this.elapsedMs = 0;
 		}
 	}, {
@@ -342,7 +339,7 @@ var Loader = function () {
 		value: function update() {
 			this.dtS = this.clock.getDelta();
 			this.dtMs = this.dtS * 1000;
-			this.dtN = this.dtMs / (1000 / 60);
+			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
 			this.elapsedMs += this.dtMs;
 
 			this.system.update();
@@ -393,11 +390,15 @@ var Loader = function () {
 	}, {
 		key: 'complete',
 		value: function complete() {
+			var _this4 = this;
+
 			if (this.isOrbit || this.isGrid) {
 				return;
 			}
-			this.clock.stop();
-			MainLoop.stop();
+			setTimeout(function () {
+				_this4.clock.stop();
+				MainLoop.stop();
+			}, 600);
 			this.completed = true;
 			document.documentElement.classList.remove('loading');
 			document.documentElement.classList.add('completed');
@@ -414,9 +415,6 @@ var Loader = function () {
 
 			this.renderer.setPixelRatio(this.dpr);
 			this.renderer.setSize(this.width, this.height);
-
-			//let topHeight = this.contentFixed.offsetHeight;
-			//this.contentOuter.style.paddingTop = `${topHeight}px`;
 		}
 	}, {
 		key: 'onReplayButtonClick',
@@ -514,6 +512,7 @@ var SystemBase = function () {
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
+		this.particleGroup.scale.set(0.0001, 0.0001, 0.0001);
 
 		this.loader.scene.add(this.particleGroup);
 
@@ -536,7 +535,7 @@ var SystemBase = function () {
 			}
 
 			if (this.entering && this.enterProg < 1) {
-				this.enterProg += this.enterRate;
+				this.enterProg += this.enterRate * this.loader.dtN;
 				if (this.enterProg > 1) {
 					this.enterProg = 1;
 					this.entering = false;
@@ -550,7 +549,7 @@ var SystemBase = function () {
 			}
 
 			if (this.exiting) {
-				this.exitProg += this.exitRate;
+				this.exitProg += this.exitRate * this.loader.dtN;
 				if (this.exitProg >= 1 && !this.loader.completed) {
 					this.exitProg = 1;
 					this.loader.complete();
@@ -572,10 +571,6 @@ var SystemBase = function () {
 
 			this.exiting = false;
 			this.exitProg = 0;
-
-			if (this.osc) {
-				this.osc.reset();
-			}
 		}
 	}]);
 

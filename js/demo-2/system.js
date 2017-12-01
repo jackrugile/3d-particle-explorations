@@ -7,23 +7,10 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
-		this.duration = 6000;
-
+		this.duration = 8500;
 		this.simplex = new FastSimplexNoise();
-
-		this.lines = [];
-
 		this.count = 330;
 		this.visW = 30;
-
-		this.osc = new Osc(0.2, 0.015);
-		this.oscEased = 0;
-
-		this.osc2 = new Osc(1, 0.015, true, false);
-
-		this.rotationTarget = 0;
-		this.lastRotationTarget = this.rotationTarget;
-		this.rotProg = 0;
 
 		for(let i = 0; i < this.count; i++) {
 			let x = this.calc.map(i, 0, this.count , -this.visW / 2, this.visW / 2) + (this.visW / this.count / 2);
@@ -41,24 +28,40 @@ class System extends SystemBase {
 				alt: i % 2 === 0
 			}, this, this.loader));
 		}
+
+		this.reset();
+	}
+
+	reset() {
+		this.osc1 = new Osc(0.2, 0.015);
+		this.osc1Eased = 0;
+		this.osc2 = new Osc(1, 0.015, true, false);
+		this.rotationTarget = 0;
+		this.lastRotationTarget = this.rotationTarget;
+		this.rotProg = 0;
+	}
+
+	replay() {
+		super.replay();
+		this.reset();
 	}
 
 	update() {
 		super.update();
 
-		this.osc.update();
-		this.oscEased = this.osc.val(this.ease.inOutExpo);
-		this.osc2.update();
+		this.osc1.update(this.loader.dtN);
+		this.osc1Eased = this.osc1.val(this.ease.inOutExpo);
+		this.osc2.update(this.loader.dtN);
 
 		if(this.osc2._triggerBot) {
 			this.lastRotationTarget = this.rotationTarget;
 			this.rotationTarget += Math.PI / -2;
-			this.rotProg = 0;
+			this.rotProg = this.rotProg - 1;
 		}
 
 		if(this.rotProg < 1) {
-			this.rotProg += 0.02;
-		} 
+			this.rotProg += 0.02 * this.loader.dtN;
+		}
 		this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
 
 		this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTarget, this.rotationTarget);

@@ -50,15 +50,16 @@ class Drop {
 	}
 
 	update(i) {
-		// ease
-		this.prog += this.rate;
+		this.prog += this.rate * this.loader.dtN;
 		this.mesh.position.y = this.baseY - this.ease.inExpo(this.prog, 0, 1, 1) * this.baseY;
 		this.mesh.scale.set(this.size, this.size + this.size * 16 * this.ease.inExpo(this.prog, 0, 1, 1), this.size);
 		this.mesh.material.opacity = this.ease.inExpo(this.prog, 0, 1, 1);
 
-		if(this.prog > 1) {
-			this.array.splice(i, 1);
+		if(this.prog >= 1) {
+			this.geometry.dispose();
+			this.material.dispose();
 			this.group.remove(this.mesh);
+			this.array.splice(i, 1);
 			this.system.createRipple(this.mesh.position.x, this.mesh.position.z);
 		}
 	}

@@ -7,19 +7,9 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
-		this.duration = 6000;
+		this.duration = 8800;
 		this.count = 10;
 		this.spread = 20;
-		this.osc1 = new Osc(0.3, 0.015, false, false);
-
-		this.particleGroup.rotation.z = Math.PI / 4;
-
-		this.rotationTargetX = 0;
-		this.lastRotationTargetX = this.rotationTargetX;
-		this.rotationTargetZ = Math.PI / 4;
-		this.lastRotationTargetZ = this.rotationTargetZ;
-		this.rotProg = 1;
-
 		this.inc = 0.04;
 		this.colors = [
 			0xff00ff,
@@ -65,6 +55,25 @@ class System extends SystemBase {
 				}, this, this.loader));
 			}
 		}
+
+		this.reset();
+	}
+
+	reset() {
+		this.osc = new Osc(0.3, 0.015, false, false);
+
+		this.particleGroup.rotation.z = Math.PI / 4;
+
+		this.rotationTargetX = 0;
+		this.lastRotationTargetX = this.rotationTargetX;
+		this.rotationTargetZ = Math.PI / 4;
+		this.lastRotationTargetZ = this.rotationTargetZ;
+		this.rotProg = 1;
+	}
+
+	replay() {
+		super.replay();
+		this.reset();
 	}
 
 	update() {
@@ -74,25 +83,23 @@ class System extends SystemBase {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 
-		this.osc1.update();
+		this.osc.update(this.loader.dtN);
 
-		if(this.osc1._triggerTop) {
+		if(this.osc._triggerTop) {
 			this.lastRotationTargetX = this.rotationTargetX;
 			this.rotationTargetX += Math.PI * -2;
 			this.lastRotationTargetZ = this.rotationTargetZ;
 			this.rotationTargetZ += Math.PI / -4;
-			this.rotProg = 0;
+			this.rotProg = this.rotProg - 1;
 		}
 
 		if(this.rotProg < 1) {
-			this.rotProg += 0.015;
+			this.rotProg += 0.015 * this.loader.dtN;
 		}
 		this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
 
-		//this.particleGroup.rotation.x = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetX, this.rotationTargetX);
 		this.particleGroup.rotation.y = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetX, this.rotationTargetX);
 		this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetZ, this.rotationTargetZ);
-		
 	}
 
 }

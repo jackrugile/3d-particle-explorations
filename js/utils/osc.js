@@ -23,13 +23,13 @@ class Osc {
 		this._flip = this._baseFlip;
 	}
 
-	update() {
+	update(dt) {
 		this._trigger = false;
 		this._triggerTop = false;
 		this._triggerBot = false;
 		if(this._dir) {
 			if(this._val < 1) {
-				this._val += this._rate;
+				this._val += this._rate * dt;
 			} else {
 				this._trigger = true;
 				this._triggerTop = true;
@@ -42,7 +42,7 @@ class Osc {
 			}
 		} else {
 			if(this._val > 0) {
-				this._val -= this._rate;
+				this._val -= this._rate * dt;
 			} else {
 				this._trigger = true;
 				this._triggerBot = true;

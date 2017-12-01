@@ -1,19 +1,14 @@
 #### WORKING
 
+- [ ] clean up inconsistencies in code
 - [ ] document code
 - [ ] move particles own class for #8
 - [ ] article write up
 - [ ] mention debug tools in article write up
-- [ ] enter debug mode button
-- [ ] switch to uglified version when complete
-- [ ] test on mobile
-- [ ] test on browsers
-- [ ] handle viewport width changes, getting cut off now, how can we maintain this?
+- [ ] switch to uglified/minified version when complete
 - [ ] handle unfocused tab and timing
-- [ ] handle memory clean up and stopping
 - [ ] add debug scene button to toggle grid and orbit
-- [ ] tune duration timings
-- [ ] figure out overlap issue on mobile sizes
+- [ ] write up for npm and gulp
 
 #### EXITS
 
@@ -23,3 +18,8 @@
 - [ ] bubble up, then content comes from bottom
 - [ ] ease left, then content come from right
 - [ ] ease right, then content come from left
+
+DURING SEND
+article write up
+debug scene
+having difficulty coming up with and executing exits, should we rebrand?

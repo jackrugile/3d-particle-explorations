@@ -29,7 +29,6 @@ var Particle = function (_ParticleBase) {
 		var _this = _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
 
 		_this.alt = config.alt;
-
 		_this.div = 0.15;
 		_this.amp = 0;
 		_this.speed = 0;
@@ -41,12 +40,12 @@ var Particle = function (_ParticleBase) {
 		value: function update() {
 			if (this.alt) {
 				this.amp = (this.system.visW / 2 - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
-				this.amp *= this.system.oscEased;
+				this.amp *= this.system.osc1Eased;
 				this.speed = this.loader.elapsedMs / 750;
 				this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.div + this.speed, 0) * 10 * this.amp;
 			} else {
 				this.amp = (this.system.visW / 2 - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
-				this.amp *= 1 - this.system.oscEased;
+				this.amp *= 1 - this.system.osc1Eased;
 				this.speed = this.loader.elapsedMs / 750;
 				this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.div + this.speed + 1000, 1000) * 10 * this.amp;
 			}
@@ -90,23 +89,10 @@ var System = function (_SystemBase) {
 
 		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
 
-		_this.duration = 6000;
-
+		_this.duration = 8500;
 		_this.simplex = new FastSimplexNoise();
-
-		_this.lines = [];
-
 		_this.count = 330;
 		_this.visW = 30;
-
-		_this.osc = new Osc(0.2, 0.015);
-		_this.oscEased = 0;
-
-		_this.osc2 = new Osc(1, 0.015, true, false);
-
-		_this.rotationTarget = 0;
-		_this.lastRotationTarget = _this.rotationTarget;
-		_this.rotProg = 0;
 
 		for (var i = 0; i < _this.count; i++) {
 			var x = _this.calc.map(i, 0, _this.count, -_this.visW / 2, _this.visW / 2) + _this.visW / _this.count / 2;
@@ -124,26 +110,44 @@ var System = function (_SystemBase) {
 				alt: i % 2 === 0
 			}, _this, _this.loader));
 		}
+
+		_this.reset();
 		return _this;
 	}
 
 	_createClass(System, [{
+		key: 'reset',
+		value: function reset() {
+			this.osc1 = new Osc(0.2, 0.015);
+			this.osc1Eased = 0;
+			this.osc2 = new Osc(1, 0.015, true, false);
+			this.rotationTarget = 0;
+			this.lastRotationTarget = this.rotationTarget;
+			this.rotProg = 0;
+		}
+	}, {
+		key: 'replay',
+		value: function replay() {
+			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'replay', this).call(this);
+			this.reset();
+		}
+	}, {
 		key: 'update',
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
 
-			this.osc.update();
-			this.oscEased = this.osc.val(this.ease.inOutExpo);
-			this.osc2.update();
+			this.osc1.update(this.loader.dtN);
+			this.osc1Eased = this.osc1.val(this.ease.inOutExpo);
+			this.osc2.update(this.loader.dtN);
 
 			if (this.osc2._triggerBot) {
 				this.lastRotationTarget = this.rotationTarget;
 				this.rotationTarget += Math.PI / -2;
-				this.rotProg = 0;
+				this.rotProg = this.rotProg - 1;
 			}
 
 			if (this.rotProg < 1) {
-				this.rotProg += 0.02;
+				this.rotProg += 0.02 * this.loader.dtN;
 			}
 			this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
 
@@ -181,8 +185,6 @@ var Loader = function () {
 		this.ease = new Ease();
 
 		this.container = document.querySelector('.loader');
-		this.contentFixed = document.querySelector('.content--fixed');
-		this.contentOuter = document.querySelector('.content-outer');
 		this.replayButton = document.querySelector('.replay-loader');
 		this.width = null;
 		this.height = null;
@@ -241,7 +243,7 @@ var Loader = function () {
 			this.clock = new THREE.Clock();
 			this.dtS = this.clock.getDelta();
 			this.dtMs = this.dtS * 1000;
-			this.dtN = this.dtMs / (1000 / 60);
+			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
 			this.elapsedMs = 0;
 		}
 	}, {
@@ -301,7 +303,7 @@ var Loader = function () {
 		value: function update() {
 			this.dtS = this.clock.getDelta();
 			this.dtMs = this.dtS * 1000;
-			this.dtN = this.dtMs / (1000 / 60);
+			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
 			this.elapsedMs += this.dtMs;
 
 			this.system.update();
@@ -352,11 +354,15 @@ var Loader = function () {
 	}, {
 		key: 'complete',
 		value: function complete() {
+			var _this4 = this;
+
 			if (this.isOrbit || this.isGrid) {
 				return;
 			}
-			this.clock.stop();
-			MainLoop.stop();
+			setTimeout(function () {
+				_this4.clock.stop();
+				MainLoop.stop();
+			}, 600);
 			this.completed = true;
 			document.documentElement.classList.remove('loading');
 			document.documentElement.classList.add('completed');
@@ -373,9 +379,6 @@ var Loader = function () {
 
 			this.renderer.setPixelRatio(this.dpr);
 			this.renderer.setSize(this.width, this.height);
-
-			//let topHeight = this.contentFixed.offsetHeight;
-			//this.contentOuter.style.paddingTop = `${topHeight}px`;
 		}
 	}, {
 		key: 'onReplayButtonClick',
@@ -473,6 +476,7 @@ var SystemBase = function () {
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
+		this.particleGroup.scale.set(0.0001, 0.0001, 0.0001);
 
 		this.loader.scene.add(this.particleGroup);
 
@@ -495,7 +499,7 @@ var SystemBase = function () {
 			}
 
 			if (this.entering && this.enterProg < 1) {
-				this.enterProg += this.enterRate;
+				this.enterProg += this.enterRate * this.loader.dtN;
 				if (this.enterProg > 1) {
 					this.enterProg = 1;
 					this.entering = false;
@@ -509,7 +513,7 @@ var SystemBase = function () {
 			}
 
 			if (this.exiting) {
-				this.exitProg += this.exitRate;
+				this.exitProg += this.exitRate * this.loader.dtN;
 				if (this.exitProg >= 1 && !this.loader.completed) {
 					this.exitProg = 1;
 					this.loader.complete();
@@ -531,10 +535,6 @@ var SystemBase = function () {
 
 			this.exiting = false;
 			this.exitProg = 0;
-
-			if (this.osc) {
-				this.osc.reset();
-			}
 		}
 	}]);
 
@@ -1414,13 +1414,13 @@ var Osc = function () {
 		}
 	}, {
 		key: "update",
-		value: function update() {
+		value: function update(dt) {
 			this._trigger = false;
 			this._triggerTop = false;
 			this._triggerBot = false;
 			if (this._dir) {
 				if (this._val < 1) {
-					this._val += this._rate;
+					this._val += this._rate * dt;
 				} else {
 					this._trigger = true;
 					this._triggerTop = true;
@@ -1433,7 +1433,7 @@ var Osc = function () {
 				}
 			} else {
 				if (this._val > 0) {
-					this._val -= this._rate;
+					this._val -= this._rate * dt;
 				} else {
 					this._trigger = true;
 					this._triggerBot = true;

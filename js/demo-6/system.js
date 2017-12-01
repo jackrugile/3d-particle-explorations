@@ -7,17 +7,10 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
-		this.duration = 6000;
-
+		this.duration = 6100;
 		this.count = 60;
 		this.outer = 12;
 
-		this.osc = new Osc(1, 0.015, true, false);
-
-		this.rotationTarget = 0;
-		this.lastRotationTarget = this.rotationTarget;
-		this.rotProg = 0;
-		
 		for(let i = 0; i < this.count; i++) {
 			let x = 0;
 			let y = 0;
@@ -40,29 +33,40 @@ class System extends SystemBase {
 				opacity: opacity
 			}, this, this.loader));
 		}
+
+		this.reset();
+	}
+
+	reset() {
+		this.osc = new Osc(0.5, 0.015, true, false);
+		this.rotationTarget = 0;
+		this.lastRotationTarget = this.rotationTarget;
+		this.rotProg = 0;
+	}
+
+	replay() {
+		super.replay();
+		this.reset();
 	}
 
 	update() {
 		super.update();
 
-		this.osc.update();
+		this.osc.update(this.loader.dtN);
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 
-		//this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMs * 0.002) * -0.5;
-		//this.particleGroup.rotation.y = this.calc.map(this.osc.val(this.ease.inOutExpo), 0, 1, 0, Math.PI * 0.5);
-
 		if(this.osc._triggerTop) {
 			this.lastRotationTarget = this.rotationTarget;
 			this.rotationTarget += Math.PI / -1;
-			this.rotProg = 0;
+			this.rotProg = this.rotProg - 1;
 		}
 
 		if(this.rotProg < 1) {
-			this.rotProg += 0.0075;
-		} 
+			this.rotProg += 0.0075 * this.loader.dtN;
+		}
 		this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
 
 		this.particleGroup.rotation.y = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTarget, this.rotationTarget);

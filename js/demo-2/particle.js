@@ -6,7 +6,6 @@ class Particle extends ParticleBase {
 		super(config, system, loader);
 
 		this.alt = config.alt;
-
 		this.div = 0.15
 		this.amp = 0;
 		this.speed = 0;
@@ -15,12 +14,12 @@ class Particle extends ParticleBase {
 	update() {
 		if(this.alt) {
 			this.amp = ((this.system.visW / 2) - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
-			this.amp *= this.system.oscEased;
+			this.amp *= this.system.osc1Eased;
 			this.speed = this.loader.elapsedMs / 750;
 			this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.div + this.speed, 0) * 10 * this.amp;
 		} else {
 			this.amp = ((this.system.visW / 2) - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
-			this.amp *= 1 - this.system.oscEased;
+			this.amp *= 1 - this.system.osc1Eased;
 			this.speed = this.loader.elapsedMs / 750;
 			this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.div + this.speed + 1000, 1000) * 10 * this.amp;
 		}

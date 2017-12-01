@@ -41,7 +41,7 @@ var Particle = function (_ParticleBase) {
 		_this.alt = config.alt;
 		_this.offset = config.offset;
 
-		_this.osc1 = new Osc(_this.prog * 0.5 + _this.offset, 0.015, true, false);
+		_this.osc = new Osc(_this.prog * 0.5 + _this.offset, 0.015, true, false);
 		return _this;
 	}
 
@@ -72,20 +72,20 @@ var Particle = function (_ParticleBase) {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.osc1.update();
+			this.osc.update(1);
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 			}
 
-			var val1 = this.osc1.val(this.ease.inOutExpo);
-			var val2 = Math.abs(this.lastY - this.mesh.position.y) * 3;
-			var val3 = Math.abs(this.lastY - this.mesh.position.y) / 4;
+			var val1 = this.osc.val(this.ease.inOutExpo);
+			var val2 = Math.abs(this.lastY - this.mesh.position.y) * 3 * this.loader.dtN;
+			var val3 = Math.abs(this.lastY - this.mesh.position.y) / 4 * this.loader.dtN;
 
 			if (this.alt) {
-				val1 = this.osc1.val(this.ease.inOutExpo);
-				val2 = Math.abs(this.lastX - this.mesh.position.x) * 3;
-				val3 = Math.abs(this.lastX - this.mesh.position.x) / 4;
+				val1 = this.osc.val(this.ease.inOutExpo);
+				val2 = Math.abs(this.lastX - this.mesh.position.x) * 3 * this.loader.dtN;
+				val3 = Math.abs(this.lastX - this.mesh.position.x) / 4 * this.loader.dtN;
 			}
 
 			this.lastX = this.mesh.position.x;
@@ -132,19 +132,9 @@ var System = function (_SystemBase) {
 
 		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
 
-		_this.duration = 6000;
+		_this.duration = 8800;
 		_this.count = 10;
 		_this.spread = 20;
-		_this.osc1 = new Osc(0.3, 0.015, false, false);
-
-		_this.particleGroup.rotation.z = Math.PI / 4;
-
-		_this.rotationTargetX = 0;
-		_this.lastRotationTargetX = _this.rotationTargetX;
-		_this.rotationTargetZ = Math.PI / 4;
-		_this.lastRotationTargetZ = _this.rotationTargetZ;
-		_this.rotProg = 1;
-
 		_this.inc = 0.04;
 		_this.colors = [0xff00ff, 0xff0000, 0x00ff00, 0x0000ff];
 
@@ -185,10 +175,31 @@ var System = function (_SystemBase) {
 				}, _this, _this.loader));
 			}
 		}
+
+		_this.reset();
 		return _this;
 	}
 
 	_createClass(System, [{
+		key: 'reset',
+		value: function reset() {
+			this.osc = new Osc(0.3, 0.015, false, false);
+
+			this.particleGroup.rotation.z = Math.PI / 4;
+
+			this.rotationTargetX = 0;
+			this.lastRotationTargetX = this.rotationTargetX;
+			this.rotationTargetZ = Math.PI / 4;
+			this.lastRotationTargetZ = this.rotationTargetZ;
+			this.rotProg = 1;
+		}
+	}, {
+		key: 'replay',
+		value: function replay() {
+			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'replay', this).call(this);
+			this.reset();
+		}
+	}, {
 		key: 'update',
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
@@ -197,22 +208,21 @@ var System = function (_SystemBase) {
 				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 			}
 
-			this.osc1.update();
+			this.osc.update(this.loader.dtN);
 
-			if (this.osc1._triggerTop) {
+			if (this.osc._triggerTop) {
 				this.lastRotationTargetX = this.rotationTargetX;
 				this.rotationTargetX += Math.PI * -2;
 				this.lastRotationTargetZ = this.rotationTargetZ;
 				this.rotationTargetZ += Math.PI / -4;
-				this.rotProg = 0;
+				this.rotProg = this.rotProg - 1;
 			}
 
 			if (this.rotProg < 1) {
-				this.rotProg += 0.015;
+				this.rotProg += 0.015 * this.loader.dtN;
 			}
 			this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
 
-			//this.particleGroup.rotation.x = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetX, this.rotationTargetX);
 			this.particleGroup.rotation.y = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetX, this.rotationTargetX);
 			this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetZ, this.rotationTargetZ);
 		}
@@ -244,8 +254,6 @@ var Loader = function () {
 		this.ease = new Ease();
 
 		this.container = document.querySelector('.loader');
-		this.contentFixed = document.querySelector('.content--fixed');
-		this.contentOuter = document.querySelector('.content-outer');
 		this.replayButton = document.querySelector('.replay-loader');
 		this.width = null;
 		this.height = null;
@@ -304,7 +312,7 @@ var Loader = function () {
 			this.clock = new THREE.Clock();
 			this.dtS = this.clock.getDelta();
 			this.dtMs = this.dtS * 1000;
-			this.dtN = this.dtMs / (1000 / 60);
+			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
 			this.elapsedMs = 0;
 		}
 	}, {
@@ -364,7 +372,7 @@ var Loader = function () {
 		value: function update() {
 			this.dtS = this.clock.getDelta();
 			this.dtMs = this.dtS * 1000;
-			this.dtN = this.dtMs / (1000 / 60);
+			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
 			this.elapsedMs += this.dtMs;
 
 			this.system.update();
@@ -415,11 +423,15 @@ var Loader = function () {
 	}, {
 		key: 'complete',
 		value: function complete() {
+			var _this4 = this;
+
 			if (this.isOrbit || this.isGrid) {
 				return;
 			}
-			this.clock.stop();
-			MainLoop.stop();
+			setTimeout(function () {
+				_this4.clock.stop();
+				MainLoop.stop();
+			}, 600);
 			this.completed = true;
 			document.documentElement.classList.remove('loading');
 			document.documentElement.classList.add('completed');
@@ -436,9 +448,6 @@ var Loader = function () {
 
 			this.renderer.setPixelRatio(this.dpr);
 			this.renderer.setSize(this.width, this.height);
-
-			//let topHeight = this.contentFixed.offsetHeight;
-			//this.contentOuter.style.paddingTop = `${topHeight}px`;
 		}
 	}, {
 		key: 'onReplayButtonClick',
@@ -536,6 +545,7 @@ var SystemBase = function () {
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
+		this.particleGroup.scale.set(0.0001, 0.0001, 0.0001);
 
 		this.loader.scene.add(this.particleGroup);
 
@@ -558,7 +568,7 @@ var SystemBase = function () {
 			}
 
 			if (this.entering && this.enterProg < 1) {
-				this.enterProg += this.enterRate;
+				this.enterProg += this.enterRate * this.loader.dtN;
 				if (this.enterProg > 1) {
 					this.enterProg = 1;
 					this.entering = false;
@@ -572,7 +582,7 @@ var SystemBase = function () {
 			}
 
 			if (this.exiting) {
-				this.exitProg += this.exitRate;
+				this.exitProg += this.exitRate * this.loader.dtN;
 				if (this.exitProg >= 1 && !this.loader.completed) {
 					this.exitProg = 1;
 					this.loader.complete();
@@ -594,10 +604,6 @@ var SystemBase = function () {
 
 			this.exiting = false;
 			this.exitProg = 0;
-
-			if (this.osc) {
-				this.osc.reset();
-			}
 		}
 	}]);
 
@@ -1477,13 +1483,13 @@ var Osc = function () {
 		}
 	}, {
 		key: "update",
-		value: function update() {
+		value: function update(dt) {
 			this._trigger = false;
 			this._triggerTop = false;
 			this._triggerBot = false;
 			if (this._dir) {
 				if (this._val < 1) {
-					this._val += this._rate;
+					this._val += this._rate * dt;
 				} else {
 					this._trigger = true;
 					this._triggerTop = true;
@@ -1496,7 +1502,7 @@ var Osc = function () {
 				}
 			} else {
 				if (this._val > 0) {
-					this._val -= this._rate;
+					this._val -= this._rate * dt;
 				} else {
 					this._trigger = true;
 					this._triggerBot = true;

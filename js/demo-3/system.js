@@ -6,7 +6,7 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
-		this.duration = 6000;
+		this.duration = 6200;
 		this.count = 75;
 
 		for(let i = 0; i < this.count; i++) {
@@ -56,10 +56,10 @@ class System extends SystemBase {
 					let diff = radii - dist;
 					let x = Math.cos(angle) * diff * 0.03;
 					let y = Math.sin(angle) * diff * 0.03;
-					c1pos.x += x;
-					c1pos.y += y;
-					c2pos.x -= x;
-					c2pos.y -= y;
+					c1pos.x += x * this.loader.dtN;
+					c1pos.y += y * this.loader.dtN;
+					c2pos.x -= x * this.loader.dtN;
+					c2pos.y -= y * this.loader.dtN;
 				}
 			}
 		}

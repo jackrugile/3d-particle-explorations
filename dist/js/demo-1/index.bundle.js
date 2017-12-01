@@ -34,7 +34,6 @@ var Particle = function (_ParticleBase) {
 		_this.baseZ = config.z;
 		_this.baseRadius = config.radius;
 		_this.baseSize = config.size;
-
 		_this.angle = _this.baseAngle;
 		return _this;
 	}
@@ -42,7 +41,7 @@ var Particle = function (_ParticleBase) {
 	_createClass(Particle, [{
 		key: 'update',
 		value: function update() {
-			this.angle -= this.loader.dtN * Math.cos(this.loader.elapsedMs * 0.0025 - this.baseRadius * 0.15) * 0.02;
+			this.angle -= Math.cos(this.loader.elapsedMs * 0.0025 - this.baseRadius * 0.15) * 0.02 * this.loader.dtN;
 
 			this.mesh.position.x = Math.cos(this.angle) * this.baseRadius;
 			this.mesh.position.y = Math.sin(this.angle) * this.baseRadius;
@@ -84,8 +83,7 @@ var System = function (_SystemBase) {
 
 		var _this = _possibleConstructorReturn(this, (System.__proto__ || Object.getPrototypeOf(System)).call(this, loader));
 
-		_this.duration = 6000;
-
+		_this.duration = 6200;
 		_this.rings = 8;
 		_this.radius = 0;
 		_this.radiusGrowth = 1.5;
@@ -155,8 +153,6 @@ var Loader = function () {
 		this.ease = new Ease();
 
 		this.container = document.querySelector('.loader');
-		this.contentFixed = document.querySelector('.content--fixed');
-		this.contentOuter = document.querySelector('.content-outer');
 		this.replayButton = document.querySelector('.replay-loader');
 		this.width = null;
 		this.height = null;
@@ -215,7 +211,7 @@ var Loader = function () {
 			this.clock = new THREE.Clock();
 			this.dtS = this.clock.getDelta();
 			this.dtMs = this.dtS * 1000;
-			this.dtN = this.dtMs / (1000 / 60);
+			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
 			this.elapsedMs = 0;
 		}
 	}, {
@@ -275,7 +271,7 @@ var Loader = function () {
 		value: function update() {
 			this.dtS = this.clock.getDelta();
 			this.dtMs = this.dtS * 1000;
-			this.dtN = this.dtMs / (1000 / 60);
+			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
 			this.elapsedMs += this.dtMs;
 
 			this.system.update();
@@ -326,11 +322,15 @@ var Loader = function () {
 	}, {
 		key: 'complete',
 		value: function complete() {
+			var _this4 = this;
+
 			if (this.isOrbit || this.isGrid) {
 				return;
 			}
-			this.clock.stop();
-			MainLoop.stop();
+			setTimeout(function () {
+				_this4.clock.stop();
+				MainLoop.stop();
+			}, 600);
 			this.completed = true;
 			document.documentElement.classList.remove('loading');
 			document.documentElement.classList.add('completed');
@@ -347,9 +347,6 @@ var Loader = function () {
 
 			this.renderer.setPixelRatio(this.dpr);
 			this.renderer.setSize(this.width, this.height);
-
-			//let topHeight = this.contentFixed.offsetHeight;
-			//this.contentOuter.style.paddingTop = `${topHeight}px`;
 		}
 	}, {
 		key: 'onReplayButtonClick',
@@ -447,6 +444,7 @@ var SystemBase = function () {
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
+		this.particleGroup.scale.set(0.0001, 0.0001, 0.0001);
 
 		this.loader.scene.add(this.particleGroup);
 
@@ -469,7 +467,7 @@ var SystemBase = function () {
 			}
 
 			if (this.entering && this.enterProg < 1) {
-				this.enterProg += this.enterRate;
+				this.enterProg += this.enterRate * this.loader.dtN;
 				if (this.enterProg > 1) {
 					this.enterProg = 1;
 					this.entering = false;
@@ -483,7 +481,7 @@ var SystemBase = function () {
 			}
 
 			if (this.exiting) {
-				this.exitProg += this.exitRate;
+				this.exitProg += this.exitRate * this.loader.dtN;
 				if (this.exitProg >= 1 && !this.loader.completed) {
 					this.exitProg = 1;
 					this.loader.complete();
@@ -505,10 +503,6 @@ var SystemBase = function () {
 
 			this.exiting = false;
 			this.exitProg = 0;
-
-			if (this.osc) {
-				this.osc.reset();
-			}
 		}
 	}]);
 

@@ -11,6 +11,7 @@ class SystemBase {
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
+		this.particleGroup.scale.set(0.0001, 0.0001, 0.0001);
 
 		this.loader.scene.add(this.particleGroup);
 
@@ -31,7 +32,7 @@ class SystemBase {
 		}
 
 		if(this.entering && this.enterProg < 1) {
-			this.enterProg += this.enterRate;
+			this.enterProg += this.enterRate * this.loader.dtN;
 			if(this.enterProg > 1) {
 				this.enterProg = 1;
 				this.entering = false;
@@ -45,7 +46,7 @@ class SystemBase {
 		}
 
 		if(this.exiting) {
-			this.exitProg += this.exitRate;
+			this.exitProg += this.exitRate * this.loader.dtN;
 			if(this.exitProg >= 1 && !this.loader.completed) {
 				this.exitProg = 1;
 				this.loader.complete();
@@ -66,10 +67,6 @@ class SystemBase {
 
 		this.exiting = false;
 		this.exitProg = 0;
-
-		if(this.osc) {
-			this.osc.reset();
-		}
 	}
 
 }

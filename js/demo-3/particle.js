@@ -44,7 +44,6 @@ class Particle extends ParticleBase {
 
 		if(!this.dying && this.elapsed > 1500 + this.delay * 4) {
 			this.dying = true;
-			this.mesh.position.z += 1.1;
 		}
 
 		if(this.dying) {

@@ -22,8 +22,6 @@ class System extends SystemBase {
 		this.dropTickMin = 20;
 		this.dropTickMax = 40;
 
-		this.setCamera();
-
 		for(let col = 0; col < this.cols; col++) {
 			for(let row = 0; row < this.rows; row++) {
 				let x = this.calc.map(col, 0, this.cols - 1, -this.size / 2, this.size / 2);
@@ -41,6 +39,27 @@ class System extends SystemBase {
 				}, this, this.loader));
 			}
 		}
+
+		this.reset();
+	}
+
+	reset() {
+		this.tick = 0;
+		this.setCamera();
+
+		let i = this.drops.length;
+		while(i--) {
+			this.drops[i].prog = 1;
+			this.drops[i].update(i);
+		}
+
+		let j = this.ripples.length;
+		while(j--) {
+			this.ripples[j].destroy(i);
+		}
+
+		this.drops.length = 0;
+		this.ripples.length = 0;
 	}
 
 	setCamera() {
@@ -89,7 +108,7 @@ class System extends SystemBase {
 
 	replay() {
 		super.replay();
-		this.setCamera();
+		this.reset();
 	}
 
 	update() {

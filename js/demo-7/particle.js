@@ -18,7 +18,7 @@ class Particle extends ParticleBase {
 		this.alt = config.alt;
 		this.offset = config.offset;
 
-		this.osc1 = new Osc(this.prog * 0.5 + this.offset, 0.015, true, false);
+		this.osc = new Osc(this.prog * 0.5 + this.offset, 0.015, true, false);
 	}
 
 	createMesh() {
@@ -45,20 +45,20 @@ class Particle extends ParticleBase {
 	}
 
 	update() {
-		this.osc1.update();
+		this.osc.update(1);
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 
-		let val1 = this.osc1.val(this.ease.inOutExpo);
-		let val2 = Math.abs(this.lastY - this.mesh.position.y) * 3;
-		let val3 = Math.abs(this.lastY - this.mesh.position.y) / 4;
+		let val1 = this.osc.val(this.ease.inOutExpo);
+		let val2 = (Math.abs(this.lastY - this.mesh.position.y) * 3) * this.loader.dtN;
+		let val3 = (Math.abs(this.lastY - this.mesh.position.y) / 4) * this.loader.dtN;
 
 		if(this.alt) {
-			val1 = this.osc1.val(this.ease.inOutExpo);
-			val2 = Math.abs(this.lastX - this.mesh.position.x) * 3;
-			val3 = Math.abs(this.lastX - this.mesh.position.x) / 4;
+			val1 = this.osc.val(this.ease.inOutExpo);
+			val2 = (Math.abs(this.lastX - this.mesh.position.x) * 3) * this.loader.dtN;
+			val3 = (Math.abs(this.lastX - this.mesh.position.x) / 4) * this.loader.dtN;
 		}
 
 		this.lastX = this.mesh.position.x;

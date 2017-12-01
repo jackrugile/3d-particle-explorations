@@ -6,8 +6,7 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
-		this.duration = 6000;
-
+		this.duration = 6200;
 		this.rings = 8;
 		this.radius = 0;
 		this.radiusGrowth = 1.5;
