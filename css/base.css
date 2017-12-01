@@ -258,7 +258,7 @@ main {
 	position: fixed;
 	right: 0;
 	top: 0;
-	transition: all 600ms;
+	transition: opacity 600ms, visibility 0ms 600ms;
 }
 
 .loading .loader {
@@ -267,6 +267,7 @@ main {
 
 .completed .loader {
 	opacity: 0;
+	visibility: hidden;
 }
 
 .content {
@@ -498,6 +499,9 @@ a.demo--current {
 	.message {
 		display: block;
 	}
+	.loader {
+		z-index: 999999;
+	}
 	.content {
 		flex-direction: column;
 		height: auto;
@@ -508,9 +512,14 @@ a.demo--current {
 		font-size: 64px;
 	}
 	.content--fixed {
+		position: relative;
 		z-index: 1000;
 		display: block;
 		padding: 0.85em;
+	}
+	.content-outer {
+		min-height: 0px;
+		padding-top: 50px;
 	}
 	.codrops-header {
 		flex-direction: column;

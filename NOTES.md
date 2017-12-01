@@ -13,6 +13,7 @@
 - [ ] handle memory clean up and stopping
 - [ ] add debug scene button to toggle grid and orbit
 - [ ] tune duration timings
+- [ ] figure out overlap issue on mobile sizes
 
 #### EXITS
 

@@ -607,8 +607,8 @@ var Loader = function () {
 			this.renderer.setPixelRatio(this.dpr);
 			this.renderer.setSize(this.width, this.height);
 
-			var topHeight = this.contentFixed.offsetHeight;
-			this.contentOuter.style.paddingTop = topHeight + 'px';
+			//let topHeight = this.contentFixed.offsetHeight;
+			//this.contentOuter.style.paddingTop = `${topHeight}px`;
 		}
 	}, {
 		key: 'onReplayButtonClick',
