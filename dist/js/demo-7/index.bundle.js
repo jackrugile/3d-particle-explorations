@@ -79,12 +79,12 @@ var Particle = function (_ParticleBase) {
 
 			var val1 = this.osc1.val(this.ease.inOutExpo);
 			var val2 = Math.abs(this.lastY - this.mesh.position.y) * 3;
-			var val3 = Math.abs(this.lastY - this.mesh.position.y) / 6;
+			var val3 = Math.abs(this.lastY - this.mesh.position.y) / 4;
 
 			if (this.alt) {
 				val1 = this.osc1.val(this.ease.inOutExpo);
 				val2 = Math.abs(this.lastX - this.mesh.position.x) * 3;
-				val3 = Math.abs(this.lastX - this.mesh.position.x) / 6;
+				val3 = Math.abs(this.lastX - this.mesh.position.x) / 4;
 			}
 
 			this.lastX = this.mesh.position.x;
@@ -97,7 +97,6 @@ var Particle = function (_ParticleBase) {
 			} else {
 				this.mesh.position.y = this.calc.map(val1, 0, 1, this.baseY - this.system.spread / 2, this.baseY + this.system.spread / 2);
 				this.mesh.scale.set(this.size - val3, this.size + val2, this.size);
-				//this.mesh.material.opacity = 0;
 			}
 		}
 	}]);
@@ -143,156 +142,45 @@ var System = function (_SystemBase) {
 		_this.lastRotationTarget = _this.rotationTarget;
 		_this.rotProg = 1;
 
-		for (var i = 0; i < _this.count; i++) {
-			var x = _this.calc.map(i, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
-			var y = 0;
-			var z = 0;
-			var pos = new THREE.Vector3(x, y, z);
-			var color = 0x222222;
-			var size = 0.3;
-			var opacity = 1;
+		_this.inc = 0.04;
+		_this.colors = [0xff00ff, 0xff0000, 0x00ff00, 0x0000ff];
 
-			color = 0xff00ff;
+		for (var j = 0; j < 4; j++) {
+			for (var i = 0; i < _this.count; i++) {
+				var x = _this.calc.map(i, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
+				var y = 0;
+				var z = 0;
+				var pos = new THREE.Vector3(x, y, z);
+				var color = _this.colors[j];
+				var size = 0.3;
+				var opacity = 1;
 
-			_this.particles.push(new Particle({
-				group: _this.particleGroup,
-				offset: 0,
-				x: x,
-				y: y,
-				z: z,
-				size: size,
-				color: color,
-				opacity: opacity,
-				prog: i / (_this.count - 1),
-				alt: 0
-			}, _this, _this.loader));
+				_this.particles.push(new Particle({
+					group: _this.particleGroup,
+					offset: j * _this.inc,
+					x: x,
+					y: y,
+					z: z,
+					size: size,
+					color: color,
+					opacity: opacity,
+					prog: i / (_this.count - 1),
+					alt: 0
+				}, _this, _this.loader));
 
-			_this.particles.push(new Particle({
-				group: _this.particleGroup,
-				offset: 0,
-				x: y,
-				y: x,
-				z: z,
-				size: size,
-				color: color,
-				opacity: opacity,
-				prog: i / (_this.count - 1),
-				alt: 1
-			}, _this, _this.loader));
-		}
-
-		for (var _i = 0; _i < _this.count; _i++) {
-			var _x = _this.calc.map(_i, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
-			var _y = 0;
-			var _z = 0;
-			var _pos = new THREE.Vector3(_x, _y, _z);
-			var _color = 0x222222;
-			var _size = 0.3;
-			var _opacity = 1;
-
-			_color = 0xff0000;
-
-			_this.particles.push(new Particle({
-				group: _this.particleGroup,
-				offset: 0.05,
-				x: _x,
-				y: _y,
-				z: _z,
-				size: _size,
-				color: _color,
-				opacity: _opacity,
-				prog: _i / (_this.count - 1),
-				alt: 0
-			}, _this, _this.loader));
-
-			_this.particles.push(new Particle({
-				group: _this.particleGroup,
-				offset: 0.05,
-				x: _y,
-				y: _x,
-				z: _z,
-				size: _size,
-				color: _color,
-				opacity: _opacity,
-				prog: _i / (_this.count - 1),
-				alt: 1
-			}, _this, _this.loader));
-		}
-
-		for (var _i2 = 0; _i2 < _this.count; _i2++) {
-			var _x2 = _this.calc.map(_i2, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
-			var _y2 = 0;
-			var _z2 = 0;
-			var _pos2 = new THREE.Vector3(_x2, _y2, _z2);
-			var _color2 = 0x222222;
-			var _size2 = 0.3;
-			var _opacity2 = 1;
-
-			_color2 = 0x00ff00;
-
-			_this.particles.push(new Particle({
-				group: _this.particleGroup,
-				offset: 0.1,
-				x: _x2,
-				y: _y2,
-				z: _z2,
-				size: _size2,
-				color: _color2,
-				opacity: _opacity2,
-				prog: _i2 / (_this.count - 1),
-				alt: 0
-			}, _this, _this.loader));
-
-			_this.particles.push(new Particle({
-				group: _this.particleGroup,
-				offset: 0.1,
-				x: _y2,
-				y: _x2,
-				z: _z2,
-				size: _size2,
-				color: _color2,
-				opacity: _opacity2,
-				prog: _i2 / (_this.count - 1),
-				alt: 1
-			}, _this, _this.loader));
-		}
-
-		for (var _i3 = 0; _i3 < _this.count; _i3++) {
-			var _x3 = _this.calc.map(_i3, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
-			var _y3 = 0;
-			var _z3 = 0;
-			var _pos3 = new THREE.Vector3(_x3, _y3, _z3);
-			var _color3 = 0x222222;
-			var _size3 = 0.3;
-			var _opacity3 = 1;
-
-			_color3 = 0x0000ff;
-
-			_this.particles.push(new Particle({
-				group: _this.particleGroup,
-				offset: 0.15,
-				x: _x3,
-				y: _y3,
-				z: _z3,
-				size: _size3,
-				color: _color3,
-				opacity: _opacity3,
-				prog: _i3 / (_this.count - 1),
-				alt: 0
-			}, _this, _this.loader));
-
-			_this.particles.push(new Particle({
-				group: _this.particleGroup,
-				offset: 0.15,
-				x: _y3,
-				y: _x3,
-				z: _z3,
-				size: _size3,
-				color: _color3,
-				opacity: _opacity3,
-				prog: _i3 / (_this.count - 1),
-				alt: 1
-			}, _this, _this.loader));
+				_this.particles.push(new Particle({
+					group: _this.particleGroup,
+					offset: j * _this.inc,
+					x: y,
+					y: x,
+					z: z,
+					size: size,
+					color: color,
+					opacity: opacity,
+					prog: i / (_this.count - 1),
+					alt: 1
+				}, _this, _this.loader));
+			}
 		}
 		return _this;
 	}
@@ -356,8 +244,8 @@ var Loader = function () {
 
 		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
-		this.isGridDark = location.hash.indexOf('dark') > 0;
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
+		//this.isGridDark = location.hreflocation.href.indexOf('index.html') || location.href.indexOf('index6') > 0;
 
 		this.debugHash = '';
 		if (this.isDebug) {
@@ -366,7 +254,6 @@ var Loader = function () {
 			this.debugHash += 'debug';
 		} else {
 			this.debugHash += this.isGrid ? 'grid' : '';
-			this.debugHash += this.isGridDark ? 'dark' : '';
 			this.debugHash += this.isOrbit ? 'orbit' : '';
 		}
 		if (this.debugHash) {
@@ -446,12 +333,12 @@ var Loader = function () {
 		value: function setupHelpers() {
 			if (this.isGrid) {
 				var color = this.isGridDark ? 0x000000 : 0xffffff;
-				this.gridHelper = new THREE.GridHelper(300, 30, color, color);
+				this.gridHelper = new THREE.GridHelper(100, 20, color, color);
 				this.gridHelper.material.transparent = true;
 				this.gridHelper.material.opacity = this.isGridDark ? 0.15 : 0.25;
 				this.scene.add(this.gridHelper);
 
-				this.axisHelper = new AxisHelper(150, 0.5);
+				this.axisHelper = new AxisHelper(50, 0.5);
 				this.scene.add(this.axisHelper);
 
 				this.camera.lookAt(new THREE.Vector3());
@@ -498,8 +385,6 @@ var Loader = function () {
 	}, {
 		key: 'replay',
 		value: function replay() {
-			var _this3 = this;
-
 			document.documentElement.classList.remove('completed');
 			document.documentElement.classList.add('loading');
 			this.camera.position.x = this.cameraBaseX;
@@ -507,12 +392,12 @@ var Loader = function () {
 			this.camera.position.z = this.cameraBaseZ;
 			this.elapsedMs = 0;
 			this.system.replay();
-			setTimeout(function () {
-				_this3.completed = false;
-				_this3.clock.start();
-				MainLoop.resetFrameDelta();
-				MainLoop.start();
-			}, 600);
+			//setTimeout(() => {
+			this.completed = false;
+			this.clock.start();
+			MainLoop.resetFrameDelta();
+			MainLoop.start();
+			//}, 600);
 		}
 	}, {
 		key: 'complete',

@@ -9,7 +9,7 @@ class System extends SystemBase {
 		super(loader);
 
 		this.duration = 6000;
-		
+
 		this.size = 35;
 		this.cols = 25;
 		this.rows = 25;
@@ -18,10 +18,11 @@ class System extends SystemBase {
 		this.ripples = [];
 		this.tick = 0;
 
-		if(!this.grid) {
-			this.loader.camera.position.y = 20;
-			this.loader.camera.lookAt(new THREE.Vector3());
-		}
+		this.dropTick = 20;
+		this.dropTickMin = 20;
+		this.dropTickMax = 40;
+
+		this.setCamera();
 
 		for(let col = 0; col < this.cols; col++) {
 			for(let row = 0; row < this.rows; row++) {
@@ -40,9 +41,13 @@ class System extends SystemBase {
 				}, this, this.loader));
 			}
 		}
+	}
 
-		//this.particleGroup.rotation.x = Math.PI * -0.4;
-		//this.particleGroup.rotation.z = Math.PI * 0.25;
+	setCamera() {
+		if(!this.loader.isGrid) {
+			this.loader.camera.position.y = 20;
+			this.loader.camera.lookAt(new THREE.Vector3());
+		}
 	}
 
 	createDrop() {
@@ -82,11 +87,17 @@ class System extends SystemBase {
 		}
 	}
 
+	replay() {
+		super.replay();
+		this.setCamera();
+	}
+
 	update() {
 		super.update();
 
-		if(this.tick % 20 === 0) {
+		if(this.tick % this.dropTick === 0) {
 			this.createDrop();
+			this.dropTick = this.calc.randInt(this.dropTickMin, this.dropTickMax);
 		}
 
 		this.updateDrops();
@@ -105,13 +116,12 @@ class System extends SystemBase {
 			}
 		}
 
-		// this.particleGroup.rotation.y = this.loader.elapsedMs * 0.00025;
-
 		this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMs * 0.0005) * 0.1;
 		this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMs * 0.0005) * -0.2;
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+			this.loader.camera.lookAt(new THREE.Vector3());
 		}
 
 		this.tick++;

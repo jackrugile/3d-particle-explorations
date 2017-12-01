@@ -134,7 +134,7 @@ class System extends SystemBase {
 
 		let noiseDiv = 10;
 		let noiseTime = this.loader.elapsedMs * 0.0008;
-		let noiseVel = this.calc.map(this.osc1.val(this.ease.inOutExpo), 0, 1, 0.05, 1);
+		let noiseVel = this.calc.map(this.osc1.val(this.ease.inOutExpo), 0, 1, 0, 1);
 
 		while(i--) {
 			let obj = this.objs[i];
@@ -176,7 +176,7 @@ class System extends SystemBase {
 				obj.pos.y = this.calc.rand(-this.size / 2, this.size / 2);
 				obj.pos.z = this.calc.rand(-this.size / 2, this.size / 2);
 
-				let hue = (this.loader.elapsedMs / 10) % 360 + this.calc.rand(90);
+				let hue = (this.loader.elapsedMs / 20 + this.calc.rand(60)) % 360;
 				let lightness = Math.round(this.calc.rand(10, 50));
 				this.color.set(`hsl(${hue}, 85%, ${lightness}%)`);
 

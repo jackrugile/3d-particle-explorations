@@ -109,11 +109,11 @@ body {
 .demo-6 {
 	--color-text: #fff;
 	--color-bg: #fff;
-	--color-link: #4e6131;
+	--color-link: #432e63;
 	--color-link-hover: #fff;
-	--color-info: #4e6131;
-	--color-top-right: #ffff00;
-	--color-bottom-left: #00ff00;
+	--color-info: #432e63;
+	--color-top-right: #00d0ff;
+	--color-bottom-left: #ff008d;
 }
 
 .completed .demo-6 {

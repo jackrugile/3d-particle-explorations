@@ -53,12 +53,12 @@ class Particle extends ParticleBase {
 
 		let val1 = this.osc1.val(this.ease.inOutExpo);
 		let val2 = Math.abs(this.lastY - this.mesh.position.y) * 3;
-		let val3 = Math.abs(this.lastY - this.mesh.position.y) / 6;
+		let val3 = Math.abs(this.lastY - this.mesh.position.y) / 4;
 
 		if(this.alt) {
 			val1 = this.osc1.val(this.ease.inOutExpo);
 			val2 = Math.abs(this.lastX - this.mesh.position.x) * 3;
-			val3 = Math.abs(this.lastX - this.mesh.position.x) / 6;
+			val3 = Math.abs(this.lastX - this.mesh.position.x) / 4;
 		}
 
 		this.lastX = this.mesh.position.x;
@@ -71,7 +71,6 @@ class Particle extends ParticleBase {
 		} else {
 			this.mesh.position.y = this.calc.map(val1, 0, 1, this.baseY - this.system.spread / 2, this.baseY + this.system.spread / 2);
 			this.mesh.scale.set(this.size - val3, this.size + val2, this.size);
-			//this.mesh.material.opacity = 0;
 		}
 	}
 

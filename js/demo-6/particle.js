@@ -6,18 +6,22 @@ class Particle extends ParticleBase {
 	constructor(config, system, loader) {
 		super(config, system, loader);
 
+		this.baseX = config.x;
+		this.baseY = config.y;
+		this.baseZ = config.z;
+
 		this.prog = config.prog;
 		this.alt = config.alt;
 		this.index = config.index;
 		this.radius = config.radius;
-		this.osc1 = new Osc(1 - this.prog / 6, 0.015, true, false);
+		this.osc1 = new Osc(1 - this.prog / 5, 0.015, true, false);
 		this.createTail();
 		this.createHead();
 	}
 
 	reset() {
 		super.reset();
-		this.osc1 = new Osc(1 - this.prog / 6, 0.015, true, false);
+		this.osc1 = new Osc(1 - this.prog / 5, 0.015, true, false);
 	}
 
 	createMesh() {
@@ -48,6 +52,8 @@ class Particle extends ParticleBase {
 		});
 
 		this.cMesh = new THREE.Line(this.cGeometry, this.cMaterial);
+
+		this.cMesh.position.z = this.z;
 
 		this.object3D.add(this.cMesh);
 	}
@@ -80,10 +86,12 @@ class Particle extends ParticleBase {
 
 		let val = this.osc1.val(this.ease.inOutExpo);
 		this.angle = Math.PI / 2 + (this.index % 3) * ((Math.PI * 2) / 3) + val * ((Math.PI * 6) / 3);
-		this.angle += this.osc1.val(this.ease.inOutExpo) * (Math.PI / 3);
+		this.angle += val * (Math.PI / 3);
 		this.pMesh.position.x = Math.cos(this.angle) * this.radius;
 		this.pMesh.position.y = Math.sin(this.angle) * this.radius;
+		this.pMesh.position.z = this.calc.map(val, 0, 1, this.baseZ / 2, -this.baseZ / 2);
 
+		this.cMesh.position.z = this.calc.map(val, 0, 1, this.baseZ / 2, -this.baseZ / 2);
 		this.cMesh.rotation.z = this.angle - (this.cAngle * (1-this.osc1.val(this.ease.inOutExpo)));
 	}
 

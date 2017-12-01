@@ -18,156 +18,50 @@ class System extends SystemBase {
 		this.lastRotationTarget = this.rotationTarget;
 		this.rotProg = 1;
 
-		for(let i = 0; i < this.count; i++) {
-			let x = this.calc.map(i, 0, this.count - 1, -this.spread / 2, this.spread / 2);
-			let y = 0;
-			let z = 0;
-			let pos = new THREE.Vector3(x, y, z);
-			let color = 0x222222;
-			let size = 0.3;
-			let opacity = 1;
+		this.inc = 0.04;
+		this.colors = [
+			0xff00ff,
+			0xff0000,
+			0x00ff00,
+			0x0000ff
+		];
 
-			color = 0xff00ff;
+		for(let j = 0; j < 4; j++) {
+			for(let i = 0; i < this.count; i++) {
+				let x = this.calc.map(i, 0, this.count - 1, -this.spread / 2, this.spread / 2);
+				let y = 0;
+				let z = 0;
+				let pos = new THREE.Vector3(x, y, z);
+				let color = this.colors[j];
+				let size = 0.3;
+				let opacity = 1;
 
-			this.particles.push(new Particle({
-				group: this.particleGroup,
-				offset: 0,
-				x: x,
-				y: y,
-				z: z,
-				size: size,
-				color: color,
-				opacity: opacity,
-				prog: i / (this.count - 1),
-				alt: 0
-			}, this, this.loader));
+				this.particles.push(new Particle({
+					group: this.particleGroup,
+					offset: j * this.inc,
+					x: x,
+					y: y,
+					z: z,
+					size: size,
+					color: color,
+					opacity: opacity,
+					prog: i / (this.count - 1),
+					alt: 0
+				}, this, this.loader));
 
-			this.particles.push(new Particle({
-				group: this.particleGroup,
-				offset: 0,
-				x: y,
-				y: x,
-				z: z,
-				size: size,
-				color: color,
-				opacity: opacity,
-				prog: i / (this.count - 1),
-				alt: 1
-			}, this, this.loader));
-		}
-
-		for(let i = 0; i < this.count; i++) {
-			let x = this.calc.map(i, 0, this.count - 1, -this.spread / 2, this.spread / 2);
-			let y = 0;
-			let z = 0;
-			let pos = new THREE.Vector3(x, y, z);
-			let color = 0x222222;
-			let size = 0.3;
-			let opacity = 1;
-
-			color = 0xff0000;
-
-			this.particles.push(new Particle({
-				group: this.particleGroup,
-				offset: 0.05,
-				x: x,
-				y: y,
-				z: z,
-				size: size,
-				color: color,
-				opacity: opacity,
-				prog: i / (this.count - 1),
-				alt: 0
-			}, this, this.loader));
-
-			this.particles.push(new Particle({
-				group: this.particleGroup,
-				offset: 0.05,
-				x: y,
-				y: x,
-				z: z,
-				size: size,
-				color: color,
-				opacity: opacity,
-				prog: i / (this.count - 1),
-				alt: 1
-			}, this, this.loader));
-		}
-
-		for(let i = 0; i < this.count; i++) {
-			let x = this.calc.map(i, 0, this.count - 1, -this.spread / 2, this.spread / 2);
-			let y = 0;
-			let z = 0;
-			let pos = new THREE.Vector3(x, y, z);
-			let color = 0x222222;
-			let size = 0.3;
-			let opacity = 1;
-
-			color = 0x00ff00;
-
-			this.particles.push(new Particle({
-				group: this.particleGroup,
-				offset: 0.1,
-				x: x,
-				y: y,
-				z: z,
-				size: size,
-				color: color,
-				opacity: opacity,
-				prog: i / (this.count - 1),
-				alt: 0
-			}, this, this.loader));
-
-			this.particles.push(new Particle({
-				group: this.particleGroup,
-				offset: 0.1,
-				x: y,
-				y: x,
-				z: z,
-				size: size,
-				color: color,
-				opacity: opacity,
-				prog: i / (this.count - 1),
-				alt: 1
-			}, this, this.loader));
-		}
-
-		for(let i = 0; i < this.count; i++) {
-			let x = this.calc.map(i, 0, this.count - 1, -this.spread / 2, this.spread / 2);
-			let y = 0;
-			let z = 0;
-			let pos = new THREE.Vector3(x, y, z);
-			let color = 0x222222;
-			let size = 0.3;
-			let opacity = 1;
-
-			color = 0x0000ff;
-
-			this.particles.push(new Particle({
-				group: this.particleGroup,
-				offset: 0.15,
-				x: x,
-				y: y,
-				z: z,
-				size: size,
-				color: color,
-				opacity: opacity,
-				prog: i / (this.count - 1),
-				alt: 0
-			}, this, this.loader));
-
-			this.particles.push(new Particle({
-				group: this.particleGroup,
-				offset: 0.15,
-				x: y,
-				y: x,
-				z: z,
-				size: size,
-				color: color,
-				opacity: opacity,
-				prog: i / (this.count - 1),
-				alt: 1
-			}, this, this.loader));
+				this.particles.push(new Particle({
+					group: this.particleGroup,
+					offset: j * this.inc,
+					x: y,
+					y: x,
+					z: z,
+					size: size,
+					color: color,
+					opacity: opacity,
+					prog: i / (this.count - 1),
+					alt: 1
+				}, this, this.loader));
+			}
 		}
 	}
 

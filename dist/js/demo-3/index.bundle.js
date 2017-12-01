@@ -225,8 +225,8 @@ var Loader = function () {
 
 		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
-		this.isGridDark = location.hash.indexOf('dark') > 0;
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
+		//this.isGridDark = location.hreflocation.href.indexOf('index.html') || location.href.indexOf('index6') > 0;
 
 		this.debugHash = '';
 		if (this.isDebug) {
@@ -235,7 +235,6 @@ var Loader = function () {
 			this.debugHash += 'debug';
 		} else {
 			this.debugHash += this.isGrid ? 'grid' : '';
-			this.debugHash += this.isGridDark ? 'dark' : '';
 			this.debugHash += this.isOrbit ? 'orbit' : '';
 		}
 		if (this.debugHash) {
@@ -315,12 +314,12 @@ var Loader = function () {
 		value: function setupHelpers() {
 			if (this.isGrid) {
 				var color = this.isGridDark ? 0x000000 : 0xffffff;
-				this.gridHelper = new THREE.GridHelper(300, 30, color, color);
+				this.gridHelper = new THREE.GridHelper(100, 20, color, color);
 				this.gridHelper.material.transparent = true;
 				this.gridHelper.material.opacity = this.isGridDark ? 0.15 : 0.25;
 				this.scene.add(this.gridHelper);
 
-				this.axisHelper = new AxisHelper(150, 0.5);
+				this.axisHelper = new AxisHelper(50, 0.5);
 				this.scene.add(this.axisHelper);
 
 				this.camera.lookAt(new THREE.Vector3());
@@ -367,8 +366,6 @@ var Loader = function () {
 	}, {
 		key: 'replay',
 		value: function replay() {
-			var _this3 = this;
-
 			document.documentElement.classList.remove('completed');
 			document.documentElement.classList.add('loading');
 			this.camera.position.x = this.cameraBaseX;
@@ -376,12 +373,12 @@ var Loader = function () {
 			this.camera.position.z = this.cameraBaseZ;
 			this.elapsedMs = 0;
 			this.system.replay();
-			setTimeout(function () {
-				_this3.completed = false;
-				_this3.clock.start();
-				MainLoop.resetFrameDelta();
-				MainLoop.start();
-			}, 600);
+			//setTimeout(() => {
+			this.completed = false;
+			this.clock.start();
+			MainLoop.resetFrameDelta();
+			MainLoop.start();
+			//}, 600);
 		}
 	}, {
 		key: 'complete',

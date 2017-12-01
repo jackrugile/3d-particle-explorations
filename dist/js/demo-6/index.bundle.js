@@ -30,11 +30,15 @@ var Particle = function (_ParticleBase) {
 
 		var _this = _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
 
+		_this.baseX = config.x;
+		_this.baseY = config.y;
+		_this.baseZ = config.z;
+
 		_this.prog = config.prog;
 		_this.alt = config.alt;
 		_this.index = config.index;
 		_this.radius = config.radius;
-		_this.osc1 = new Osc(1 - _this.prog / 6, 0.015, true, false);
+		_this.osc1 = new Osc(1 - _this.prog / 5, 0.015, true, false);
 		_this.createTail();
 		_this.createHead();
 		return _this;
@@ -44,7 +48,7 @@ var Particle = function (_ParticleBase) {
 		key: 'reset',
 		value: function reset() {
 			_get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'reset', this).call(this);
-			this.osc1 = new Osc(1 - this.prog / 6, 0.015, true, false);
+			this.osc1 = new Osc(1 - this.prog / 5, 0.015, true, false);
 		}
 	}, {
 		key: 'createMesh',
@@ -68,6 +72,8 @@ var Particle = function (_ParticleBase) {
 			});
 
 			this.cMesh = new THREE.Line(this.cGeometry, this.cMaterial);
+
+			this.cMesh.position.z = this.z;
 
 			this.object3D.add(this.cMesh);
 		}
@@ -102,10 +108,12 @@ var Particle = function (_ParticleBase) {
 
 			var val = this.osc1.val(this.ease.inOutExpo);
 			this.angle = Math.PI / 2 + this.index % 3 * (Math.PI * 2 / 3) + val * (Math.PI * 6 / 3);
-			this.angle += this.osc1.val(this.ease.inOutExpo) * (Math.PI / 3);
+			this.angle += val * (Math.PI / 3);
 			this.pMesh.position.x = Math.cos(this.angle) * this.radius;
 			this.pMesh.position.y = Math.sin(this.angle) * this.radius;
+			this.pMesh.position.z = this.calc.map(val, 0, 1, this.baseZ / 2, -this.baseZ / 2);
 
+			this.cMesh.position.z = this.calc.map(val, 0, 1, this.baseZ / 2, -this.baseZ / 2);
 			this.cMesh.rotation.z = this.angle - this.cAngle * (1 - this.osc1.val(this.ease.inOutExpo));
 		}
 	}]);
@@ -130,6 +138,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var SystemBase = require('../system-base');
 var Particle = require('./particle');
+var Osc = require('../utils/osc');
 
 var System = function (_SystemBase) {
 	_inherits(System, _SystemBase);
@@ -144,10 +153,16 @@ var System = function (_SystemBase) {
 		_this.count = 60;
 		_this.outer = 12;
 
+		_this.osc = new Osc(1, 0.015, true, false);
+
+		_this.rotationTarget = 0;
+		_this.lastRotationTarget = _this.rotationTarget;
+		_this.rotProg = 0;
+
 		for (var i = 0; i < _this.count; i++) {
 			var x = 0;
 			var y = 0;
-			var z = 0;
+			var z = _this.calc.map(i, 0, _this.count - 1, -10, 0);
 			var size = _this.calc.map(i, 0, _this.count - 1, 0.01, 0.175);
 			var radius = _this.calc.map(i, 0, _this.count - 1, 1, _this.outer) - _this.outer / _this.count * (i % 3);
 			var opacity = _this.calc.map(i, 0, _this.count - 1, 0.1, 1);
@@ -162,7 +177,7 @@ var System = function (_SystemBase) {
 				z: z,
 				size: size,
 				radius: radius,
-				color: 0x4e6131,
+				color: 0xffffff,
 				opacity: opacity
 			}, _this, _this.loader));
 		}
@@ -174,9 +189,27 @@ var System = function (_SystemBase) {
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
 
+			this.osc.update();
+
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 			}
+
+			//this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMs * 0.002) * -0.5;
+			//this.particleGroup.rotation.y = this.calc.map(this.osc.val(this.ease.inOutExpo), 0, 1, 0, Math.PI * 0.5);
+
+			if (this.osc._triggerTop) {
+				this.lastRotationTarget = this.rotationTarget;
+				this.rotationTarget += Math.PI / -1;
+				this.rotProg = 0;
+			}
+
+			if (this.rotProg < 1) {
+				this.rotProg += 0.0075;
+			}
+			this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
+
+			this.particleGroup.rotation.y = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTarget, this.rotationTarget);
 		}
 	}]);
 
@@ -185,7 +218,7 @@ var System = function (_SystemBase) {
 
 module.exports = System;
 
-},{"../system-base":6,"./particle":2}],4:[function(require,module,exports){
+},{"../system-base":6,"../utils/osc":10,"./particle":2}],4:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -213,8 +246,8 @@ var Loader = function () {
 
 		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
-		this.isGridDark = location.hash.indexOf('dark') > 0;
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
+		//this.isGridDark = location.hreflocation.href.indexOf('index.html') || location.href.indexOf('index6') > 0;
 
 		this.debugHash = '';
 		if (this.isDebug) {
@@ -223,7 +256,6 @@ var Loader = function () {
 			this.debugHash += 'debug';
 		} else {
 			this.debugHash += this.isGrid ? 'grid' : '';
-			this.debugHash += this.isGridDark ? 'dark' : '';
 			this.debugHash += this.isOrbit ? 'orbit' : '';
 		}
 		if (this.debugHash) {
@@ -303,12 +335,12 @@ var Loader = function () {
 		value: function setupHelpers() {
 			if (this.isGrid) {
 				var color = this.isGridDark ? 0x000000 : 0xffffff;
-				this.gridHelper = new THREE.GridHelper(300, 30, color, color);
+				this.gridHelper = new THREE.GridHelper(100, 20, color, color);
 				this.gridHelper.material.transparent = true;
 				this.gridHelper.material.opacity = this.isGridDark ? 0.15 : 0.25;
 				this.scene.add(this.gridHelper);
 
-				this.axisHelper = new AxisHelper(150, 0.5);
+				this.axisHelper = new AxisHelper(50, 0.5);
 				this.scene.add(this.axisHelper);
 
 				this.camera.lookAt(new THREE.Vector3());
@@ -355,8 +387,6 @@ var Loader = function () {
 	}, {
 		key: 'replay',
 		value: function replay() {
-			var _this3 = this;
-
 			document.documentElement.classList.remove('completed');
 			document.documentElement.classList.add('loading');
 			this.camera.position.x = this.cameraBaseX;
@@ -364,12 +394,12 @@ var Loader = function () {
 			this.camera.position.z = this.cameraBaseZ;
 			this.elapsedMs = 0;
 			this.system.replay();
-			setTimeout(function () {
-				_this3.completed = false;
-				_this3.clock.start();
-				MainLoop.resetFrameDelta();
-				MainLoop.start();
-			}, 600);
+			//setTimeout(() => {
+			this.completed = false;
+			this.clock.start();
+			MainLoop.resetFrameDelta();
+			MainLoop.start();
+			//}, 600);
 		}
 	}, {
 		key: 'complete',

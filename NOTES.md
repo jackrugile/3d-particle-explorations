@@ -15,6 +15,9 @@
 - [ ] enter debug mode button
 - [ ] switch to uglified version when complete
 
+- SETUP numbered variable for which demo we're on, then put grid to dark on proper ones
+- add debug scene button to toggle grid and orbit
+
 #### EXITS
 
 - zoom in to single particle

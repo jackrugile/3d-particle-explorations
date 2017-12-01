@@ -268,10 +268,11 @@ var System = function (_SystemBase) {
 		_this.ripples = [];
 		_this.tick = 0;
 
-		if (!_this.grid) {
-			_this.loader.camera.position.y = 20;
-			_this.loader.camera.lookAt(new THREE.Vector3());
-		}
+		_this.dropTick = 20;
+		_this.dropTickMin = 20;
+		_this.dropTickMax = 40;
+
+		_this.setCamera();
 
 		for (var col = 0; col < _this.cols; col++) {
 			for (var row = 0; row < _this.rows; row++) {
@@ -290,13 +291,18 @@ var System = function (_SystemBase) {
 				}, _this, _this.loader));
 			}
 		}
-
-		//this.particleGroup.rotation.x = Math.PI * -0.4;
-		//this.particleGroup.rotation.z = Math.PI * 0.25;
 		return _this;
 	}
 
 	_createClass(System, [{
+		key: 'setCamera',
+		value: function setCamera() {
+			if (!this.loader.isGrid) {
+				this.loader.camera.position.y = 20;
+				this.loader.camera.lookAt(new THREE.Vector3());
+			}
+		}
+	}, {
 		key: 'createDrop',
 		value: function createDrop() {
 			this.drops.push(new Drop({
@@ -338,12 +344,19 @@ var System = function (_SystemBase) {
 			}
 		}
 	}, {
+		key: 'replay',
+		value: function replay() {
+			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'replay', this).call(this);
+			this.setCamera();
+		}
+	}, {
 		key: 'update',
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
 
-			if (this.tick % 20 === 0) {
+			if (this.tick % this.dropTick === 0) {
 				this.createDrop();
+				this.dropTick = this.calc.randInt(this.dropTickMin, this.dropTickMax);
 			}
 
 			this.updateDrops();
@@ -362,13 +375,12 @@ var System = function (_SystemBase) {
 				}
 			}
 
-			// this.particleGroup.rotation.y = this.loader.elapsedMs * 0.00025;
-
 			this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMs * 0.0005) * 0.1;
 			this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMs * 0.0005) * -0.2;
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+				this.loader.camera.lookAt(new THREE.Vector3());
 			}
 
 			this.tick++;
@@ -408,8 +420,8 @@ var Loader = function () {
 
 		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
-		this.isGridDark = location.hash.indexOf('dark') > 0;
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
+		//this.isGridDark = location.hreflocation.href.indexOf('index.html') || location.href.indexOf('index6') > 0;
 
 		this.debugHash = '';
 		if (this.isDebug) {
@@ -418,7 +430,6 @@ var Loader = function () {
 			this.debugHash += 'debug';
 		} else {
 			this.debugHash += this.isGrid ? 'grid' : '';
-			this.debugHash += this.isGridDark ? 'dark' : '';
 			this.debugHash += this.isOrbit ? 'orbit' : '';
 		}
 		if (this.debugHash) {
@@ -498,12 +509,12 @@ var Loader = function () {
 		value: function setupHelpers() {
 			if (this.isGrid) {
 				var color = this.isGridDark ? 0x000000 : 0xffffff;
-				this.gridHelper = new THREE.GridHelper(300, 30, color, color);
+				this.gridHelper = new THREE.GridHelper(100, 20, color, color);
 				this.gridHelper.material.transparent = true;
 				this.gridHelper.material.opacity = this.isGridDark ? 0.15 : 0.25;
 				this.scene.add(this.gridHelper);
 
-				this.axisHelper = new AxisHelper(150, 0.5);
+				this.axisHelper = new AxisHelper(50, 0.5);
 				this.scene.add(this.axisHelper);
 
 				this.camera.lookAt(new THREE.Vector3());
@@ -550,8 +561,6 @@ var Loader = function () {
 	}, {
 		key: 'replay',
 		value: function replay() {
-			var _this3 = this;
-
 			document.documentElement.classList.remove('completed');
 			document.documentElement.classList.add('loading');
 			this.camera.position.x = this.cameraBaseX;
@@ -559,12 +568,12 @@ var Loader = function () {
 			this.camera.position.z = this.cameraBaseZ;
 			this.elapsedMs = 0;
 			this.system.replay();
-			setTimeout(function () {
-				_this3.completed = false;
-				_this3.clock.start();
-				MainLoop.resetFrameDelta();
-				MainLoop.start();
-			}, 600);
+			//setTimeout(() => {
+			this.completed = false;
+			this.clock.start();
+			MainLoop.resetFrameDelta();
+			MainLoop.start();
+			//}, 600);
 		}
 	}, {
 		key: 'complete',
