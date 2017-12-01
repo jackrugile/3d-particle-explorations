@@ -13,6 +13,7 @@ class Loader {
 		this.width = null;
 		this.height = null;
 		this.completed = false;
+		this.raf = null;
 
 		this.setupDebug();
 		this.setupTime();
@@ -27,18 +28,14 @@ class Loader {
 		this.system = new System(this);
 
 		document.documentElement.classList.add('loading');
-		MainLoop
-			.setUpdate((delta) => this.update(delta))
-			.setDraw(() => this.render())
-			.setEnd((fps, panic) => this.end(fps, panic))
-			.start();
+		this.loop();
 	}
 
 	setupDebug() {
 		this.isDebug = location.hash.indexOf('debug') > 0;
 		this.isGrid = location.hash.indexOf('grid') > 0;
 		this.isOrbit = location.hash.indexOf('orbit') > 0;
-		//this.isGridDark = [1, 2, 3].indexOf(demoNum) > -1;
+		this.isGridDark = [].indexOf(demoNum) > -1;
 
 		this.debugHash = '';
 		if(this.isDebug) {
@@ -60,7 +57,7 @@ class Loader {
 		this.clock = new THREE.Clock();
 		this.dtS = this.clock.getDelta();
 		this.dtMs = this.dtS * 1000;
-		this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
+		this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
 		this.elapsedMs = 0;
 	}
 
@@ -114,7 +111,7 @@ class Loader {
 	update() {
 		this.dtS = this.clock.getDelta();
 		this.dtMs = this.dtS * 1000;
-		this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
+		this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
 		this.elapsedMs += this.dtMs;
 
 		this.system.update();
@@ -126,12 +123,6 @@ class Loader {
 
 	render() {
 		this.renderer.render(this.scene, this.camera);
-	}
-
-	end(fps, panic) {
-		if(panic) {
-			MainLoop.resetFrameDelta();
-		}
 	}
 
 	listen() {
@@ -149,8 +140,7 @@ class Loader {
 		this.system.replay();
 		this.completed = false;
 		this.clock.start();
-		MainLoop.resetFrameDelta();
-		MainLoop.start();
+		this.loop();
 	}
 
 	complete() {
@@ -159,7 +149,7 @@ class Loader {
 		}
 		setTimeout(() => {
 			this.clock.stop();
-			MainLoop.stop();
+			cancelAnimationFrame(this.raf);
 		}, 600);
 		this.completed = true;
 		document.documentElement.classList.remove('loading');
@@ -181,6 +171,12 @@ class Loader {
 	onReplayButtonClick(e) {
 		e.preventDefault();
 		this.replay();
+	}
+
+	loop() {
+		this.update();
+		this.render();
+		this.raf = window.requestAnimationFrame(() => this.loop());
 	}
 
 }

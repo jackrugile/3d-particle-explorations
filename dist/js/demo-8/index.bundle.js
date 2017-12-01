@@ -68,7 +68,7 @@ var System = function (_SystemBase) {
 		_this.simplex = new FastSimplexNoise();
 		_this.color = new THREE.Color();
 
-		_this.texture = new THREE.TextureLoader().load('./images/orb.png');
+		_this.texture = _this.generateTexture();
 		_this.size = 10;
 		_this.scale = 1;
 		_this.base = 20;
@@ -132,6 +132,29 @@ var System = function (_SystemBase) {
 	}, {
 		key: 'createMesh',
 		value: function createMesh() {}
+	}, {
+		key: 'generateTexture',
+		value: function generateTexture() {
+			var c = document.createElement('canvas');
+			var ctx = c.getContext('2d');
+			var size = 64;
+			c.width = size;
+			c.height = size;
+
+			var gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+			gradient.addColorStop(0, 'hsla(0, 0%, 100%, 1)');
+			gradient.addColorStop(1, 'hsla(0, 0%, 100%, 0)');
+
+			ctx.beginPath();
+			ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+			ctx.fillStyle = gradient;
+			ctx.fill();
+
+			var texture = new THREE.Texture(c);
+			texture.needsUpdate = true;
+
+			return texture;
+		}
 	}, {
 		key: 'updateParticles',
 		value: function updateParticles(color, position, size) {
@@ -253,8 +276,6 @@ var AxisHelper = require('./utils/axis');
 
 var Loader = function () {
 	function Loader(System) {
-		var _this = this;
-
 		_classCallCheck(this, Loader);
 
 		this.calc = new Calc();
@@ -265,6 +286,7 @@ var Loader = function () {
 		this.width = null;
 		this.height = null;
 		this.completed = false;
+		this.raf = null;
 
 		this.setupDebug();
 		this.setupTime();
@@ -279,24 +301,18 @@ var Loader = function () {
 		this.system = new System(this);
 
 		document.documentElement.classList.add('loading');
-		MainLoop.setUpdate(function (delta) {
-			return _this.update(delta);
-		}).setDraw(function () {
-			return _this.render();
-		}).setEnd(function (fps, panic) {
-			return _this.end(fps, panic);
-		}).start();
+		this.loop();
 	}
 
 	_createClass(Loader, [{
 		key: 'setupDebug',
 		value: function setupDebug() {
-			var _this2 = this;
+			var _this = this;
 
 			this.isDebug = location.hash.indexOf('debug') > 0;
 			this.isGrid = location.hash.indexOf('grid') > 0;
 			this.isOrbit = location.hash.indexOf('orbit') > 0;
-			//this.isGridDark = [1, 2, 3].indexOf(demoNum) > -1;
+			this.isGridDark = [].indexOf(demoNum) > -1;
 
 			this.debugHash = '';
 			if (this.isDebug) {
@@ -309,7 +325,7 @@ var Loader = function () {
 			}
 			if (this.debugHash) {
 				[].slice.call(document.querySelectorAll('.demo')).forEach(function (elem, i, arr) {
-					elem.setAttribute('href', elem.getAttribute('href') + '#' + _this2.debugHash);
+					elem.setAttribute('href', elem.getAttribute('href') + '#' + _this.debugHash);
 				});
 			}
 		}
@@ -319,7 +335,7 @@ var Loader = function () {
 			this.clock = new THREE.Clock();
 			this.dtS = this.clock.getDelta();
 			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
+			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
 			this.elapsedMs = 0;
 		}
 	}, {
@@ -379,7 +395,7 @@ var Loader = function () {
 		value: function update() {
 			this.dtS = this.clock.getDelta();
 			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.5, 2);
+			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
 			this.elapsedMs += this.dtMs;
 
 			this.system.update();
@@ -394,22 +410,15 @@ var Loader = function () {
 			this.renderer.render(this.scene, this.camera);
 		}
 	}, {
-		key: 'end',
-		value: function end(fps, panic) {
-			if (panic) {
-				MainLoop.resetFrameDelta();
-			}
-		}
-	}, {
 		key: 'listen',
 		value: function listen() {
-			var _this3 = this;
+			var _this2 = this;
 
 			window.addEventListener('resize', function (e) {
-				return _this3.onResize(e);
+				return _this2.onResize(e);
 			});
 			this.replayButton.addEventListener('click', function (e) {
-				return _this3.onReplayButtonClick(e);
+				return _this2.onReplayButtonClick(e);
 			});
 		}
 	}, {
@@ -424,20 +433,19 @@ var Loader = function () {
 			this.system.replay();
 			this.completed = false;
 			this.clock.start();
-			MainLoop.resetFrameDelta();
-			MainLoop.start();
+			this.loop();
 		}
 	}, {
 		key: 'complete',
 		value: function complete() {
-			var _this4 = this;
+			var _this3 = this;
 
 			if (this.isOrbit || this.isGrid) {
 				return;
 			}
 			setTimeout(function () {
-				_this4.clock.stop();
-				MainLoop.stop();
+				_this3.clock.stop();
+				cancelAnimationFrame(_this3.raf);
 			}, 600);
 			this.completed = true;
 			document.documentElement.classList.remove('loading');
@@ -461,6 +469,17 @@ var Loader = function () {
 		value: function onReplayButtonClick(e) {
 			e.preventDefault();
 			this.replay();
+		}
+	}, {
+		key: 'loop',
+		value: function loop() {
+			var _this4 = this;
+
+			this.update();
+			this.render();
+			this.raf = window.requestAnimationFrame(function () {
+				return _this4.loop();
+			});
 		}
 	}]);
 

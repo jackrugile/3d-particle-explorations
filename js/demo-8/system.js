@@ -11,7 +11,7 @@ class System extends SystemBase {
 		this.simplex = new FastSimplexNoise();
 		this.color = new THREE.Color();
 
-		this.texture = new THREE.TextureLoader().load('./images/orb.png');
+		this.texture = this.generateTexture();
 		this.size = 10;
 		this.scale = 1;
 		this.base = 20;
@@ -91,6 +91,28 @@ class System extends SystemBase {
 	}
 
 	createMesh() {
+	}
+
+	generateTexture() {
+		let c = document.createElement('canvas');
+		let ctx = c.getContext('2d');
+		let size = 64;
+		c.width = size;
+		c.height = size;
+
+		let gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+		gradient.addColorStop(0, 'hsla(0, 0%, 100%, 1)');
+		gradient.addColorStop(1, 'hsla(0, 0%, 100%, 0)');
+
+		ctx.beginPath();
+		ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+		ctx.fillStyle = gradient;
+		ctx.fill();
+
+		let texture = new THREE.Texture(c);
+		texture.needsUpdate = true;
+
+		return texture;
 	}
 
 	updateParticles(color, position, size) {
