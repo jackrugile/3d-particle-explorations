@@ -2,10 +2,8 @@
 
 - [ ] clean up inconsistencies in code
 - [ ] document code
-- [ ] move particles own class for #8
+- [ ] move particles own class for #8 demo
 - [ ] article write up
-- [ ] mention debug tools in article write up
+ - [ ] mention debug tools in article write up
 - [ ] switch to uglified/minified version when complete
-- [ ] add debug scene button to toggle grid and orbit
-
-- [ ] setup titles in html files, read me, and repo
+- [ ] setup new title in html files, read me, and repo
