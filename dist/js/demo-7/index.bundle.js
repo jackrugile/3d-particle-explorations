@@ -4,6 +4,7 @@
 var Loader = require('../loader');
 var System = require('./system');
 
+window.demoNum = 7;
 var loader = new Loader(System);
 
 },{"../loader":4,"./system":3}],2:[function(require,module,exports){
@@ -248,26 +249,7 @@ var Loader = function () {
 		this.height = null;
 		this.completed = false;
 
-		this.isDebug = location.hash.indexOf('debug') > 0;
-		this.isGrid = location.hash.indexOf('grid') > 0;
-		this.isOrbit = location.hash.indexOf('orbit') > 0;
-		//this.isGridDark = location.hreflocation.href.indexOf('index.html') || location.href.indexOf('index6') > 0;
-
-		this.debugHash = '';
-		if (this.isDebug) {
-			this.isGrid = true;
-			this.isOrbit = true;
-			this.debugHash += 'debug';
-		} else {
-			this.debugHash += this.isGrid ? 'grid' : '';
-			this.debugHash += this.isOrbit ? 'orbit' : '';
-		}
-		if (this.debugHash) {
-			[].slice.call(document.querySelectorAll('.demo')).forEach(function (elem, i, arr) {
-				elem.setAttribute('href', elem.getAttribute('href') + '#' + _this.debugHash);
-			});
-		}
-
+		this.setupDebug();
 		this.setupTime();
 		this.setupScene();
 		this.setupCamera();
@@ -290,6 +272,31 @@ var Loader = function () {
 	}
 
 	_createClass(Loader, [{
+		key: 'setupDebug',
+		value: function setupDebug() {
+			var _this2 = this;
+
+			this.isDebug = location.hash.indexOf('debug') > 0;
+			this.isGrid = location.hash.indexOf('grid') > 0;
+			this.isOrbit = location.hash.indexOf('orbit') > 0;
+			//this.isGridDark = [1, 2, 3].indexOf(demoNum) > -1;
+
+			this.debugHash = '';
+			if (this.isDebug) {
+				this.isGrid = true;
+				this.isOrbit = true;
+				this.debugHash += 'debug';
+			} else {
+				this.debugHash += this.isGrid ? 'grid' : '';
+				this.debugHash += this.isOrbit ? 'orbit' : '';
+			}
+			if (this.debugHash) {
+				[].slice.call(document.querySelectorAll('.demo')).forEach(function (elem, i, arr) {
+					elem.setAttribute('href', elem.getAttribute('href') + '#' + _this2.debugHash);
+				});
+			}
+		}
+	}, {
 		key: 'setupTime',
 		value: function setupTime() {
 			this.clock = new THREE.Clock();
@@ -307,9 +314,9 @@ var Loader = function () {
 		key: 'setupCamera',
 		value: function setupCamera() {
 			this.camera = new THREE.PerspectiveCamera(100, 0, 0.0001, 10000);
-			this.cameraBaseX = this.isGrid ? -40 : 0;
-			this.cameraBaseY = this.isGrid ? 20 : 0;
-			this.cameraBaseZ = this.isGrid ? 40 : 35;
+			this.cameraBaseX = this.isGrid ? -30 : 0;
+			this.cameraBaseY = this.isGrid ? 15 : 0;
+			this.cameraBaseZ = this.isGrid ? 30 : 35;
 
 			this.camera.position.x = this.cameraBaseX;
 			this.camera.position.y = this.cameraBaseY;
@@ -341,7 +348,7 @@ var Loader = function () {
 				var color = this.isGridDark ? 0x000000 : 0xffffff;
 				this.gridHelper = new THREE.GridHelper(100, 20, color, color);
 				this.gridHelper.material.transparent = true;
-				this.gridHelper.material.opacity = this.isGridDark ? 0.15 : 0.25;
+				this.gridHelper.material.opacity = this.isGridDark ? 0.1 : 0.2;
 				this.scene.add(this.gridHelper);
 
 				this.axisHelper = new AxisHelper(50, 0.5);
@@ -379,13 +386,13 @@ var Loader = function () {
 	}, {
 		key: 'listen',
 		value: function listen() {
-			var _this2 = this;
+			var _this3 = this;
 
 			window.addEventListener('resize', function (e) {
-				return _this2.onResize(e);
+				return _this3.onResize(e);
 			});
 			this.replayButton.addEventListener('click', function (e) {
-				return _this2.onReplayButtonClick(e);
+				return _this3.onReplayButtonClick(e);
 			});
 		}
 	}, {

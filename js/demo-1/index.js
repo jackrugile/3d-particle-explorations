@@ -1,5 +1,5 @@
 const Loader = require('../loader');
 const System = require('./system');
 
-//let demo
+window.demoNum = 1;
 let loader = new Loader(System);
