@@ -197,7 +197,7 @@ class System extends SystemBase {
 
 			obj.a = obj.life > 1 ? 2 - obj.life : obj.life;
 
-			obj.size = this.calc.map(this.osc.val(this.ease.inOutExpo), 0, 1, obj.baseSize * 6, obj.baseSize * 1);
+			obj.size = this.calc.map(this.osc.val(this.ease.inOutExpo), 0, 1, obj.baseSize * 4, obj.baseSize * 1);
 		}
 
 		this.updateParticles(true, true, true);
