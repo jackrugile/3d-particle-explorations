@@ -508,7 +508,6 @@ a.demo--current {
 		font-size: 64px;
 	}
 	.content--fixed {
-		position: relative;
 		z-index: 1000;
 		display: block;
 		padding: 0.85em;

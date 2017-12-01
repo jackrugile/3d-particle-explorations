@@ -155,6 +155,8 @@ var Loader = function () {
 		this.ease = new Ease();
 
 		this.container = document.querySelector('.loader');
+		this.contentFixed = document.querySelector('.content--fixed');
+		this.contentOuter = document.querySelector('.content-outer');
 		this.replayButton = document.querySelector('.replay-loader');
 		this.width = null;
 		this.height = null;
@@ -316,12 +318,10 @@ var Loader = function () {
 			this.camera.position.z = this.cameraBaseZ;
 			this.elapsedMs = 0;
 			this.system.replay();
-			//setTimeout(() => {
 			this.completed = false;
 			this.clock.start();
 			MainLoop.resetFrameDelta();
 			MainLoop.start();
-			//}, 600);
 		}
 	}, {
 		key: 'complete',
@@ -347,6 +347,9 @@ var Loader = function () {
 
 			this.renderer.setPixelRatio(this.dpr);
 			this.renderer.setSize(this.width, this.height);
+
+			var topHeight = this.contentFixed.offsetHeight;
+			this.contentOuter.style.paddingTop = topHeight + 'px';
 		}
 	}, {
 		key: 'onReplayButtonClick',

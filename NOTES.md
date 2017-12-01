@@ -6,15 +6,13 @@
 - [ ] mention debug tools in article write up
 - [ ] enter debug mode button
 - [ ] switch to uglified version when complete
-
 - [ ] test on mobile
 - [ ] test on browsers
 - [ ] handle viewport width changes, getting cut off now, how can we maintain this?
 - [ ] handle unfocused tab and timing
 - [ ] handle memory clean up and stopping
-
-- [ ] SETUP numbered variable for which demo we're on, then put grid to dark on proper ones
-- [ ]add debug scene button to toggle grid and orbit
+- [ ] add debug scene button to toggle grid and orbit
+- [ ] tune duration timings
 
 #### EXITS
 
