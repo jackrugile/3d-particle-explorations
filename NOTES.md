@@ -18,8 +18,3 @@
 - [ ] bubble up, then content comes from bottom
 - [ ] ease left, then content come from right
 - [ ] ease right, then content come from left
-
-DURING SEND
-article write up
-debug scene
-having difficulty coming up with and executing exits, should we rebrand?
