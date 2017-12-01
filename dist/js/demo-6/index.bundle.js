@@ -155,10 +155,10 @@ var System = function (_SystemBase) {
 		for (var i = 0; i < _this.count; i++) {
 			var x = 0;
 			var y = 0;
-			var z = _this.calc.map(i, 0, _this.count - 1, -10, 0);
-			var size = _this.calc.map(i, 0, _this.count - 1, 0.01, 0.175);
+			var z = _this.calc.map(i, 0, _this.count - 1, -15, 0);
+			var size = _this.calc.map(i, 0, _this.count - 1, 0.2, 0.01);
 			var radius = _this.calc.map(i, 0, _this.count - 1, 1, _this.outer) - _this.outer / _this.count * (i % 3);
-			var opacity = _this.calc.map(i, 0, _this.count - 1, 0.1, 1);
+			var opacity = _this.calc.map(i, 0, _this.count - 1, 1, 1);
 
 			_this.particles.push(new Particle({
 				group: _this.particleGroup,

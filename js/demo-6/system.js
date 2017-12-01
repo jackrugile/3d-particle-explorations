@@ -14,10 +14,10 @@ class System extends SystemBase {
 		for(let i = 0; i < this.count; i++) {
 			let x = 0;
 			let y = 0;
-			let z = this.calc.map(i, 0, this.count - 1, -10, 0);
-			let size = this.calc.map(i, 0, this.count - 1, 0.01, 0.175);
+			let z = this.calc.map(i, 0, this.count - 1, -15, 0);
+			let size = this.calc.map(i, 0, this.count - 1, 0.2, 0.01);
 			let radius = this.calc.map(i, 0, this.count - 1, 1, this.outer) - ((this.outer / this.count) * (i % 3));
-			let opacity = this.calc.map(i, 0, this.count - 1, 0.1, 1)
+			let opacity = this.calc.map(i, 0, this.count - 1, 1, 1)
 
 			this.particles.push(new Particle({
 				group: this.particleGroup,
