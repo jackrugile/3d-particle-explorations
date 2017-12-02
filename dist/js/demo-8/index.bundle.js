@@ -7,39 +7,7 @@ var System = require('./system');
 window.demoNum = 8;
 var loader = new Loader(System);
 
-},{"../loader":4,"./system":3}],2:[function(require,module,exports){
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ParticleBase = require('../particle-base');
-
-var Particle = function (_ParticleBase) {
-	_inherits(Particle, _ParticleBase);
-
-	function Particle(config, system, loader) {
-		_classCallCheck(this, Particle);
-
-		return _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
-	}
-
-	_createClass(Particle, [{
-		key: 'update',
-		value: function update() {}
-	}]);
-
-	return Particle;
-}(ParticleBase);
-
-module.exports = Particle;
-
-},{"../particle-base":5}],3:[function(require,module,exports){
+},{"../loader":3,"./system":2}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -53,7 +21,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var SystemBase = require('../system-base');
-var Particle = require('./particle');
 var Osc = require('../utils/osc');
 
 var System = function (_SystemBase) {
@@ -74,7 +41,7 @@ var System = function (_SystemBase) {
 		_this.base = 20;
 		_this.count = _this.base * _this.base * _this.base;
 		_this.geometry = new THREE.BufferGeometry();
-		_this.objs = [];
+		_this.parts = [];
 
 		_this.positions = new Float32Array(_this.count * 3);
 		_this.colors = new Float32Array(_this.count * 4);
@@ -86,7 +53,7 @@ var System = function (_SystemBase) {
 
 		for (var i = 0; i < _this.count; i++) {
 			var size = _this.calc.rand(0.1, 0.8);
-			_this.objs.push({
+			_this.parts.push({
 				offset: 0,
 				pos: new THREE.Vector3(_this.calc.rand(-_this.size / 2, _this.size / 2), _this.calc.rand(-_this.size / 2, _this.size / 2), _this.calc.rand(-_this.size / 2, _this.size / 2)),
 				baseSize: size,
@@ -118,7 +85,7 @@ var System = function (_SystemBase) {
 		_this.mesh = new THREE.Points(_this.geometry, _this.material);
 		_this.particleGroup.add(_this.mesh);
 
-		_this.updateParticles(true, true, true);
+		_this.updateParticleAttributes(true, true, true);
 
 		_this.reset();
 		return _this;
@@ -129,9 +96,6 @@ var System = function (_SystemBase) {
 		value: function reset() {
 			this.osc = new Osc(0, 0.015, true, false);
 		}
-	}, {
-		key: 'createMesh',
-		value: function createMesh() {}
 	}, {
 		key: 'generateTexture',
 		value: function generateTexture() {
@@ -156,24 +120,24 @@ var System = function (_SystemBase) {
 			return texture;
 		}
 	}, {
-		key: 'updateParticles',
-		value: function updateParticles(color, position, size) {
+		key: 'updateParticleAttributes',
+		value: function updateParticleAttributes(color, position, size) {
 			var i = this.count;
 			while (i--) {
-				var obj = this.objs[i];
+				var part = this.parts[i];
 				if (color) {
-					this.colors[i * 4 + 0] = obj.r;
-					this.colors[i * 4 + 1] = obj.g;
-					this.colors[i * 4 + 2] = obj.b;
-					this.colors[i * 4 + 3] = obj.a;
+					this.colors[i * 4 + 0] = part.r;
+					this.colors[i * 4 + 1] = part.g;
+					this.colors[i * 4 + 2] = part.b;
+					this.colors[i * 4 + 3] = part.a;
 				}
 				if (position) {
-					this.positions[i * 3 + 0] = obj.pos.x;
-					this.positions[i * 3 + 1] = obj.pos.y;
-					this.positions[i * 3 + 2] = obj.pos.z;
+					this.positions[i * 3 + 0] = part.pos.x;
+					this.positions[i * 3 + 1] = part.pos.y;
+					this.positions[i * 3 + 2] = part.pos.z;
 				}
 				if (size) {
-					this.sizes[i] = obj.size;
+					this.sizes[i] = part.size;
 				}
 			}
 
@@ -199,6 +163,7 @@ var System = function (_SystemBase) {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
 
 			this.osc.update(this.loader.dtN);
+			this.oscEased = this.osc.val(this.ease.inOutExpo);
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
@@ -208,53 +173,53 @@ var System = function (_SystemBase) {
 
 			var noiseDiv = 10;
 			var noiseTime = this.loader.elapsedMs * 0.0008;
-			var noiseVel = this.calc.map(this.osc.val(this.ease.inOutExpo), 0, 1, 0, 1);
+			var noiseVel = this.calc.map(this.oscEased, 0, 1, 0, 1);
 
 			while (i--) {
-				var obj = this.objs[i];
+				var part = this.parts[i];
 
-				var xDiv = obj.pos.x / noiseDiv;
-				var yDiv = obj.pos.y / noiseDiv;
-				var zDiv = obj.pos.z / noiseDiv;
+				var xDiv = part.pos.x / noiseDiv;
+				var yDiv = part.pos.y / noiseDiv;
+				var zDiv = part.pos.z / noiseDiv;
 
 				var noise1 = this.simplex.getRaw4DNoise(xDiv, yDiv, zDiv, noiseTime) * 0.5 + 0.5;
 				var noise2 = this.simplex.getRaw4DNoise(xDiv + 100, yDiv + 100, zDiv + 100, 50 + noiseTime) * 0.5 + 0.5;
 				var noise3 = this.simplex.getRaw4DNoise(xDiv + 200, yDiv + 200, zDiv + 200, 100 + noiseTime) * 0.5 + 0.5;
 
-				obj.pos.x += Math.sin(noise1 * Math.PI * 2) * noiseVel * this.loader.dtN;
-				obj.pos.y += Math.sin(noise2 * Math.PI * 2) * noiseVel * this.loader.dtN;
-				obj.pos.z += Math.sin(noise3 * Math.PI * 2) * noiseVel * this.loader.dtN;
+				part.pos.x += Math.sin(noise1 * Math.PI * 2) * noiseVel * this.loader.dtN;
+				part.pos.y += Math.sin(noise2 * Math.PI * 2) * noiseVel * this.loader.dtN;
+				part.pos.z += Math.sin(noise3 * Math.PI * 2) * noiseVel * this.loader.dtN;
 
-				if (obj.life > 0) {
-					obj.life -= obj.decay * this.osc.val(this.ease.inOutExpo);
+				if (part.life > 0) {
+					part.life -= part.decay * this.oscEased;
 				}
 
-				if (obj.life <= 0 || obj.firstRun) {
-					obj.life = 2;
-					obj.pos.x = this.calc.rand(-this.size / 2, this.size / 2);
-					obj.pos.y = this.calc.rand(-this.size / 2, this.size / 2);
-					obj.pos.z = this.calc.rand(-this.size / 2, this.size / 2);
+				if (part.life <= 0 || part.firstRun) {
+					part.life = 2;
+					part.pos.x = this.calc.rand(-this.size / 2, this.size / 2);
+					part.pos.y = this.calc.rand(-this.size / 2, this.size / 2);
+					part.pos.z = this.calc.rand(-this.size / 2, this.size / 2);
 
 					var hue = (this.loader.elapsedMs / 25 + this.calc.rand(60)) % 360 + 110;
 					var lightness = Math.round(this.calc.rand(10, 50));
 					this.color.set('hsl(' + hue + ', 85%, ' + lightness + '%)');
 
-					obj.r = this.color.r;
-					obj.g = this.color.g;
-					obj.b = this.color.b;
+					part.r = this.color.r;
+					part.g = this.color.g;
+					part.b = this.color.b;
 
-					obj.firstRun = false;
+					part.firstRun = false;
 				}
 
-				obj.a = obj.life > 1 ? 2 - obj.life : obj.life;
+				part.a = part.life > 1 ? 2 - part.life : part.life;
 
-				obj.size = this.calc.map(this.osc.val(this.ease.inOutExpo), 0, 1, obj.baseSize * 4, obj.baseSize * 1);
+				part.size = this.calc.map(this.oscEased, 0, 1, part.baseSize * 4, part.baseSize * 1);
 			}
 
-			this.updateParticles(true, true, true);
+			this.updateParticleAttributes(true, true, true);
 
-			this.particleGroup.rotation.y += 0.005 + this.osc.val(this.ease.inOutExpo) * 0.04;
-			this.particleGroup.position.z = 5 - this.osc.val(this.ease.inOutExpo) * 15;
+			this.particleGroup.rotation.y += 0.005 + this.oscEased * 0.04;
+			this.particleGroup.position.z = 5 - this.oscEased * 15;
 		}
 	}]);
 
@@ -263,7 +228,7 @@ var System = function (_SystemBase) {
 
 module.exports = System;
 
-},{"../system-base":6,"../utils/osc":10,"./particle":2}],4:[function(require,module,exports){
+},{"../system-base":4,"../utils/osc":8}],3:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -531,69 +496,7 @@ var Loader = function () {
 
 module.exports = Loader;
 
-},{"./utils/axis":7,"./utils/calc":8,"./utils/ease":9}],5:[function(require,module,exports){
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ParticleBase = function () {
-	function ParticleBase(config, system, loader) {
-		_classCallCheck(this, ParticleBase);
-
-		this.system = system;
-		this.loader = loader;
-
-		this.calc = this.loader.calc;
-		this.ease = this.loader.ease;
-
-		this.group = config.group;
-		this.x = config.x;
-		this.y = config.y;
-		this.z = config.z;
-		this.size = config.size;
-		this.color = config.color;
-		this.opacity = config.opacity;
-
-		this.createMesh();
-	}
-
-	_createClass(ParticleBase, [{
-		key: 'createMesh',
-		value: function createMesh() {
-			this.geometry = this.system.sphereGeometry;
-
-			this.material = new THREE.MeshBasicMaterial({
-				color: this.color,
-				transparent: true,
-				opacity: this.opacity,
-				depthTest: false,
-				precision: 'lowp',
-				side: THREE.DoubleSide
-			});
-
-			this.mesh = new THREE.Mesh(this.geometry, this.material);
-
-			this.mesh.position.x = this.x;
-			this.mesh.position.y = this.y;
-			this.mesh.position.z = this.z;
-
-			this.mesh.scale.set(this.size, this.size, this.size);
-
-			this.group.add(this.mesh);
-		}
-	}, {
-		key: 'reset',
-		value: function reset() {}
-	}]);
-
-	return ParticleBase;
-}();
-
-module.exports = ParticleBase;
-
-},{}],6:[function(require,module,exports){
+},{"./utils/axis":5,"./utils/calc":6,"./utils/ease":7}],4:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -681,7 +584,7 @@ var SystemBase = function () {
 
 module.exports = SystemBase;
 
-},{}],7:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -725,7 +628,7 @@ var AxisHelper = function () {
 
 module.exports = AxisHelper;
 
-},{}],8:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -977,7 +880,7 @@ var Calc = function () {
 
 module.exports = Calc;
 
-},{}],9:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1513,7 +1416,7 @@ var Ease = function () {
 
 module.exports = Ease;
 
-},{}],10:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
