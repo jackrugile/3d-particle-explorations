@@ -185,6 +185,8 @@ var Loader = function () {
 		this.container = document.querySelector('.loader');
 		this.replayButton = document.querySelector('.replay-loader');
 		this.debugButton = document.querySelector('.icon--debug');
+		document.documentElement.classList.add('loading');
+
 		this.width = null;
 		this.height = null;
 		this.completed = false;
@@ -197,12 +199,10 @@ var Loader = function () {
 		this.setupRenderer();
 		this.setupControls();
 		this.setupHelpers();
-
 		this.listen();
 		this.onResize();
-		this.system = new System(this);
 
-		document.documentElement.classList.add('loading');
+		this.system = new System(this);
 		this.loop();
 	}
 
@@ -214,9 +214,9 @@ var Loader = function () {
 			this.isDebug = location.hash.indexOf('debug') > 0;
 			this.isGrid = location.hash.indexOf('grid') > 0;
 			this.isOrbit = location.hash.indexOf('orbit') > 0;
-			this.isGridDark = [].indexOf(demoNum) > -1;
 
 			this.debugHash = '';
+
 			if (this.isDebug) {
 				this.isGrid = true;
 				this.isOrbit = true;
@@ -225,6 +225,7 @@ var Loader = function () {
 				this.debugHash += this.isGrid ? 'grid' : '';
 				this.debugHash += this.isOrbit ? 'orbit' : '';
 			}
+
 			if (this.debugHash) {
 				[].slice.call(document.querySelectorAll('.demo')).forEach(function (elem, i, arr) {
 					elem.setAttribute('href', elem.getAttribute('href') + '#' + _this.debugHash);
@@ -249,9 +250,10 @@ var Loader = function () {
 		key: 'setupCamera',
 		value: function setupCamera() {
 			this.camera = new THREE.PerspectiveCamera(100, 0, 0.0001, 10000);
-			this.cameraBaseX = this.isGrid ? -30 : 0;
+
+			this.cameraBaseX = this.isGrid ? -20 : 0;
 			this.cameraBaseY = this.isGrid ? 15 : 0;
-			this.cameraBaseZ = this.isGrid ? 30 : 35;
+			this.cameraBaseZ = this.isGrid ? 20 : 35;
 
 			this.camera.position.x = this.cameraBaseX;
 			this.camera.position.y = this.cameraBaseY;
@@ -264,6 +266,7 @@ var Loader = function () {
 				alpha: true,
 				antialias: true
 			});
+
 			this.container.appendChild(this.renderer.domElement);
 		}
 	}, {
@@ -280,13 +283,30 @@ var Loader = function () {
 		key: 'setupHelpers',
 		value: function setupHelpers() {
 			if (this.isGrid) {
-				var color = this.isGridDark ? 0x000000 : 0xffffff;
-				this.gridHelper = new THREE.GridHelper(100, 20, color, color);
+				this.gridOpacityMap = [0.4, // 1
+				0.2, // 2
+				0.2, // 3
+				0.2, // 4
+				0.1, // 5
+				0.2, // 6
+				0.1, // 7
+				0.1 // 8
+				];
+				this.gridHelper = new THREE.GridHelper(100, 20, 0xffffff, 0xffffff);
 				this.gridHelper.material.transparent = true;
-				this.gridHelper.material.opacity = this.isGridDark ? 0.1 : 0.2;
+				this.gridHelper.material.opacity = this.gridOpacityMap[demoNum - 1];
 				this.scene.add(this.gridHelper);
 
-				this.axisHelper = new AxisHelper(50, 0.5);
+				this.axisOpacityMap = [1, // 1
+				0.6, // 2
+				0.6, // 3
+				0.6, // 4
+				0.3, // 5
+				0.6, // 6
+				0.3, // 7
+				0.3 // 8
+				];
+				this.axisHelper = new AxisHelper(50, this.axisOpacityMap[demoNum - 1]);
 				this.scene.add(this.axisHelper);
 
 				this.camera.lookAt(new THREE.Vector3());
@@ -331,9 +351,11 @@ var Loader = function () {
 		value: function replay() {
 			document.documentElement.classList.remove('completed');
 			document.documentElement.classList.add('loading');
+
 			this.camera.position.x = this.cameraBaseX;
 			this.camera.position.y = this.cameraBaseY;
 			this.camera.position.z = this.cameraBaseZ;
+
 			this.elapsedMs = 0;
 			this.system.replay();
 			this.completed = false;
@@ -575,11 +597,11 @@ var AxisHelper = function () {
 		this.axisLength = axisLength;
 		this.opacity = opacity;
 
-		this.createAxis(new THREE.Vector3(-this.axisLength, 0, 0), new THREE.Vector3(this.axisLength, 0, 0), new THREE.Color('hsl(0, 100%, 50%)'));
+		this.createAxis(new THREE.Vector3(-this.axisLength, 0, 0), new THREE.Vector3(this.axisLength, 0, 0), new THREE.Color('hsl(0, 100%, 100%)'));
 
-		this.createAxis(new THREE.Vector3(0, -this.axisLength, 0), new THREE.Vector3(0, this.axisLength, 0), new THREE.Color('hsl(120, 100%, 50%)'));
+		this.createAxis(new THREE.Vector3(0, -this.axisLength, 0), new THREE.Vector3(0, this.axisLength, 0), new THREE.Color('hsl(120, 100%, 100%)'));
 
-		this.createAxis(new THREE.Vector3(0, 0, -this.axisLength), new THREE.Vector3(0, 0, this.axisLength), new THREE.Color('hsl(240, 100%, 50%)'));
+		this.createAxis(new THREE.Vector3(0, 0, -this.axisLength), new THREE.Vector3(0, 0, this.axisLength), new THREE.Color('hsl(240, 100%, 100%)'));
 
 		return this.object3d;
 	}

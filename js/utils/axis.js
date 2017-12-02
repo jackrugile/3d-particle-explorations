@@ -8,19 +8,19 @@ class AxisHelper {
 		this.createAxis(
 			new THREE.Vector3(-this.axisLength, 0, 0),
 			new THREE.Vector3(this.axisLength, 0, 0),
-			new THREE.Color('hsl(0, 100%, 50%)'),
+			new THREE.Color('hsl(0, 100%, 100%)')
 		);
 
 		this.createAxis(
 			new THREE.Vector3(0, -this.axisLength, 0),
 			new THREE.Vector3(0, this.axisLength, 0),
-			new THREE.Color('hsl(120, 100%, 50%)')
+			new THREE.Color('hsl(120, 100%, 100%)')
 		);
 
 		this.createAxis(
 			new THREE.Vector3(0, 0, -this.axisLength),
 			new THREE.Vector3(0, 0, this.axisLength),
-			new THREE.Color('hsl(240, 100%, 50%)')
+			new THREE.Color('hsl(240, 100%, 100%)')
 		);
 
 		return this.object3d;

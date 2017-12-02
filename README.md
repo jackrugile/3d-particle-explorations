@@ -1,6 +1,6 @@
 # 3D Particle Explorations
 
-*Explorations of particle animations in 3D space with three.js.*, *Jack Rugile*
+Particle animation explorations in 3D space with three.js. By Jack Rugile.
 
 ![Image Title](link)
 
@@ -18,7 +18,7 @@ This resource can be used freely if integrated or build upon in personal or comm
 
 ## Misc
 
-Follow *Jack Rugile*: [Twitter](https://www.twitter.com/jackrugile), [CodePen](https://codepen.io/jackrugile/), [GitHub](https://www.github.com/jackrugile)
+Follow Jack Rugile: [Twitter](https://www.twitter.com/jackrugile), [CodePen](https://codepen.io/jackrugile/), [GitHub](https://www.github.com/jackrugile)
 
 Follow Codrops: [Twitter](http://www.twitter.com/codrops), [Facebook](http://www.facebook.com/codrops), [Google+](https://plus.google.com/101095823814290637419), [GitHub](https://github.com/codrops), [Pinterest](http://www.pinterest.com/codrops/), [Instagram](https://www.instagram.com/codropsss/)
 
