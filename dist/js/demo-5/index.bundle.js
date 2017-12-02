@@ -116,8 +116,8 @@ var Particle = function (_ParticleBase) {
 		_this.baseZ = config.z;
 		_this.base = new THREE.Vector3(config.x, config.y, config.z);
 
-		_this.lerpFactor = 0.25;
-		_this.dampFactor = 0.25;
+		_this.lerpFactor = 0.3;
+		_this.dampFactor = 0.3;
 
 		_this.velocity = new THREE.Vector3(0, 0, 0);
 		return _this;
@@ -163,7 +163,7 @@ var Ripple = function () {
 		this.array = config.array;
 		this.group = config.group;
 		this.sphere = new THREE.Sphere(new THREE.Vector3(config.x, config.y, config.z), 0);
-		this.strength = this.calc.rand(6, 9);
+		this.strength = this.calc.rand(7, 12);
 		this.threshold = this.calc.rand(4, 8);
 		this.growth = this.calc.rand(0.1, 0.3);
 		this.life = 1;
@@ -317,7 +317,8 @@ var System = function (_SystemBase) {
 		key: 'setCamera',
 		value: function setCamera() {
 			if (!this.loader.isGrid) {
-				this.loader.camera.position.y = 20;
+				this.loader.cameraBaseY = 20;
+				this.loader.camera.position.y = this.loader.cameraBaseY;
 				this.loader.camera.lookAt(new THREE.Vector3());
 			}
 		}
@@ -398,6 +399,7 @@ var System = function (_SystemBase) {
 			this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMs * 0.0005) * -0.2;
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
+				this.loader.camera.position.y = this.loader.cameraBaseY - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseY;
 				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
 				this.loader.camera.lookAt(new THREE.Vector3());
 			}

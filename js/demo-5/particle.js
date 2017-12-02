@@ -10,8 +10,8 @@ class Particle extends ParticleBase {
 		this.baseZ = config.z;
 		this.base = new THREE.Vector3(config.x, config.y, config.z);
 
-		this.lerpFactor = 0.25;
-		this.dampFactor = 0.25;
+		this.lerpFactor = 0.3;
+		this.dampFactor = 0.3;
 
 		this.velocity = new THREE.Vector3(0, 0, 0);
 	}
