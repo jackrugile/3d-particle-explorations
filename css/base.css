@@ -336,7 +336,7 @@ main {
 	transition: color 0ms 0ms;
 }
 
-.content-inner .replay-loader {
+.content-inner .replay-animation {
 	background: var(--color-bg);
 	box-shadow: inset 0 0 0 3px var(--color-link);
 	color: var(--color-link);
@@ -346,7 +346,7 @@ main {
 	transition: all 300ms;
 }
 
-.content-inner .replay-loader:hover {
+.content-inner .replay-animation:hover {
 	background: var(--color-link);
 	color: var(--color-bg);
 }

@@ -16,11 +16,9 @@ class Drop {
 		this.color = config.color;
 		this.opacity = config.opacity;
 
-		this.baseX = config.x;
-		this.baseY = config.y;
-		this.baseZ = config.z;
+		this.yBase = config.y;
 
-		this.prog = 0;
+		this.progress = 0;
 		this.rate = 0.015;
 
 		this.createMesh();
@@ -34,8 +32,7 @@ class Drop {
 			transparent: true,
 			opacity: this.opacity,
 			depthTest: false,
-			precision: 'lowp',
-			side: THREE.DoubleSide
+			precision: 'lowp'
 		});
 
 		this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -50,12 +47,12 @@ class Drop {
 	}
 
 	update(i) {
-		this.prog += this.rate * this.loader.dtN;
-		this.mesh.position.y = this.baseY - this.ease.inExpo(this.prog, 0, 1, 1) * this.baseY;
-		this.mesh.scale.set(this.size, this.size + this.size * 16 * this.ease.inExpo(this.prog, 0, 1, 1), this.size);
-		this.mesh.material.opacity = this.ease.inExpo(this.prog, 0, 1, 1);
+		this.progress += this.rate * this.loader.deltaTimeNormal;
+		this.mesh.position.y = this.yBase - this.ease.inExpo(this.progress, 0, 1, 1) * this.yBase;
+		this.mesh.scale.set(this.size, this.size + this.size * 16 * this.ease.inExpo(this.progress, 0, 1, 1), this.size);
+		this.mesh.material.opacity = this.ease.inExpo(this.progress, 0, 1, 1);
 
-		if(this.prog >= 1) {
+		if(this.progress >= 1) {
 			this.geometry.dispose();
 			this.material.dispose();
 			this.group.remove(this.mesh);

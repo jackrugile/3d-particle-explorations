@@ -24,11 +24,9 @@ var Drop = function () {
 		this.color = config.color;
 		this.opacity = config.opacity;
 
-		this.baseX = config.x;
-		this.baseY = config.y;
-		this.baseZ = config.z;
+		this.yBase = config.y;
 
-		this.prog = 0;
+		this.progress = 0;
 		this.rate = 0.015;
 
 		this.createMesh();
@@ -44,8 +42,7 @@ var Drop = function () {
 				transparent: true,
 				opacity: this.opacity,
 				depthTest: false,
-				precision: 'lowp',
-				side: THREE.DoubleSide
+				precision: 'lowp'
 			});
 
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -61,12 +58,12 @@ var Drop = function () {
 	}, {
 		key: 'update',
 		value: function update(i) {
-			this.prog += this.rate * this.loader.dtN;
-			this.mesh.position.y = this.baseY - this.ease.inExpo(this.prog, 0, 1, 1) * this.baseY;
-			this.mesh.scale.set(this.size, this.size + this.size * 16 * this.ease.inExpo(this.prog, 0, 1, 1), this.size);
-			this.mesh.material.opacity = this.ease.inExpo(this.prog, 0, 1, 1);
+			this.progress += this.rate * this.loader.deltaTimeNormal;
+			this.mesh.position.y = this.yBase - this.ease.inExpo(this.progress, 0, 1, 1) * this.yBase;
+			this.mesh.scale.set(this.size, this.size + this.size * 16 * this.ease.inExpo(this.progress, 0, 1, 1), this.size);
+			this.mesh.material.opacity = this.ease.inExpo(this.progress, 0, 1, 1);
 
-			if (this.prog >= 1) {
+			if (this.progress >= 1) {
 				this.geometry.dispose();
 				this.material.dispose();
 				this.group.remove(this.mesh);
@@ -111,15 +108,11 @@ var Particle = function (_ParticleBase) {
 
 		var _this = _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
 
-		_this.baseX = config.x;
-		_this.baseY = config.y;
-		_this.baseZ = config.z;
 		_this.base = new THREE.Vector3(config.x, config.y, config.z);
+		_this.velocity = new THREE.Vector3(0, 0, 0);
 
 		_this.lerpFactor = 0.3;
 		_this.dampFactor = 0.3;
-
-		_this.velocity = new THREE.Vector3(0, 0, 0);
 		return _this;
 	}
 
@@ -204,8 +197,8 @@ var Ripple = function () {
 	}, {
 		key: 'update',
 		value: function update(i) {
-			this.sphere.radius += this.growth * this.life * this.loader.dtN;
-			this.life -= this.decay * this.loader.dtN;
+			this.sphere.radius += this.growth * this.life * this.loader.deltaTimeNormal;
+			this.life -= this.decay * this.loader.deltaTimeNormal;
 
 			this.mesh.position.y = (1 - this.life) * -2;
 			var newScale = 0.001 + this.sphere.radius;
@@ -301,7 +294,7 @@ var System = function (_SystemBase) {
 
 			var i = this.drops.length;
 			while (i--) {
-				this.drops[i].prog = 1;
+				this.drops[i].progress = 1;
 				this.drops[i].update(i);
 			}
 
@@ -319,7 +312,7 @@ var System = function (_SystemBase) {
 			if (!this.loader.isGrid) {
 				this.loader.cameraBaseY = 20;
 				this.loader.camera.position.y = this.loader.cameraBaseY;
-				this.loader.camera.lookAt(new THREE.Vector3());
+				this.loader.camera.lookAt(this.center);
 			}
 		}
 	}, {
@@ -395,16 +388,16 @@ var System = function (_SystemBase) {
 				}
 			}
 
-			this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMs * 0.0005) * 0.1;
-			this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMs * 0.0005) * -0.2;
-
-			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-				this.loader.camera.position.y = this.loader.cameraBaseY - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseY;
-				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
-				this.loader.camera.lookAt(new THREE.Vector3());
-			}
+			this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMilliseconds * 0.0005) * 0.1;
+			this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMilliseconds * 0.0005) * -0.2;
 
 			this.tick++;
+
+			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
+				this.loader.camera.position.y = this.loader.cameraBaseY - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseY;
+				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
+				this.loader.camera.lookAt(this.center);
+			}
 		}
 	}]);
 
@@ -431,13 +424,15 @@ var Loader = function () {
 		this.calc = new Calc();
 		this.ease = new Ease();
 
-		this.container = document.querySelector('.loader');
-		this.replayButton = document.querySelector('.replay-loader');
-		this.debugButton = document.querySelector('.icon--debug');
-		document.documentElement.classList.add('loading');
+		this.dom = {
+			html: document.documentElement,
+			container: document.querySelector('.loader'),
+			replayButton: document.querySelector('.replay-animation'),
+			debugButton: document.querySelector('.icon--debug')
+		};
 
-		this.width = null;
-		this.height = null;
+		this.dom.html.classList.add('loading');
+
 		this.completed = false;
 		this.raf = null;
 
@@ -485,10 +480,10 @@ var Loader = function () {
 		key: 'setupTime',
 		value: function setupTime() {
 			this.clock = new THREE.Clock();
-			this.dtS = this.clock.getDelta();
-			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-			this.elapsedMs = 0;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.elapsedMilliseconds = 0;
 		}
 	}, {
 		key: 'setupScene',
@@ -516,7 +511,7 @@ var Loader = function () {
 				antialias: true
 			});
 
-			this.container.appendChild(this.renderer.domElement);
+			this.dom.container.appendChild(this.renderer.domElement);
 		}
 	}, {
 		key: 'setupControls',
@@ -564,10 +559,10 @@ var Loader = function () {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.dtS = this.clock.getDelta();
-			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-			this.elapsedMs += this.dtMs;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.elapsedMilliseconds += this.deltaTimeMilliseconds;
 
 			this.system.update();
 
@@ -588,10 +583,10 @@ var Loader = function () {
 			window.addEventListener('resize', function (e) {
 				return _this2.onResize(e);
 			});
-			this.replayButton.addEventListener('click', function (e) {
+			this.dom.replayButton.addEventListener('click', function (e) {
 				return _this2.onReplayButtonClick(e);
 			});
-			this.debugButton.addEventListener('click', function (e) {
+			this.dom.debugButton.addEventListener('click', function (e) {
 				return _this2.onDebugButtonClick(e);
 			});
 		}
@@ -605,7 +600,7 @@ var Loader = function () {
 			this.camera.position.y = this.cameraBaseY;
 			this.camera.position.z = this.cameraBaseZ;
 
-			this.elapsedMs = 0;
+			this.elapsedMilliseconds = 0;
 			this.system.replay();
 			this.completed = false;
 			this.clock.start();
@@ -624,8 +619,8 @@ var Loader = function () {
 				cancelAnimationFrame(_this3.raf);
 			}, 600);
 			this.completed = true;
-			document.documentElement.classList.remove('loading');
-			document.documentElement.classList.add('completed');
+			this.dom.html.classList.remove('loading');
+			this.dom.html.classList.add('completed');
 		}
 	}, {
 		key: 'onResize',
@@ -719,8 +714,7 @@ var ParticleBase = function () {
 				transparent: true,
 				opacity: this.opacity,
 				depthTest: false,
-				precision: 'lowp',
-				side: THREE.DoubleSide
+				precision: 'lowp'
 			});
 
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -761,6 +755,7 @@ var SystemBase = function () {
 
 		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
 		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
+		this.center = new THREE.Vector3();
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
@@ -769,11 +764,11 @@ var SystemBase = function () {
 		this.loader.scene.add(this.particleGroup);
 
 		this.entering = true;
-		this.enterProg = 0;
+		this.enterProgress = 0;
 		this.enterRate = 0.015;
 
 		this.exiting = false;
-		this.exitProg = 0;
+		this.exitProgress = 0;
 		this.exitRate = 0.01;
 		this.duration = Infinity;
 	}
@@ -786,24 +781,24 @@ var SystemBase = function () {
 				this.particles[i].update();
 			}
 
-			if (this.entering && this.enterProg < 1) {
-				this.enterProg += this.enterRate * this.loader.dtN;
-				if (this.enterProg > 1) {
-					this.enterProg = 1;
+			if (this.entering && this.enterProgress < 1) {
+				this.enterProgress += this.enterRate * this.loader.deltaTimeNormal;
+				if (this.enterProgress > 1) {
+					this.enterProgress = 1;
 					this.entering = false;
 				}
-				var scale = this.ease.inOutExpo(this.enterProg, 0, 1, 1);
+				var scale = this.ease.inOutExpo(this.enterProgress, 0, 1, 1);
 				this.particleGroup.scale.set(scale, scale, scale);
 			}
 
-			if (!this.exiting && this.loader.elapsedMs > this.duration) {
+			if (!this.exiting && this.loader.elapsedMilliseconds > this.duration) {
 				this.exiting = true;
 			}
 
 			if (this.exiting) {
-				this.exitProg += this.exitRate * this.loader.dtN;
-				if (this.exitProg >= 1 && !this.loader.completed) {
-					this.exitProg = 1;
+				this.exitProgress += this.exitRate * this.loader.deltaTimeNormal;
+				if (this.exitProgress >= 1 && !this.loader.completed) {
+					this.exitProgress = 1;
 					this.loader.complete();
 				}
 			}
@@ -819,10 +814,10 @@ var SystemBase = function () {
 			}
 
 			this.entering = true;
-			this.enterProg = 0;
+			this.enterProgress = 0;
 
 			this.exiting = false;
-			this.exitProg = 0;
+			this.exitProgress = 0;
 		}
 	}]);
 

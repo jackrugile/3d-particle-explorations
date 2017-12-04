@@ -28,9 +28,9 @@ var Particle = function (_ParticleBase) {
 
 		var _this = _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
 
-		_this.alt = config.alt;
-		_this.div = 0.15;
-		_this.amp = 0;
+		_this.alternate = config.alternate;
+		_this.noiseScale = 0.15;
+		_this.amplitude = 0;
 		_this.speed = 0;
 		return _this;
 	}
@@ -38,24 +38,24 @@ var Particle = function (_ParticleBase) {
 	_createClass(Particle, [{
 		key: 'update',
 		value: function update() {
-			if (this.alt) {
-				this.amp = (this.system.visW / 2 - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
-				this.amp *= this.system.osc1Eased;
-				this.speed = this.loader.elapsedMs / 750;
-				this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.div + this.speed, 0) * 10 * this.amp;
+			if (this.alternate) {
+				this.amplitude = (this.system.size / 2 - Math.abs(this.mesh.position.x)) / (this.system.size / 2);
+				this.amplitude *= this.system.osc1Eased;
+				this.speed = this.loader.elapsedMilliseconds / 750;
+				this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.noiseScale + this.speed, 0) * 10 * this.amplitude;
 			} else {
-				this.amp = (this.system.visW / 2 - Math.abs(this.mesh.position.x)) / (this.system.visW / 2);
-				this.amp *= 1 - this.system.osc1Eased;
-				this.speed = this.loader.elapsedMs / 750;
-				this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.div + this.speed + 1000, 1000) * 10 * this.amp;
+				this.amplitude = (this.system.size / 2 - Math.abs(this.mesh.position.x)) / (this.system.size / 2);
+				this.amplitude *= 1 - this.system.osc1Eased;
+				this.speed = this.loader.elapsedMilliseconds / 750;
+				this.mesh.position.y = this.system.simplex.getRaw2DNoise(this.mesh.position.x * this.noiseScale + this.speed + 1000, 1000) * 10 * this.amplitude;
 			}
 
-			var size = 0.05 + this.size * this.amp;
-			this.mesh.material.opacity = 0.1 + this.amp * 0.9;
-			size = 0.05 + 0.1 * this.amp;
+			var size = 0.05 + this.size * this.amplitude;
+			this.mesh.material.opacity = 0.1 + this.amplitude * 0.9;
+			size = 0.05 + 0.1 * this.amplitude;
 			this.mesh.scale.set(size, size, size);
 
-			this.mesh.position.z = this.alt ? 0.05 + 10 * this.amp : -(0.05 + 10 * this.amp);
+			this.mesh.position.z = this.alternate ? 0.05 + 10 * this.amplitude : -(0.05 + 10 * this.amplitude);
 		}
 	}]);
 
@@ -92,10 +92,10 @@ var System = function (_SystemBase) {
 		_this.duration = 8500;
 		_this.simplex = new FastSimplexNoise();
 		_this.count = 330;
-		_this.visW = 30;
+		_this.size = 30;
 
 		for (var i = 0; i < _this.count; i++) {
-			var x = _this.calc.map(i, 0, _this.count, -_this.visW / 2, _this.visW / 2) + _this.visW / _this.count / 2;
+			var x = _this.calc.map(i, 0, _this.count, -_this.size / 2, _this.size / 2) + _this.size / _this.count / 2;
 			var y = 0;
 			var z = 0;
 
@@ -104,10 +104,10 @@ var System = function (_SystemBase) {
 				x: x,
 				y: y,
 				z: z,
-				size: _this.calc.map(Math.abs(x), 0, _this.visW / 2, 0.2, 0.01),
+				size: _this.calc.map(Math.abs(x), 0, _this.size / 2, 0.2, 0.01),
 				color: i % 2 === 0 ? 0xffffff : 0x56311e,
 				opacity: 1,
-				alt: i % 2 === 0
+				alternate: i % 2 === 0
 			}, _this, _this.loader));
 		}
 
@@ -121,9 +121,9 @@ var System = function (_SystemBase) {
 			this.osc1 = new Osc(0.2, 0.015);
 			this.osc1Eased = 0;
 			this.osc2 = new Osc(1, 0.015, true, false);
-			this.rotationTarget = 0;
-			this.lastRotationTarget = this.rotationTarget;
-			this.rotProg = 0;
+			this.rotationZTarget = 0;
+			this.lastRotationZTarget = this.rotationZTarget;
+			this.rotationZProgress = 0;
 		}
 	}, {
 		key: 'replay',
@@ -136,25 +136,25 @@ var System = function (_SystemBase) {
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
 
-			this.osc1.update(this.loader.dtN);
+			this.osc1.update(this.loader.deltaTimeNormal);
 			this.osc1Eased = this.osc1.val(this.ease.inOutExpo);
-			this.osc2.update(this.loader.dtN);
+			this.osc2.update(this.loader.deltaTimeNormal);
 
-			if (this.osc2._triggerBot) {
-				this.lastRotationTarget = this.rotationTarget;
-				this.rotationTarget += Math.PI / -2;
-				this.rotProg = this.rotProg - 1;
+			if (this.osc2.triggerBot) {
+				this.lastRotationZTarget = this.rotationZTarget;
+				this.rotationZTarget += Math.PI / -2;
+				this.rotationZProgress = this.rotationZProgress - 1;
 			}
 
-			if (this.rotProg < 1) {
-				this.rotProg += 0.02 * this.loader.dtN;
+			if (this.rotationZProgress < 1) {
+				this.rotationZProgress += 0.02 * this.loader.deltaTimeNormal;
 			}
-			this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
+			this.rotationZProgress = this.calc.clamp(this.rotationZProgress, 0, 1);
 
-			this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTarget, this.rotationTarget);
+			this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotationZProgress, 0, 1, 1), 0, 1, this.lastRotationZTarget, this.rotationZTarget);
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 			}
 		}
 	}]);
@@ -182,13 +182,15 @@ var Loader = function () {
 		this.calc = new Calc();
 		this.ease = new Ease();
 
-		this.container = document.querySelector('.loader');
-		this.replayButton = document.querySelector('.replay-loader');
-		this.debugButton = document.querySelector('.icon--debug');
-		document.documentElement.classList.add('loading');
+		this.dom = {
+			html: document.documentElement,
+			container: document.querySelector('.loader'),
+			replayButton: document.querySelector('.replay-animation'),
+			debugButton: document.querySelector('.icon--debug')
+		};
 
-		this.width = null;
-		this.height = null;
+		this.dom.html.classList.add('loading');
+
 		this.completed = false;
 		this.raf = null;
 
@@ -236,10 +238,10 @@ var Loader = function () {
 		key: 'setupTime',
 		value: function setupTime() {
 			this.clock = new THREE.Clock();
-			this.dtS = this.clock.getDelta();
-			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-			this.elapsedMs = 0;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.elapsedMilliseconds = 0;
 		}
 	}, {
 		key: 'setupScene',
@@ -267,7 +269,7 @@ var Loader = function () {
 				antialias: true
 			});
 
-			this.container.appendChild(this.renderer.domElement);
+			this.dom.container.appendChild(this.renderer.domElement);
 		}
 	}, {
 		key: 'setupControls',
@@ -315,10 +317,10 @@ var Loader = function () {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.dtS = this.clock.getDelta();
-			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-			this.elapsedMs += this.dtMs;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.elapsedMilliseconds += this.deltaTimeMilliseconds;
 
 			this.system.update();
 
@@ -339,10 +341,10 @@ var Loader = function () {
 			window.addEventListener('resize', function (e) {
 				return _this2.onResize(e);
 			});
-			this.replayButton.addEventListener('click', function (e) {
+			this.dom.replayButton.addEventListener('click', function (e) {
 				return _this2.onReplayButtonClick(e);
 			});
-			this.debugButton.addEventListener('click', function (e) {
+			this.dom.debugButton.addEventListener('click', function (e) {
 				return _this2.onDebugButtonClick(e);
 			});
 		}
@@ -356,7 +358,7 @@ var Loader = function () {
 			this.camera.position.y = this.cameraBaseY;
 			this.camera.position.z = this.cameraBaseZ;
 
-			this.elapsedMs = 0;
+			this.elapsedMilliseconds = 0;
 			this.system.replay();
 			this.completed = false;
 			this.clock.start();
@@ -375,8 +377,8 @@ var Loader = function () {
 				cancelAnimationFrame(_this3.raf);
 			}, 600);
 			this.completed = true;
-			document.documentElement.classList.remove('loading');
-			document.documentElement.classList.add('completed');
+			this.dom.html.classList.remove('loading');
+			this.dom.html.classList.add('completed');
 		}
 	}, {
 		key: 'onResize',
@@ -470,8 +472,7 @@ var ParticleBase = function () {
 				transparent: true,
 				opacity: this.opacity,
 				depthTest: false,
-				precision: 'lowp',
-				side: THREE.DoubleSide
+				precision: 'lowp'
 			});
 
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -512,6 +513,7 @@ var SystemBase = function () {
 
 		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
 		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
+		this.center = new THREE.Vector3();
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
@@ -520,11 +522,11 @@ var SystemBase = function () {
 		this.loader.scene.add(this.particleGroup);
 
 		this.entering = true;
-		this.enterProg = 0;
+		this.enterProgress = 0;
 		this.enterRate = 0.015;
 
 		this.exiting = false;
-		this.exitProg = 0;
+		this.exitProgress = 0;
 		this.exitRate = 0.01;
 		this.duration = Infinity;
 	}
@@ -537,24 +539,24 @@ var SystemBase = function () {
 				this.particles[i].update();
 			}
 
-			if (this.entering && this.enterProg < 1) {
-				this.enterProg += this.enterRate * this.loader.dtN;
-				if (this.enterProg > 1) {
-					this.enterProg = 1;
+			if (this.entering && this.enterProgress < 1) {
+				this.enterProgress += this.enterRate * this.loader.deltaTimeNormal;
+				if (this.enterProgress > 1) {
+					this.enterProgress = 1;
 					this.entering = false;
 				}
-				var scale = this.ease.inOutExpo(this.enterProg, 0, 1, 1);
+				var scale = this.ease.inOutExpo(this.enterProgress, 0, 1, 1);
 				this.particleGroup.scale.set(scale, scale, scale);
 			}
 
-			if (!this.exiting && this.loader.elapsedMs > this.duration) {
+			if (!this.exiting && this.loader.elapsedMilliseconds > this.duration) {
 				this.exiting = true;
 			}
 
 			if (this.exiting) {
-				this.exitProg += this.exitRate * this.loader.dtN;
-				if (this.exitProg >= 1 && !this.loader.completed) {
-					this.exitProg = 1;
+				this.exitProgress += this.exitRate * this.loader.deltaTimeNormal;
+				if (this.exitProgress >= 1 && !this.loader.completed) {
+					this.exitProgress = 1;
 					this.loader.complete();
 				}
 			}
@@ -570,10 +572,10 @@ var SystemBase = function () {
 			}
 
 			this.entering = true;
-			this.enterProg = 0;
+			this.enterProgress = 0;
 
 			this.exiting = false;
-			this.exitProg = 0;
+			this.exitProgress = 0;
 		}
 	}]);
 
@@ -1428,41 +1430,41 @@ var Osc = function () {
 
 		_classCallCheck(this, Osc);
 
-		this._baseVal = val;
-		this._baseRate = rate;
-		this._baseDir = dir;
-		this._baseFlip = flip;
-
 		this._val = val;
 		this._rate = rate;
 		this._dir = dir;
 		this._flip = flip;
 
-		this._trigger = false;
-		this._triggerTop = false;
-		this._triggerBot = false;
+		this._valBase = val;
+		this._rateBase = rate;
+		this._dirBase = dir;
+		this._flipBase = flip;
+
+		this.trigger = false;
+		this.triggerTop = false;
+		this.triggerBot = false;
 	}
 
 	_createClass(Osc, [{
 		key: "reset",
 		value: function reset() {
-			this._val = this._baseVal;
-			this._rate = this._baseRate;
-			this._dir = this._baseDir;
-			this._flip = this._baseFlip;
+			this._val = this._valBase;
+			this._rate = this._rateBase;
+			this._dir = this._dirBase;
+			this._flip = this._flipBase;
 		}
 	}, {
 		key: "update",
 		value: function update(dt) {
-			this._trigger = false;
-			this._triggerTop = false;
-			this._triggerBot = false;
+			this.trigger = false;
+			this.triggerTop = false;
+			this.triggerBot = false;
 			if (this._dir) {
 				if (this._val < 1) {
 					this._val += this._rate * dt;
 				} else {
-					this._trigger = true;
-					this._triggerTop = true;
+					this.trigger = true;
+					this.triggerTop = true;
 					if (this._flip) {
 						this._val = this._val - 1;
 					} else {
@@ -1474,8 +1476,8 @@ var Osc = function () {
 				if (this._val > 0) {
 					this._val -= this._rate * dt;
 				} else {
-					this._trigger = true;
-					this._triggerBot = true;
+					this.trigger = true;
+					this.triggerBot = true;
 					if (this._flip) {
 						this._val = 1 + this._val;
 					} else {

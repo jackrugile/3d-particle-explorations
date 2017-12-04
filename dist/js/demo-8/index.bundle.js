@@ -55,7 +55,7 @@ var System = function (_SystemBase) {
 			var size = _this.calc.rand(0.1, 0.8);
 			_this.parts.push({
 				offset: 0,
-				pos: new THREE.Vector3(_this.calc.rand(-_this.size / 2, _this.size / 2), _this.calc.rand(-_this.size / 2, _this.size / 2), _this.calc.rand(-_this.size / 2, _this.size / 2)),
+				position: new THREE.Vector3(_this.calc.rand(-_this.size / 2, _this.size / 2), _this.calc.rand(-_this.size / 2, _this.size / 2), _this.calc.rand(-_this.size / 2, _this.size / 2)),
 				baseSize: size,
 				size: size,
 				r: 1,
@@ -132,9 +132,9 @@ var System = function (_SystemBase) {
 					this.colors[i * 4 + 3] = part.a;
 				}
 				if (position) {
-					this.positions[i * 3 + 0] = part.pos.x;
-					this.positions[i * 3 + 1] = part.pos.y;
-					this.positions[i * 3 + 2] = part.pos.z;
+					this.positions[i * 3 + 0] = part.position.x;
+					this.positions[i * 3 + 1] = part.position.y;
+					this.positions[i * 3 + 2] = part.position.z;
 				}
 				if (size) {
 					this.sizes[i] = part.size;
@@ -162,33 +162,29 @@ var System = function (_SystemBase) {
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
 
-			this.osc.update(this.loader.dtN);
+			this.osc.update(this.loader.deltaTimeNormal);
 			this.oscEased = this.osc.val(this.ease.inOutExpo);
-
-			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
-			}
 
 			var i = this.count;
 
-			var noiseDiv = 10;
-			var noiseTime = this.loader.elapsedMs * 0.0008;
-			var noiseVel = this.calc.map(this.oscEased, 0, 1, 0, 1);
+			var noiseScale = 0.1;
+			var noiseTime = this.loader.elapsedMilliseconds * 0.0008;
+			var noiseVelocity = this.calc.map(this.oscEased, 0, 1, 0, 1);
 
 			while (i--) {
 				var part = this.parts[i];
 
-				var xDiv = part.pos.x / noiseDiv;
-				var yDiv = part.pos.y / noiseDiv;
-				var zDiv = part.pos.z / noiseDiv;
+				var xScaled = part.position.x * noiseScale;
+				var yScaled = part.position.y * noiseScale;
+				var zScaled = part.position.z * noiseScale;
 
-				var noise1 = this.simplex.getRaw4DNoise(xDiv, yDiv, zDiv, noiseTime) * 0.5 + 0.5;
-				var noise2 = this.simplex.getRaw4DNoise(xDiv + 100, yDiv + 100, zDiv + 100, 50 + noiseTime) * 0.5 + 0.5;
-				var noise3 = this.simplex.getRaw4DNoise(xDiv + 200, yDiv + 200, zDiv + 200, 100 + noiseTime) * 0.5 + 0.5;
+				var noise1 = this.simplex.getRaw4DNoise(xScaled, yScaled, zScaled, noiseTime) * 0.5 + 0.5;
+				var noise2 = this.simplex.getRaw4DNoise(xScaled + 100, yScaled + 100, zScaled + 100, 50 + noiseTime) * 0.5 + 0.5;
+				var noise3 = this.simplex.getRaw4DNoise(xScaled + 200, yScaled + 200, zScaled + 200, 100 + noiseTime) * 0.5 + 0.5;
 
-				part.pos.x += Math.sin(noise1 * Math.PI * 2) * noiseVel * this.loader.dtN;
-				part.pos.y += Math.sin(noise2 * Math.PI * 2) * noiseVel * this.loader.dtN;
-				part.pos.z += Math.sin(noise3 * Math.PI * 2) * noiseVel * this.loader.dtN;
+				part.position.x += Math.sin(noise1 * Math.PI * 2) * noiseVelocity * this.loader.deltaTimeNormal;
+				part.position.y += Math.sin(noise2 * Math.PI * 2) * noiseVelocity * this.loader.deltaTimeNormal;
+				part.position.z += Math.sin(noise3 * Math.PI * 2) * noiseVelocity * this.loader.deltaTimeNormal;
 
 				if (part.life > 0) {
 					part.life -= part.decay * this.oscEased;
@@ -196,11 +192,11 @@ var System = function (_SystemBase) {
 
 				if (part.life <= 0 || part.firstRun) {
 					part.life = 2;
-					part.pos.x = this.calc.rand(-this.size / 2, this.size / 2);
-					part.pos.y = this.calc.rand(-this.size / 2, this.size / 2);
-					part.pos.z = this.calc.rand(-this.size / 2, this.size / 2);
+					part.position.x = this.calc.rand(-this.size / 2, this.size / 2);
+					part.position.y = this.calc.rand(-this.size / 2, this.size / 2);
+					part.position.z = this.calc.rand(-this.size / 2, this.size / 2);
 
-					var hue = (this.loader.elapsedMs / 25 + this.calc.rand(60)) % 360 + 110;
+					var hue = (this.loader.elapsedMilliseconds / 25 + this.calc.rand(60)) % 360 + 110;
 					var lightness = Math.round(this.calc.rand(10, 50));
 					this.color.set('hsl(' + hue + ', 85%, ' + lightness + '%)');
 
@@ -218,8 +214,12 @@ var System = function (_SystemBase) {
 
 			this.updateParticleAttributes(true, true, true);
 
-			this.particleGroup.rotation.y += 0.005 + this.oscEased * 0.04;
+			this.particleGroup.rotation.y += (0.0075 + this.oscEased * 0.04) * this.loader.deltaTimeNormal;
 			this.particleGroup.position.z = 5 - this.oscEased * 15;
+
+			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
+				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
+			}
 		}
 	}]);
 
@@ -246,13 +246,15 @@ var Loader = function () {
 		this.calc = new Calc();
 		this.ease = new Ease();
 
-		this.container = document.querySelector('.loader');
-		this.replayButton = document.querySelector('.replay-loader');
-		this.debugButton = document.querySelector('.icon--debug');
-		document.documentElement.classList.add('loading');
+		this.dom = {
+			html: document.documentElement,
+			container: document.querySelector('.loader'),
+			replayButton: document.querySelector('.replay-animation'),
+			debugButton: document.querySelector('.icon--debug')
+		};
 
-		this.width = null;
-		this.height = null;
+		this.dom.html.classList.add('loading');
+
 		this.completed = false;
 		this.raf = null;
 
@@ -300,10 +302,10 @@ var Loader = function () {
 		key: 'setupTime',
 		value: function setupTime() {
 			this.clock = new THREE.Clock();
-			this.dtS = this.clock.getDelta();
-			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-			this.elapsedMs = 0;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.elapsedMilliseconds = 0;
 		}
 	}, {
 		key: 'setupScene',
@@ -331,7 +333,7 @@ var Loader = function () {
 				antialias: true
 			});
 
-			this.container.appendChild(this.renderer.domElement);
+			this.dom.container.appendChild(this.renderer.domElement);
 		}
 	}, {
 		key: 'setupControls',
@@ -379,10 +381,10 @@ var Loader = function () {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.dtS = this.clock.getDelta();
-			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-			this.elapsedMs += this.dtMs;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.elapsedMilliseconds += this.deltaTimeMilliseconds;
 
 			this.system.update();
 
@@ -403,10 +405,10 @@ var Loader = function () {
 			window.addEventListener('resize', function (e) {
 				return _this2.onResize(e);
 			});
-			this.replayButton.addEventListener('click', function (e) {
+			this.dom.replayButton.addEventListener('click', function (e) {
 				return _this2.onReplayButtonClick(e);
 			});
-			this.debugButton.addEventListener('click', function (e) {
+			this.dom.debugButton.addEventListener('click', function (e) {
 				return _this2.onDebugButtonClick(e);
 			});
 		}
@@ -420,7 +422,7 @@ var Loader = function () {
 			this.camera.position.y = this.cameraBaseY;
 			this.camera.position.z = this.cameraBaseZ;
 
-			this.elapsedMs = 0;
+			this.elapsedMilliseconds = 0;
 			this.system.replay();
 			this.completed = false;
 			this.clock.start();
@@ -439,8 +441,8 @@ var Loader = function () {
 				cancelAnimationFrame(_this3.raf);
 			}, 600);
 			this.completed = true;
-			document.documentElement.classList.remove('loading');
-			document.documentElement.classList.add('completed');
+			this.dom.html.classList.remove('loading');
+			this.dom.html.classList.add('completed');
 		}
 	}, {
 		key: 'onResize',
@@ -514,6 +516,7 @@ var SystemBase = function () {
 
 		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
 		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
+		this.center = new THREE.Vector3();
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
@@ -522,11 +525,11 @@ var SystemBase = function () {
 		this.loader.scene.add(this.particleGroup);
 
 		this.entering = true;
-		this.enterProg = 0;
+		this.enterProgress = 0;
 		this.enterRate = 0.015;
 
 		this.exiting = false;
-		this.exitProg = 0;
+		this.exitProgress = 0;
 		this.exitRate = 0.01;
 		this.duration = Infinity;
 	}
@@ -539,24 +542,24 @@ var SystemBase = function () {
 				this.particles[i].update();
 			}
 
-			if (this.entering && this.enterProg < 1) {
-				this.enterProg += this.enterRate * this.loader.dtN;
-				if (this.enterProg > 1) {
-					this.enterProg = 1;
+			if (this.entering && this.enterProgress < 1) {
+				this.enterProgress += this.enterRate * this.loader.deltaTimeNormal;
+				if (this.enterProgress > 1) {
+					this.enterProgress = 1;
 					this.entering = false;
 				}
-				var scale = this.ease.inOutExpo(this.enterProg, 0, 1, 1);
+				var scale = this.ease.inOutExpo(this.enterProgress, 0, 1, 1);
 				this.particleGroup.scale.set(scale, scale, scale);
 			}
 
-			if (!this.exiting && this.loader.elapsedMs > this.duration) {
+			if (!this.exiting && this.loader.elapsedMilliseconds > this.duration) {
 				this.exiting = true;
 			}
 
 			if (this.exiting) {
-				this.exitProg += this.exitRate * this.loader.dtN;
-				if (this.exitProg >= 1 && !this.loader.completed) {
-					this.exitProg = 1;
+				this.exitProgress += this.exitRate * this.loader.deltaTimeNormal;
+				if (this.exitProgress >= 1 && !this.loader.completed) {
+					this.exitProgress = 1;
 					this.loader.complete();
 				}
 			}
@@ -572,10 +575,10 @@ var SystemBase = function () {
 			}
 
 			this.entering = true;
-			this.enterProg = 0;
+			this.enterProgress = 0;
 
 			this.exiting = false;
-			this.exitProg = 0;
+			this.exitProgress = 0;
 		}
 	}]);
 
@@ -1430,41 +1433,41 @@ var Osc = function () {
 
 		_classCallCheck(this, Osc);
 
-		this._baseVal = val;
-		this._baseRate = rate;
-		this._baseDir = dir;
-		this._baseFlip = flip;
-
 		this._val = val;
 		this._rate = rate;
 		this._dir = dir;
 		this._flip = flip;
 
-		this._trigger = false;
-		this._triggerTop = false;
-		this._triggerBot = false;
+		this._valBase = val;
+		this._rateBase = rate;
+		this._dirBase = dir;
+		this._flipBase = flip;
+
+		this.trigger = false;
+		this.triggerTop = false;
+		this.triggerBot = false;
 	}
 
 	_createClass(Osc, [{
 		key: "reset",
 		value: function reset() {
-			this._val = this._baseVal;
-			this._rate = this._baseRate;
-			this._dir = this._baseDir;
-			this._flip = this._baseFlip;
+			this._val = this._valBase;
+			this._rate = this._rateBase;
+			this._dir = this._dirBase;
+			this._flip = this._flipBase;
 		}
 	}, {
 		key: "update",
 		value: function update(dt) {
-			this._trigger = false;
-			this._triggerTop = false;
-			this._triggerBot = false;
+			this.trigger = false;
+			this.triggerTop = false;
+			this.triggerBot = false;
 			if (this._dir) {
 				if (this._val < 1) {
 					this._val += this._rate * dt;
 				} else {
-					this._trigger = true;
-					this._triggerTop = true;
+					this.trigger = true;
+					this.triggerTop = true;
 					if (this._flip) {
 						this._val = this._val - 1;
 					} else {
@@ -1476,8 +1479,8 @@ var Osc = function () {
 				if (this._val > 0) {
 					this._val -= this._rate * dt;
 				} else {
-					this._trigger = true;
-					this._triggerBot = true;
+					this.trigger = true;
+					this.triggerBot = true;
 					if (this._flip) {
 						this._val = 1 + this._val;
 					} else {

@@ -56,18 +56,18 @@ class System extends SystemBase {
 					let diff = radii - dist;
 					let x = Math.cos(angle) * diff * 0.03;
 					let y = Math.sin(angle) * diff * 0.03;
-					c1pos.x += x * this.loader.dtN;
-					c1pos.y += y * this.loader.dtN;
-					c2pos.x -= x * this.loader.dtN;
-					c2pos.y -= y * this.loader.dtN;
+					c1pos.x += x * this.loader.deltaTimeNormal;
+					c1pos.y += y * this.loader.deltaTimeNormal;
+					c2pos.x -= x * this.loader.deltaTimeNormal;
+					c2pos.y -= y * this.loader.deltaTimeNormal;
 				}
 			}
 		}
 
-		this.particleGroup.rotation.z = this.loader.elapsedMs * -0.0003;
+		this.particleGroup.rotation.z = this.loader.elapsedMilliseconds * -0.0003;
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 	}
 

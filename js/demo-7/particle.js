@@ -6,19 +6,22 @@ class Particle extends ParticleBase {
 	constructor(config, system, loader) {
 		super(config, system, loader);
 
-		this.baseX = config.x;
-		this.baseY = config.y;
-		this.baseZ = config.z;
+		this.xBase = config.x;
+		this.yBase = config.y;
 
-		this.lastX = config.x;
-		this.lastY = config.y;
-		this.lastZ = config.z;
+		this.xLast = config.x;
+		this.yLast = config.y;
 
-		this.prog = config.prog;
-		this.alt = config.alt;
+		this.order = config.order;
+		this.alternate = config.alternate;
 		this.offset = config.offset;
 
-		this.osc = new Osc(this.prog * 0.5 + this.offset, 0.015, true, false);
+		this.reset();
+	}
+
+	reset() {
+		super.reset();
+		this.osc = new Osc(this.order * 0.5 + this.offset, 0.015, true, false);
 	}
 
 	createMesh() {
@@ -48,28 +51,26 @@ class Particle extends ParticleBase {
 		this.osc.update(1);
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 
 		let val1 = this.osc.val(this.ease.inOutExpo);
-		let val2 = (Math.abs(this.lastY - this.mesh.position.y) * 3) * this.loader.dtN;
-		let val3 = (Math.abs(this.lastY - this.mesh.position.y) / 4) * this.loader.dtN;
+		let val2 = (Math.abs(this.yLast - this.mesh.position.y) * 3) * this.loader.deltaTimeNormal;
+		let val3 = (Math.abs(this.yLast - this.mesh.position.y) / 4) * this.loader.deltaTimeNormal;
 
-		if(this.alt) {
-			val1 = this.osc.val(this.ease.inOutExpo);
-			val2 = (Math.abs(this.lastX - this.mesh.position.x) * 3) * this.loader.dtN;
-			val3 = (Math.abs(this.lastX - this.mesh.position.x) / 4) * this.loader.dtN;
+		if(this.alternate) {
+			val2 = (Math.abs(this.xLast - this.mesh.position.x) * 3) * this.loader.deltaTimeNormal;
+			val3 = (Math.abs(this.xLast - this.mesh.position.x) / 4) * this.loader.deltaTimeNormal;
 		}
 
-		this.lastX = this.mesh.position.x;
-		this.lastY = this.mesh.position.y;
-		this.lastZ = this.mesh.position.z;
+		this.xLast = this.mesh.position.x;
+		this.yLast = this.mesh.position.y;
 
-		if(this.alt) {
-			this.mesh.position.x = this.calc.map(val1, 0, 1, this.baseX - this.system.spread / 2, this.baseX + this.system.spread / 2);
+		if(this.alternate) {
+			this.mesh.position.x = this.calc.map(val1, 0, 1, this.xBase - this.system.spread / 2, this.xBase + this.system.spread / 2);
 			this.mesh.scale.set(this.size + val2, this.size - val3, this.size);
 		} else {
-			this.mesh.position.y = this.calc.map(val1, 0, 1, this.baseY - this.system.spread / 2, this.baseY + this.system.spread / 2);
+			this.mesh.position.y = this.calc.map(val1, 0, 1, this.yBase - this.system.spread / 2, this.yBase + this.system.spread / 2);
 			this.mesh.scale.set(this.size - val3, this.size + val2, this.size);
 		}
 	}

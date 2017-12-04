@@ -6,7 +6,7 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
-		this.duration = 6200;
+		this.duration = 6000;
 		this.rings = 8;
 		this.radius = 0;
 		this.radiusGrowth = 1.5;
@@ -42,7 +42,7 @@ class System extends SystemBase {
 		super.update();
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid && !this.loader.isGrid) {
-			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 	}
 

@@ -21,8 +21,7 @@ class System extends SystemBase {
 
 			this.particles.push(new Particle({
 				group: this.particleGroup,
-				prog: i / (this.count - 1),
-				alt: i % 2 === 0,
+				order: i / (this.count - 1),
 				index: i,
 				x: x,
 				y: y,
@@ -39,9 +38,9 @@ class System extends SystemBase {
 
 	reset() {
 		this.osc = new Osc(0.5, 0.015, true, false);
-		this.rotationTarget = 0;
-		this.lastRotationTarget = this.rotationTarget;
-		this.rotProg = 0;
+		this.rotationYTarget = 0;
+		this.lastRotationYTarget = this.rotationYTarget;
+		this.rotationYProgress = 0;
 	}
 
 	replay() {
@@ -52,24 +51,24 @@ class System extends SystemBase {
 	update() {
 		super.update();
 
-		this.osc.update(this.loader.dtN);
+		this.osc.update(this.loader.deltaTimeNormal);
+
+		if(this.osc.triggerTop) {
+			this.lastRotationYTarget = this.rotationYTarget;
+			this.rotationYTarget += Math.PI / -1;
+			this.rotationYProgress = this.rotationYProgress - 1;
+		}
+
+		if(this.rotationYProgress < 1) {
+			this.rotationYProgress += 0.0075 * this.loader.deltaTimeNormal;
+		}
+		this.rotationYProgress = this.calc.clamp(this.rotationYProgress, 0, 1);
+
+		this.particleGroup.rotation.y = this.calc.map(this.ease.inOutExpo(this.rotationYProgress, 0, 1, 1), 0, 1, this.lastRotationYTarget, this.rotationYTarget);
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
-
-		if(this.osc._triggerTop) {
-			this.lastRotationTarget = this.rotationTarget;
-			this.rotationTarget += Math.PI / -1;
-			this.rotProg = this.rotProg - 1;
-		}
-
-		if(this.rotProg < 1) {
-			this.rotProg += 0.0075 * this.loader.dtN;
-		}
-		this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
-
-		this.particleGroup.rotation.y = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTarget, this.rotationTarget);
 	}
 
 }

@@ -26,8 +26,7 @@ class ParticleBase {
 			transparent: true,
 			opacity: this.opacity,
 			depthTest: false,
-			precision: 'lowp',
-			side: THREE.DoubleSide
+			precision: 'lowp'
 		});
 
 		this.mesh = new THREE.Mesh(this.geometry, this.material);

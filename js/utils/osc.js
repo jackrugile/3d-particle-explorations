@@ -1,38 +1,38 @@
 class Osc {
 
 	constructor(val, rate, dir = true, flip = false) {
-		this._baseVal = val;
-		this._baseRate = rate;
-		this._baseDir = dir;
-		this._baseFlip = flip;
-
 		this._val = val;
 		this._rate = rate;
 		this._dir = dir;
 		this._flip = flip;
 
-		this._trigger = false;
-		this._triggerTop = false;
-		this._triggerBot = false;
+		this._valBase = val;
+		this._rateBase = rate;
+		this._dirBase = dir;
+		this._flipBase = flip;
+
+		this.trigger = false;
+		this.triggerTop = false;
+		this.triggerBot = false;
 	}
 
 	reset() {
-		this._val = this._baseVal;
-		this._rate = this._baseRate;
-		this._dir = this._baseDir;
-		this._flip = this._baseFlip;
+		this._val = this._valBase;
+		this._rate = this._rateBase;
+		this._dir = this._dirBase;
+		this._flip = this._flipBase;
 	}
 
 	update(dt) {
-		this._trigger = false;
-		this._triggerTop = false;
-		this._triggerBot = false;
+		this.trigger = false;
+		this.triggerTop = false;
+		this.triggerBot = false;
 		if(this._dir) {
 			if(this._val < 1) {
 				this._val += this._rate * dt;
 			} else {
-				this._trigger = true;
-				this._triggerTop = true;
+				this.trigger = true;
+				this.triggerTop = true;
 				if(this._flip) {
 					this._val = this._val - 1;
 				} else {
@@ -44,8 +44,8 @@ class Osc {
 			if(this._val > 0) {
 				this._val -= this._rate * dt;
 			} else {
-				this._trigger = true;
-				this._triggerBot = true;
+				this.trigger = true;
+				this.triggerBot = true;
 				if(this._flip) {
 					this._val = 1 + this._val;
 				} else {

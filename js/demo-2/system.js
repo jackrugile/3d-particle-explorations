@@ -10,10 +10,10 @@ class System extends SystemBase {
 		this.duration = 8500;
 		this.simplex = new FastSimplexNoise();
 		this.count = 330;
-		this.visW = 30;
+		this.size = 30;
 
 		for(let i = 0; i < this.count; i++) {
-			let x = this.calc.map(i, 0, this.count , -this.visW / 2, this.visW / 2) + (this.visW / this.count / 2);
+			let x = this.calc.map(i, 0, this.count , -this.size / 2, this.size / 2) + (this.size / this.count / 2);
 			let y = 0;
 			let z = 0;
 
@@ -22,10 +22,10 @@ class System extends SystemBase {
 				x: x,
 				y: y,
 				z: z,
-				size: this.calc.map(Math.abs(x), 0, this.visW / 2, 0.2, 0.01),
+				size: this.calc.map(Math.abs(x), 0, this.size / 2, 0.2, 0.01),
 				color: i % 2 === 0 ? 0xffffff : 0x56311e,
 				opacity: 1,
-				alt: i % 2 === 0
+				alternate: i % 2 === 0
 			}, this, this.loader));
 		}
 
@@ -36,9 +36,9 @@ class System extends SystemBase {
 		this.osc1 = new Osc(0.2, 0.015);
 		this.osc1Eased = 0;
 		this.osc2 = new Osc(1, 0.015, true, false);
-		this.rotationTarget = 0;
-		this.lastRotationTarget = this.rotationTarget;
-		this.rotProg = 0;
+		this.rotationZTarget = 0;
+		this.lastRotationZTarget = this.rotationZTarget;
+		this.rotationZProgress = 0;
 	}
 
 	replay() {
@@ -49,25 +49,25 @@ class System extends SystemBase {
 	update() {
 		super.update();
 
-		this.osc1.update(this.loader.dtN);
+		this.osc1.update(this.loader.deltaTimeNormal);
 		this.osc1Eased = this.osc1.val(this.ease.inOutExpo);
-		this.osc2.update(this.loader.dtN);
+		this.osc2.update(this.loader.deltaTimeNormal);
 
-		if(this.osc2._triggerBot) {
-			this.lastRotationTarget = this.rotationTarget;
-			this.rotationTarget += Math.PI / -2;
-			this.rotProg = this.rotProg - 1;
+		if(this.osc2.triggerBot) {
+			this.lastRotationZTarget = this.rotationZTarget;
+			this.rotationZTarget += Math.PI / -2;
+			this.rotationZProgress = this.rotationZProgress - 1;
 		}
 
-		if(this.rotProg < 1) {
-			this.rotProg += 0.02 * this.loader.dtN;
+		if(this.rotationZProgress < 1) {
+			this.rotationZProgress += 0.02 * this.loader.deltaTimeNormal;
 		}
-		this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
+		this.rotationZProgress = this.calc.clamp(this.rotationZProgress, 0, 1);
 
-		this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTarget, this.rotationTarget);
+		this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotationZProgress, 0, 1, 1), 0, 1, this.lastRotationZTarget, this.rotationZTarget);
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 	}
 

@@ -30,7 +30,7 @@ class System extends SystemBase {
 			let size = this.calc.rand(0.1, 0.8);
 			this.parts.push({
 				offset: 0,
-				pos: new THREE.Vector3(
+				position: new THREE.Vector3(
 					this.calc.rand(-this.size / 2, this.size / 2),
 					this.calc.rand(-this.size / 2, this.size / 2),
 					this.calc.rand(-this.size / 2, this.size / 2)
@@ -122,9 +122,9 @@ class System extends SystemBase {
 				this.colors[i * 4 + 3] = part.a;
 			}
 			if(position) {
-				this.positions[i * 3 + 0] = part.pos.x;
-				this.positions[i * 3 + 1] = part.pos.y;
-				this.positions[i * 3 + 2] = part.pos.z;
+				this.positions[i * 3 + 0] = part.position.x;
+				this.positions[i * 3 + 1] = part.position.y;
+				this.positions[i * 3 + 2] = part.position.z;
 			}
 			if(size) {
 				this.sizes[i] = part.size;
@@ -150,48 +150,44 @@ class System extends SystemBase {
 	update() {
 		super.update();
 
-		this.osc.update(this.loader.dtN);
+		this.osc.update(this.loader.deltaTimeNormal);
 		this.oscEased = this.osc.val(this.ease.inOutExpo);
-
-		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
-		}
 
 		let i = this.count;
 
-		let noiseDiv = 10;
-		let noiseTime = this.loader.elapsedMs * 0.0008;
-		let noiseVel = this.calc.map(this.oscEased, 0, 1, 0, 1);
+		let noiseScale = 0.1;
+		let noiseTime = this.loader.elapsedMilliseconds * 0.0008;
+		let noiseVelocity = this.calc.map(this.oscEased, 0, 1, 0, 1);
 
 		while(i--) {
 			let part = this.parts[i];
 
-			let xDiv = part.pos.x / noiseDiv;
-			let yDiv = part.pos.y / noiseDiv;
-			let zDiv = part.pos.z / noiseDiv;
+			let xScaled = part.position.x * noiseScale;
+			let yScaled = part.position.y * noiseScale;
+			let zScaled = part.position.z * noiseScale;
 
 			let noise1 = this.simplex.getRaw4DNoise(
-				xDiv,
-				yDiv,
-				zDiv,
+				xScaled,
+				yScaled,
+				zScaled,
 				noiseTime
 			) * 0.5 + 0.5;
 			let noise2 = this.simplex.getRaw4DNoise(
-				xDiv + 100,
-				yDiv + 100,
-				zDiv + 100,
+				xScaled + 100,
+				yScaled + 100,
+				zScaled + 100,
 				50 + noiseTime
 			) * 0.5 + 0.5;
 			let noise3 = this.simplex.getRaw4DNoise(
-				xDiv + 200,
-				yDiv + 200,
-				zDiv + 200,
+				xScaled + 200,
+				yScaled + 200,
+				zScaled + 200,
 				100 + noiseTime
 			) * 0.5 + 0.5;
 
-			part.pos.x += Math.sin(noise1 * Math.PI * 2) * noiseVel * this.loader.dtN;
-			part.pos.y += Math.sin(noise2 * Math.PI * 2) * noiseVel * this.loader.dtN;
-			part.pos.z += Math.sin(noise3 * Math.PI * 2) * noiseVel * this.loader.dtN;
+			part.position.x += Math.sin(noise1 * Math.PI * 2) * noiseVelocity * this.loader.deltaTimeNormal;
+			part.position.y += Math.sin(noise2 * Math.PI * 2) * noiseVelocity * this.loader.deltaTimeNormal;
+			part.position.z += Math.sin(noise3 * Math.PI * 2) * noiseVelocity * this.loader.deltaTimeNormal;
 
 			if(part.life > 0 ) {
 				part.life -= part.decay * this.oscEased;
@@ -199,11 +195,11 @@ class System extends SystemBase {
 			
 			if(part.life <= 0 || part.firstRun) {
 				part.life = 2;
-				part.pos.x = this.calc.rand(-this.size / 2, this.size / 2);
-				part.pos.y = this.calc.rand(-this.size / 2, this.size / 2);
-				part.pos.z = this.calc.rand(-this.size / 2, this.size / 2);
+				part.position.x = this.calc.rand(-this.size / 2, this.size / 2);
+				part.position.y = this.calc.rand(-this.size / 2, this.size / 2);
+				part.position.z = this.calc.rand(-this.size / 2, this.size / 2);
 
-				let hue = (this.loader.elapsedMs / 25 + this.calc.rand(60)) % 360 + 110;
+				let hue = (this.loader.elapsedMilliseconds / 25 + this.calc.rand(60)) % 360 + 110;
 				let lightness = Math.round(this.calc.rand(10, 50));
 				this.color.set(`hsl(${hue}, 85%, ${lightness}%)`);
 
@@ -221,8 +217,12 @@ class System extends SystemBase {
 
 		this.updateParticleAttributes(true, true, true);
 
-		this.particleGroup.rotation.y += 0.005 + this.oscEased * 0.04;
+		this.particleGroup.rotation.y += (0.0075 + this.oscEased * 0.04) * this.loader.deltaTimeNormal;
 		this.particleGroup.position.z = 5 - this.oscEased * 15;
+
+		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
+		}
 	}
 
 }

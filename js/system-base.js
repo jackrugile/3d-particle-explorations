@@ -8,6 +8,7 @@ class SystemBase {
 
 		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
 		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
+		this.center = new THREE.Vector3();
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
@@ -16,11 +17,11 @@ class SystemBase {
 		this.loader.scene.add(this.particleGroup);
 
 		this.entering = true;
-		this.enterProg = 0;
+		this.enterProgress = 0;
 		this.enterRate = 0.015;
 
 		this.exiting = false;
-		this.exitProg = 0;
+		this.exitProgress = 0;
 		this.exitRate = 0.01;
 		this.duration = Infinity;
 	}
@@ -31,24 +32,24 @@ class SystemBase {
 			this.particles[i].update();
 		}
 
-		if(this.entering && this.enterProg < 1) {
-			this.enterProg += this.enterRate * this.loader.dtN;
-			if(this.enterProg > 1) {
-				this.enterProg = 1;
+		if(this.entering && this.enterProgress < 1) {
+			this.enterProgress += this.enterRate * this.loader.deltaTimeNormal;
+			if(this.enterProgress > 1) {
+				this.enterProgress = 1;
 				this.entering = false;
 			}
-			let scale = this.ease.inOutExpo(this.enterProg, 0, 1, 1);
+			let scale = this.ease.inOutExpo(this.enterProgress, 0, 1, 1);
 			this.particleGroup.scale.set(scale, scale, scale);
 		}
 
-		if(!this.exiting && this.loader.elapsedMs > this.duration) {
+		if(!this.exiting && this.loader.elapsedMilliseconds > this.duration) {
 			this.exiting = true;
 		}
 
 		if(this.exiting) {
-			this.exitProg += this.exitRate * this.loader.dtN;
-			if(this.exitProg >= 1 && !this.loader.completed) {
-				this.exitProg = 1;
+			this.exitProgress += this.exitRate * this.loader.deltaTimeNormal;
+			if(this.exitProgress >= 1 && !this.loader.completed) {
+				this.exitProgress = 1;
 				this.loader.complete();
 			}
 		}
@@ -63,10 +64,10 @@ class SystemBase {
 		}
 
 		this.entering = true;
-		this.enterProg = 0;
+		this.enterProgress = 0;
 
 		this.exiting = false;
-		this.exitProg = 0;
+		this.exitProgress = 0;
 	}
 
 }

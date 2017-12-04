@@ -14,8 +14,8 @@ class System extends SystemBase {
 		for(let i = 0; i < this.count; i++) {
 			this.particles.push(new Particle({
 				group: this.particleGroup,
-				prog: i / (this.count - 1),
-				alt: false,
+				order: i / (this.count - 1),
+				alternate: false,
 				color: 0xffffff,
 				opacity: 1,
 				size: 0.1,
@@ -24,8 +24,8 @@ class System extends SystemBase {
 
 			this.particles.push(new Particle({
 				group: this.particleGroup,
-				prog: i / (this.count - 1),
-				alt: true,
+				order: i / (this.count - 1),
+				alternate: true,
 				color: 0xffffff,
 				opacity: 1,
 				size: 0.1,
@@ -73,10 +73,10 @@ class System extends SystemBase {
 			line.geometry.verticesNeedUpdate = true;
 		}
 
-		this.particleGroup.rotation.z = Math.sin(this.loader.elapsedMs * 0.0015) * Math.PI * 0.25;
+		this.particleGroup.rotation.z = Math.sin(this.loader.elapsedMilliseconds * 0.0015) * Math.PI * 0.25;
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 		}
 	}
 

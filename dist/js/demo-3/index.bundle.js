@@ -32,10 +32,10 @@ var Particle = function (_ParticleBase) {
 
 		_this.size = 0.0001;
 		_this.sizeTarget = config.size;
-		_this.sizeConfig = config.size;
+		_this.sizeBase = config.size;
 
 		_this.delay = config.delay;
-		_this.elapsed = 0;
+		_this.elapsedMilliseconds = 0;
 		_this.initiated = true;
 		_this.active = false;
 		_this.dying = false;
@@ -47,7 +47,7 @@ var Particle = function (_ParticleBase) {
 		value: function reset() {
 			_get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'reset', this).call(this);
 			this.size = 0.0001;
-			this.elapsed = 0;
+			this.elapsedMilliseconds = 0;
 			this.initiated = true;
 			this.active = false;
 			this.dying = false;
@@ -56,10 +56,10 @@ var Particle = function (_ParticleBase) {
 		key: 'update',
 		value: function update() {
 			if (this.initiated) {
-				this.elapsed += this.loader.dtMs;
+				this.elapsedMilliseconds += this.loader.deltaTimeMilliseconds;
 			}
 
-			if (!this.active && this.elapsed > 400 + this.delay * 5) {
+			if (!this.active && this.elapsedMilliseconds > 400 + this.delay * 5) {
 				this.mesh.position.x = 0;
 				this.mesh.position.y = 0;
 				this.mesh.position.z = 0;
@@ -71,24 +71,24 @@ var Particle = function (_ParticleBase) {
 				this.mesh.position.z = this.calc.map(this.size / this.sizeTarget, 0, 1, -10, this.z);
 			}
 
-			if (!this.dying && this.elapsed > 1500 + this.delay * 4) {
+			if (!this.dying && this.elapsedMilliseconds > 1500 + this.delay * 4) {
 				this.dying = true;
 			}
 
 			if (this.dying) {
 				this.size *= 0.85;
 				this.mesh.position.z *= 1.2;
-				this.mesh.material.opacity = this.size / this.sizeConfig;
+				this.mesh.material.opacity = this.size / this.sizeBase;
 				if (this.size < 0.1) {
 					this.dying = false;
 					this.active = false;
-					this.elapsed = 0;
+					this.elapsedMilliseconds = 0;
 					this.initiated = false;
 					this.mesh.position.x = 0;
 					this.mesh.position.y = 0;
 					this.mesh.position.z = 0;
 					this.size = 0.0001;
-					this.sizeTarget = this.sizeConfig;
+					this.sizeTarget = this.sizeBase;
 					this.mesh.material.opacity = this.calc.rand(0.1, 1);
 				}
 			}
@@ -179,18 +179,18 @@ var System = function (_SystemBase) {
 						var diff = radii - dist;
 						var x = Math.cos(angle) * diff * 0.03;
 						var y = Math.sin(angle) * diff * 0.03;
-						c1pos.x += x * this.loader.dtN;
-						c1pos.y += y * this.loader.dtN;
-						c2pos.x -= x * this.loader.dtN;
-						c2pos.y -= y * this.loader.dtN;
+						c1pos.x += x * this.loader.deltaTimeNormal;
+						c1pos.y += y * this.loader.deltaTimeNormal;
+						c2pos.x -= x * this.loader.deltaTimeNormal;
+						c2pos.y -= y * this.loader.deltaTimeNormal;
 					}
 				}
 			}
 
-			this.particleGroup.rotation.z = this.loader.elapsedMs * -0.0003;
+			this.particleGroup.rotation.z = this.loader.elapsedMilliseconds * -0.0003;
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 			}
 		}
 	}]);
@@ -218,13 +218,15 @@ var Loader = function () {
 		this.calc = new Calc();
 		this.ease = new Ease();
 
-		this.container = document.querySelector('.loader');
-		this.replayButton = document.querySelector('.replay-loader');
-		this.debugButton = document.querySelector('.icon--debug');
-		document.documentElement.classList.add('loading');
+		this.dom = {
+			html: document.documentElement,
+			container: document.querySelector('.loader'),
+			replayButton: document.querySelector('.replay-animation'),
+			debugButton: document.querySelector('.icon--debug')
+		};
 
-		this.width = null;
-		this.height = null;
+		this.dom.html.classList.add('loading');
+
 		this.completed = false;
 		this.raf = null;
 
@@ -272,10 +274,10 @@ var Loader = function () {
 		key: 'setupTime',
 		value: function setupTime() {
 			this.clock = new THREE.Clock();
-			this.dtS = this.clock.getDelta();
-			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-			this.elapsedMs = 0;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.elapsedMilliseconds = 0;
 		}
 	}, {
 		key: 'setupScene',
@@ -303,7 +305,7 @@ var Loader = function () {
 				antialias: true
 			});
 
-			this.container.appendChild(this.renderer.domElement);
+			this.dom.container.appendChild(this.renderer.domElement);
 		}
 	}, {
 		key: 'setupControls',
@@ -351,10 +353,10 @@ var Loader = function () {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.dtS = this.clock.getDelta();
-			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-			this.elapsedMs += this.dtMs;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.elapsedMilliseconds += this.deltaTimeMilliseconds;
 
 			this.system.update();
 
@@ -375,10 +377,10 @@ var Loader = function () {
 			window.addEventListener('resize', function (e) {
 				return _this2.onResize(e);
 			});
-			this.replayButton.addEventListener('click', function (e) {
+			this.dom.replayButton.addEventListener('click', function (e) {
 				return _this2.onReplayButtonClick(e);
 			});
-			this.debugButton.addEventListener('click', function (e) {
+			this.dom.debugButton.addEventListener('click', function (e) {
 				return _this2.onDebugButtonClick(e);
 			});
 		}
@@ -392,7 +394,7 @@ var Loader = function () {
 			this.camera.position.y = this.cameraBaseY;
 			this.camera.position.z = this.cameraBaseZ;
 
-			this.elapsedMs = 0;
+			this.elapsedMilliseconds = 0;
 			this.system.replay();
 			this.completed = false;
 			this.clock.start();
@@ -411,8 +413,8 @@ var Loader = function () {
 				cancelAnimationFrame(_this3.raf);
 			}, 600);
 			this.completed = true;
-			document.documentElement.classList.remove('loading');
-			document.documentElement.classList.add('completed');
+			this.dom.html.classList.remove('loading');
+			this.dom.html.classList.add('completed');
 		}
 	}, {
 		key: 'onResize',
@@ -506,8 +508,7 @@ var ParticleBase = function () {
 				transparent: true,
 				opacity: this.opacity,
 				depthTest: false,
-				precision: 'lowp',
-				side: THREE.DoubleSide
+				precision: 'lowp'
 			});
 
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -548,6 +549,7 @@ var SystemBase = function () {
 
 		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
 		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
+		this.center = new THREE.Vector3();
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
@@ -556,11 +558,11 @@ var SystemBase = function () {
 		this.loader.scene.add(this.particleGroup);
 
 		this.entering = true;
-		this.enterProg = 0;
+		this.enterProgress = 0;
 		this.enterRate = 0.015;
 
 		this.exiting = false;
-		this.exitProg = 0;
+		this.exitProgress = 0;
 		this.exitRate = 0.01;
 		this.duration = Infinity;
 	}
@@ -573,24 +575,24 @@ var SystemBase = function () {
 				this.particles[i].update();
 			}
 
-			if (this.entering && this.enterProg < 1) {
-				this.enterProg += this.enterRate * this.loader.dtN;
-				if (this.enterProg > 1) {
-					this.enterProg = 1;
+			if (this.entering && this.enterProgress < 1) {
+				this.enterProgress += this.enterRate * this.loader.deltaTimeNormal;
+				if (this.enterProgress > 1) {
+					this.enterProgress = 1;
 					this.entering = false;
 				}
-				var scale = this.ease.inOutExpo(this.enterProg, 0, 1, 1);
+				var scale = this.ease.inOutExpo(this.enterProgress, 0, 1, 1);
 				this.particleGroup.scale.set(scale, scale, scale);
 			}
 
-			if (!this.exiting && this.loader.elapsedMs > this.duration) {
+			if (!this.exiting && this.loader.elapsedMilliseconds > this.duration) {
 				this.exiting = true;
 			}
 
 			if (this.exiting) {
-				this.exitProg += this.exitRate * this.loader.dtN;
-				if (this.exitProg >= 1 && !this.loader.completed) {
-					this.exitProg = 1;
+				this.exitProgress += this.exitRate * this.loader.deltaTimeNormal;
+				if (this.exitProgress >= 1 && !this.loader.completed) {
+					this.exitProgress = 1;
 					this.loader.complete();
 				}
 			}
@@ -606,10 +608,10 @@ var SystemBase = function () {
 			}
 
 			this.entering = true;
-			this.enterProg = 0;
+			this.enterProgress = 0;
 
 			this.exiting = false;
-			this.exitProg = 0;
+			this.exitProgress = 0;
 		}
 	}]);
 

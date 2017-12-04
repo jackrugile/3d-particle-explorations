@@ -12,6 +12,8 @@ var loader = new Loader(System);
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -29,23 +31,27 @@ var Particle = function (_ParticleBase) {
 
 		var _this = _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
 
-		_this.baseX = config.x;
-		_this.baseY = config.y;
-		_this.baseZ = config.z;
+		_this.xBase = config.x;
+		_this.yBase = config.y;
 
-		_this.lastX = config.x;
-		_this.lastY = config.y;
-		_this.lastZ = config.z;
+		_this.xLast = config.x;
+		_this.yLast = config.y;
 
-		_this.prog = config.prog;
-		_this.alt = config.alt;
+		_this.order = config.order;
+		_this.alternate = config.alternate;
 		_this.offset = config.offset;
 
-		_this.osc = new Osc(_this.prog * 0.5 + _this.offset, 0.015, true, false);
+		_this.reset();
 		return _this;
 	}
 
 	_createClass(Particle, [{
+		key: 'reset',
+		value: function reset() {
+			_get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'reset', this).call(this);
+			this.osc = new Osc(this.order * 0.5 + this.offset, 0.015, true, false);
+		}
+	}, {
 		key: 'createMesh',
 		value: function createMesh() {
 			this.geometry = this.system.boxGeometry;
@@ -75,28 +81,26 @@ var Particle = function (_ParticleBase) {
 			this.osc.update(1);
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 			}
 
 			var val1 = this.osc.val(this.ease.inOutExpo);
-			var val2 = Math.abs(this.lastY - this.mesh.position.y) * 3 * this.loader.dtN;
-			var val3 = Math.abs(this.lastY - this.mesh.position.y) / 4 * this.loader.dtN;
+			var val2 = Math.abs(this.yLast - this.mesh.position.y) * 3 * this.loader.deltaTimeNormal;
+			var val3 = Math.abs(this.yLast - this.mesh.position.y) / 4 * this.loader.deltaTimeNormal;
 
-			if (this.alt) {
-				val1 = this.osc.val(this.ease.inOutExpo);
-				val2 = Math.abs(this.lastX - this.mesh.position.x) * 3 * this.loader.dtN;
-				val3 = Math.abs(this.lastX - this.mesh.position.x) / 4 * this.loader.dtN;
+			if (this.alternate) {
+				val2 = Math.abs(this.xLast - this.mesh.position.x) * 3 * this.loader.deltaTimeNormal;
+				val3 = Math.abs(this.xLast - this.mesh.position.x) / 4 * this.loader.deltaTimeNormal;
 			}
 
-			this.lastX = this.mesh.position.x;
-			this.lastY = this.mesh.position.y;
-			this.lastZ = this.mesh.position.z;
+			this.xLast = this.mesh.position.x;
+			this.yLast = this.mesh.position.y;
 
-			if (this.alt) {
-				this.mesh.position.x = this.calc.map(val1, 0, 1, this.baseX - this.system.spread / 2, this.baseX + this.system.spread / 2);
+			if (this.alternate) {
+				this.mesh.position.x = this.calc.map(val1, 0, 1, this.xBase - this.system.spread / 2, this.xBase + this.system.spread / 2);
 				this.mesh.scale.set(this.size + val2, this.size - val3, this.size);
 			} else {
-				this.mesh.position.y = this.calc.map(val1, 0, 1, this.baseY - this.system.spread / 2, this.baseY + this.system.spread / 2);
+				this.mesh.position.y = this.calc.map(val1, 0, 1, this.yBase - this.system.spread / 2, this.yBase + this.system.spread / 2);
 				this.mesh.scale.set(this.size - val3, this.size + val2, this.size);
 			}
 		}
@@ -135,7 +139,7 @@ var System = function (_SystemBase) {
 		_this.duration = 8800;
 		_this.count = 10;
 		_this.spread = 20;
-		_this.inc = 0.04;
+		_this.increase = 0.04;
 		_this.colors = [0xff00ff, 0xff0000, 0x00ff00, 0x0000ff];
 
 		for (var j = 0; j < 4; j++) {
@@ -143,35 +147,34 @@ var System = function (_SystemBase) {
 				var x = _this.calc.map(i, 0, _this.count - 1, -_this.spread / 2, _this.spread / 2);
 				var y = 0;
 				var z = _this.calc.map(j, 0, 3, -0.25, 0.25);
-				var pos = new THREE.Vector3(x, y, z);
 				var color = _this.colors[j];
 				var size = 0.3;
 				var opacity = 1;
 
 				_this.particles.push(new Particle({
 					group: _this.particleGroup,
-					offset: j * _this.inc,
+					offset: j * _this.increase,
 					x: x,
 					y: y,
 					z: z,
 					size: size,
 					color: color,
 					opacity: opacity,
-					prog: i / (_this.count - 1),
-					alt: 0
+					order: i / (_this.count - 1),
+					alternate: 0
 				}, _this, _this.loader));
 
 				_this.particles.push(new Particle({
 					group: _this.particleGroup,
-					offset: j * _this.inc,
+					offset: j * _this.increase,
 					x: y,
 					y: x,
 					z: z,
 					size: size,
 					color: color,
 					opacity: opacity,
-					prog: i / (_this.count - 1),
-					alt: 1
+					order: i / (_this.count - 1),
+					alternate: 1
 				}, _this, _this.loader));
 			}
 		}
@@ -187,11 +190,13 @@ var System = function (_SystemBase) {
 
 			this.particleGroup.rotation.z = Math.PI / 4;
 
-			this.rotationTargetX = 0;
-			this.lastRotationTargetX = this.rotationTargetX;
-			this.rotationTargetZ = Math.PI / 4;
-			this.lastRotationTargetZ = this.rotationTargetZ;
-			this.rotProg = 1;
+			this.rotationXTarget = 0;
+			this.lastRotationXTarget = this.rotationXTarget;
+			this.rotationXProgress = 1;
+
+			this.rotationZTarget = Math.PI / 4;
+			this.lastRotationZTarget = this.rotationZTarget;
+			this.rotationZProgress = 1;
 		}
 	}, {
 		key: 'replay',
@@ -204,27 +209,34 @@ var System = function (_SystemBase) {
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
 
+			this.osc.update(this.loader.deltaTimeNormal);
+
+			if (this.osc.triggerTop) {
+				this.lastRotationXTarget = this.rotationXTarget;
+				this.rotationXTarget += Math.PI * -2;
+				this.rotationXProgress = this.rotationXProgress - 1;
+
+				this.lastRotationZTarget = this.rotationZTarget;
+				this.rotationZTarget += Math.PI / -4;
+				this.rotationZProgress = this.rotationZProgress - 1;
+			}
+
+			if (this.rotationXProgress < 1) {
+				this.rotationXProgress += 0.015 * this.loader.deltaTimeNormal;
+			}
+			this.rotationXProgress = this.calc.clamp(this.rotationXProgress, 0, 1);
+
+			if (this.rotationZProgress < 1) {
+				this.rotationZProgress += 0.015 * this.loader.deltaTimeNormal;
+			}
+			this.rotationZProgress = this.calc.clamp(this.rotationZProgress, 0, 1);
+
+			this.particleGroup.rotation.y = this.calc.map(this.ease.inOutExpo(this.rotationXProgress, 0, 1, 1), 0, 1, this.lastRotationXTarget, this.rotationXTarget);
+			this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotationZProgress, 0, 1, 1), 0, 1, this.lastRotationZTarget, this.rotationZTarget);
+
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
+				this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 			}
-
-			this.osc.update(this.loader.dtN);
-
-			if (this.osc._triggerTop) {
-				this.lastRotationTargetX = this.rotationTargetX;
-				this.rotationTargetX += Math.PI * -2;
-				this.lastRotationTargetZ = this.rotationTargetZ;
-				this.rotationTargetZ += Math.PI / -4;
-				this.rotProg = this.rotProg - 1;
-			}
-
-			if (this.rotProg < 1) {
-				this.rotProg += 0.015 * this.loader.dtN;
-			}
-			this.rotProg = this.calc.clamp(this.rotProg, 0, 1);
-
-			this.particleGroup.rotation.y = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetX, this.rotationTargetX);
-			this.particleGroup.rotation.z = this.calc.map(this.ease.inOutExpo(this.rotProg, 0, 1, 1), 0, 1, this.lastRotationTargetZ, this.rotationTargetZ);
 		}
 	}]);
 
@@ -251,13 +263,15 @@ var Loader = function () {
 		this.calc = new Calc();
 		this.ease = new Ease();
 
-		this.container = document.querySelector('.loader');
-		this.replayButton = document.querySelector('.replay-loader');
-		this.debugButton = document.querySelector('.icon--debug');
-		document.documentElement.classList.add('loading');
+		this.dom = {
+			html: document.documentElement,
+			container: document.querySelector('.loader'),
+			replayButton: document.querySelector('.replay-animation'),
+			debugButton: document.querySelector('.icon--debug')
+		};
 
-		this.width = null;
-		this.height = null;
+		this.dom.html.classList.add('loading');
+
 		this.completed = false;
 		this.raf = null;
 
@@ -305,10 +319,10 @@ var Loader = function () {
 		key: 'setupTime',
 		value: function setupTime() {
 			this.clock = new THREE.Clock();
-			this.dtS = this.clock.getDelta();
-			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-			this.elapsedMs = 0;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.elapsedMilliseconds = 0;
 		}
 	}, {
 		key: 'setupScene',
@@ -336,7 +350,7 @@ var Loader = function () {
 				antialias: true
 			});
 
-			this.container.appendChild(this.renderer.domElement);
+			this.dom.container.appendChild(this.renderer.domElement);
 		}
 	}, {
 		key: 'setupControls',
@@ -384,10 +398,10 @@ var Loader = function () {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.dtS = this.clock.getDelta();
-			this.dtMs = this.dtS * 1000;
-			this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-			this.elapsedMs += this.dtMs;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.elapsedMilliseconds += this.deltaTimeMilliseconds;
 
 			this.system.update();
 
@@ -408,10 +422,10 @@ var Loader = function () {
 			window.addEventListener('resize', function (e) {
 				return _this2.onResize(e);
 			});
-			this.replayButton.addEventListener('click', function (e) {
+			this.dom.replayButton.addEventListener('click', function (e) {
 				return _this2.onReplayButtonClick(e);
 			});
-			this.debugButton.addEventListener('click', function (e) {
+			this.dom.debugButton.addEventListener('click', function (e) {
 				return _this2.onDebugButtonClick(e);
 			});
 		}
@@ -425,7 +439,7 @@ var Loader = function () {
 			this.camera.position.y = this.cameraBaseY;
 			this.camera.position.z = this.cameraBaseZ;
 
-			this.elapsedMs = 0;
+			this.elapsedMilliseconds = 0;
 			this.system.replay();
 			this.completed = false;
 			this.clock.start();
@@ -444,8 +458,8 @@ var Loader = function () {
 				cancelAnimationFrame(_this3.raf);
 			}, 600);
 			this.completed = true;
-			document.documentElement.classList.remove('loading');
-			document.documentElement.classList.add('completed');
+			this.dom.html.classList.remove('loading');
+			this.dom.html.classList.add('completed');
 		}
 	}, {
 		key: 'onResize',
@@ -539,8 +553,7 @@ var ParticleBase = function () {
 				transparent: true,
 				opacity: this.opacity,
 				depthTest: false,
-				precision: 'lowp',
-				side: THREE.DoubleSide
+				precision: 'lowp'
 			});
 
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -581,6 +594,7 @@ var SystemBase = function () {
 
 		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
 		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
+		this.center = new THREE.Vector3();
 
 		this.particles = [];
 		this.particleGroup = new THREE.Object3D();
@@ -589,11 +603,11 @@ var SystemBase = function () {
 		this.loader.scene.add(this.particleGroup);
 
 		this.entering = true;
-		this.enterProg = 0;
+		this.enterProgress = 0;
 		this.enterRate = 0.015;
 
 		this.exiting = false;
-		this.exitProg = 0;
+		this.exitProgress = 0;
 		this.exitRate = 0.01;
 		this.duration = Infinity;
 	}
@@ -606,24 +620,24 @@ var SystemBase = function () {
 				this.particles[i].update();
 			}
 
-			if (this.entering && this.enterProg < 1) {
-				this.enterProg += this.enterRate * this.loader.dtN;
-				if (this.enterProg > 1) {
-					this.enterProg = 1;
+			if (this.entering && this.enterProgress < 1) {
+				this.enterProgress += this.enterRate * this.loader.deltaTimeNormal;
+				if (this.enterProgress > 1) {
+					this.enterProgress = 1;
 					this.entering = false;
 				}
-				var scale = this.ease.inOutExpo(this.enterProg, 0, 1, 1);
+				var scale = this.ease.inOutExpo(this.enterProgress, 0, 1, 1);
 				this.particleGroup.scale.set(scale, scale, scale);
 			}
 
-			if (!this.exiting && this.loader.elapsedMs > this.duration) {
+			if (!this.exiting && this.loader.elapsedMilliseconds > this.duration) {
 				this.exiting = true;
 			}
 
 			if (this.exiting) {
-				this.exitProg += this.exitRate * this.loader.dtN;
-				if (this.exitProg >= 1 && !this.loader.completed) {
-					this.exitProg = 1;
+				this.exitProgress += this.exitRate * this.loader.deltaTimeNormal;
+				if (this.exitProgress >= 1 && !this.loader.completed) {
+					this.exitProgress = 1;
 					this.loader.complete();
 				}
 			}
@@ -639,10 +653,10 @@ var SystemBase = function () {
 			}
 
 			this.entering = true;
-			this.enterProg = 0;
+			this.enterProgress = 0;
 
 			this.exiting = false;
-			this.exitProg = 0;
+			this.exitProgress = 0;
 		}
 	}]);
 
@@ -1497,41 +1511,41 @@ var Osc = function () {
 
 		_classCallCheck(this, Osc);
 
-		this._baseVal = val;
-		this._baseRate = rate;
-		this._baseDir = dir;
-		this._baseFlip = flip;
-
 		this._val = val;
 		this._rate = rate;
 		this._dir = dir;
 		this._flip = flip;
 
-		this._trigger = false;
-		this._triggerTop = false;
-		this._triggerBot = false;
+		this._valBase = val;
+		this._rateBase = rate;
+		this._dirBase = dir;
+		this._flipBase = flip;
+
+		this.trigger = false;
+		this.triggerTop = false;
+		this.triggerBot = false;
 	}
 
 	_createClass(Osc, [{
 		key: "reset",
 		value: function reset() {
-			this._val = this._baseVal;
-			this._rate = this._baseRate;
-			this._dir = this._baseDir;
-			this._flip = this._baseFlip;
+			this._val = this._valBase;
+			this._rate = this._rateBase;
+			this._dir = this._dirBase;
+			this._flip = this._flipBase;
 		}
 	}, {
 		key: "update",
 		value: function update(dt) {
-			this._trigger = false;
-			this._triggerTop = false;
-			this._triggerBot = false;
+			this.trigger = false;
+			this.triggerTop = false;
+			this.triggerBot = false;
 			if (this._dir) {
 				if (this._val < 1) {
 					this._val += this._rate * dt;
 				} else {
-					this._trigger = true;
-					this._triggerTop = true;
+					this.trigger = true;
+					this.triggerTop = true;
 					if (this._flip) {
 						this._val = this._val - 1;
 					} else {
@@ -1543,8 +1557,8 @@ var Osc = function () {
 				if (this._val > 0) {
 					this._val -= this._rate * dt;
 				} else {
-					this._trigger = true;
-					this._triggerBot = true;
+					this.trigger = true;
+					this.triggerBot = true;
 					if (this._flip) {
 						this._val = 1 + this._val;
 					} else {

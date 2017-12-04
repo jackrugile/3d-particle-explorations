@@ -48,8 +48,8 @@ class Ripple {
 	}
 
 	update(i) {
-		this.sphere.radius += (this.growth * this.life) * this.loader.dtN;
-		this.life -= this.decay * this.loader.dtN;
+		this.sphere.radius += (this.growth * this.life) * this.loader.deltaTimeNormal;
+		this.life -= this.decay * this.loader.deltaTimeNormal;
 
 		this.mesh.position.y = (1 - this.life) * -2;
 		let newScale = 0.001 + this.sphere.radius;

@@ -8,13 +8,15 @@ class Loader {
 		this.calc = new Calc();
 		this.ease = new Ease();
 
-		this.container = document.querySelector('.loader');
-		this.replayButton = document.querySelector('.replay-loader');
-		this.debugButton = document.querySelector('.icon--debug');
-		document.documentElement.classList.add('loading');
+		this.dom = {
+			html: document.documentElement,
+			container: document.querySelector('.loader'),
+			replayButton: document.querySelector('.replay-animation'),
+			debugButton: document.querySelector('.icon--debug')
+		}
 
-		this.width = null;
-		this.height = null;
+		this.dom.html.classList.add('loading');
+
 		this.completed = false;
 		this.raf = null;
 
@@ -57,10 +59,10 @@ class Loader {
 
 	setupTime() {
 		this.clock = new THREE.Clock();
-		this.dtS = this.clock.getDelta();
-		this.dtMs = this.dtS * 1000;
-		this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-		this.elapsedMs = 0;
+		this.deltaTimeSeconds = this.clock.getDelta();
+		this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+		this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+		this.elapsedMilliseconds = 0;
 	}
 
 	setupScene() {
@@ -85,7 +87,7 @@ class Loader {
 			antialias: true
 		});
 
-		this.container.appendChild(this.renderer.domElement);
+		this.dom.container.appendChild(this.renderer.domElement);
 	}
 
 	setupControls() {
@@ -132,10 +134,10 @@ class Loader {
 	}
 
 	update() {
-		this.dtS = this.clock.getDelta();
-		this.dtMs = this.dtS * 1000;
-		this.dtN = this.calc.clamp(this.dtMs / (1000 / 60), 0.25, 3);
-		this.elapsedMs += this.dtMs;
+		this.deltaTimeSeconds = this.clock.getDelta();
+		this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+		this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+		this.elapsedMilliseconds += this.deltaTimeMilliseconds;
 
 		this.system.update();
 
@@ -150,8 +152,8 @@ class Loader {
 
 	listen() {
 		window.addEventListener('resize', (e) => this.onResize(e));
-		this.replayButton.addEventListener('click', (e) => this.onReplayButtonClick(e));
-		this.debugButton.addEventListener('click', (e) => this.onDebugButtonClick(e));
+		this.dom.replayButton.addEventListener('click', (e) => this.onReplayButtonClick(e));
+		this.dom.debugButton.addEventListener('click', (e) => this.onDebugButtonClick(e));
 	}
 
 	replay() {
@@ -162,7 +164,7 @@ class Loader {
 		this.camera.position.y = this.cameraBaseY;
 		this.camera.position.z = this.cameraBaseZ;
 
-		this.elapsedMs = 0;
+		this.elapsedMilliseconds = 0;
 		this.system.replay();
 		this.completed = false;
 		this.clock.start();
@@ -178,8 +180,8 @@ class Loader {
 			cancelAnimationFrame(this.raf);
 		}, 600);
 		this.completed = true;
-		document.documentElement.classList.remove('loading');
-		document.documentElement.classList.add('completed');
+		this.dom.html.classList.remove('loading');
+		this.dom.html.classList.add('completed');
 	}
 
 	onResize() {

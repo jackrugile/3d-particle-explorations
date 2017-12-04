@@ -49,7 +49,7 @@ class System extends SystemBase {
 
 		let i = this.drops.length;
 		while(i--) {
-			this.drops[i].prog = 1;
+			this.drops[i].progress = 1;
 			this.drops[i].update(i);
 		}
 
@@ -66,7 +66,7 @@ class System extends SystemBase {
 		if(!this.loader.isGrid) {
 			this.loader.cameraBaseY = 20;
 			this.loader.camera.position.y = this.loader.cameraBaseY;
-			this.loader.camera.lookAt(new THREE.Vector3());
+			this.loader.camera.lookAt(this.center);
 		}
 	}
 
@@ -136,16 +136,16 @@ class System extends SystemBase {
 			}
 		}
 
-		this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMs * 0.0005) * 0.1;
-		this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMs * 0.0005) * -0.2;
-
-		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
-			this.loader.camera.position.y = this.loader.cameraBaseY - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseY;
-			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProg, 0, 1, 1) * this.loader.cameraBaseZ;
-			this.loader.camera.lookAt(new THREE.Vector3());
-		}
+		this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMilliseconds * 0.0005) * 0.1;
+		this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMilliseconds * 0.0005) * -0.2;
 
 		this.tick++;
+
+		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
+			this.loader.camera.position.y = this.loader.cameraBaseY - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseY;
+			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
+			this.loader.camera.lookAt(this.center);
+		}
 	}
 
 }
