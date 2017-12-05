@@ -14,7 +14,7 @@ class Particle extends ParticleBase {
 		this.offset = config.offset;
 
 		this.osc1 = new Osc(this.order * 0.5 + this.offset, 0.015, true, false);
-		this.osc2 = new Osc(this.order * 0.5 + this.offset + 0.5, 0.03, true, false);
+		this.osc2 = new Osc(this.order * 0.5 + this.offset + 0.5, 0.015, true, false);
 
 		this.reset();
 	}
@@ -49,19 +49,21 @@ class Particle extends ParticleBase {
 	}
 
 	update() {
-		this.osc1.update(this.loader.timescale);
-		this.osc2.update(this.loader.timescale);
+		this.osc1.update(this.loader.deltaTimeNormal);
+		this.osc2.update(this.loader.deltaTimeNormal);
+		this.osc2.update(this.loader.deltaTimeNormal);
 
-		let val1 = this.osc1.val(this.ease.inOutExpo);
-		let val2 = this.calc.map(this.osc2.val(this.ease.inOutExpo), 0, 1, this.size, this.size * 8);
-		let val3 = this.calc.map(this.osc2.val(this.ease.inOutExpo), 0, 1, this.size, this.size * 0.4);
+
+		let position = this.osc1.val(this.ease.inOutExpo);
+		let stretch = this.calc.map(this.osc2.val(this.ease.inOutExpo), 0, 1, this.size, this.size * 8);
+		let squash = this.calc.map(this.osc2.val(this.ease.inOutExpo), 0, 1, this.size, this.size * 0.4);
 
 		if(this.alternate) {
-			this.mesh.position.x = this.calc.map(val1, 0, 1, this.xBase - this.system.spread / 2, this.xBase + this.system.spread / 2);
-			this.mesh.scale.set(val2, val3, this.size);
+			this.mesh.position.x = this.calc.map(position, 0, 1, this.xBase - this.system.spread / 2, this.xBase + this.system.spread / 2);
+			this.mesh.scale.set(stretch, squash, this.size);
 		} else {
-			this.mesh.position.y = this.calc.map(val1, 0, 1, this.yBase - this.system.spread / 2, this.yBase + this.system.spread / 2);
-			this.mesh.scale.set(val3, val2, this.size);
+			this.mesh.position.y = this.calc.map(position, 0, 1, this.yBase - this.system.spread / 2, this.yBase + this.system.spread / 2);
+			this.mesh.scale.set(squash, stretch, this.size);
 		}
 	}
 

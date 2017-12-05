@@ -39,7 +39,7 @@ var Particle = function (_ParticleBase) {
 		_this.offset = config.offset;
 
 		_this.osc1 = new Osc(_this.order * 0.5 + _this.offset, 0.015, true, false);
-		_this.osc2 = new Osc(_this.order * 0.5 + _this.offset + 0.5, 0.03, true, false);
+		_this.osc2 = new Osc(_this.order * 0.5 + _this.offset + 0.5, 0.015, true, false);
 
 		_this.reset();
 		return _this;
@@ -79,19 +79,20 @@ var Particle = function (_ParticleBase) {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.osc1.update(this.loader.timescale);
-			this.osc2.update(this.loader.timescale);
+			this.osc1.update(this.loader.deltaTimeNormal);
+			this.osc2.update(this.loader.deltaTimeNormal);
+			this.osc2.update(this.loader.deltaTimeNormal);
 
-			var val1 = this.osc1.val(this.ease.inOutExpo);
-			var val2 = this.calc.map(this.osc2.val(this.ease.inOutExpo), 0, 1, this.size, this.size * 8);
-			var val3 = this.calc.map(this.osc2.val(this.ease.inOutExpo), 0, 1, this.size, this.size * 0.4);
+			var position = this.osc1.val(this.ease.inOutExpo);
+			var stretch = this.calc.map(this.osc2.val(this.ease.inOutExpo), 0, 1, this.size, this.size * 8);
+			var squash = this.calc.map(this.osc2.val(this.ease.inOutExpo), 0, 1, this.size, this.size * 0.4);
 
 			if (this.alternate) {
-				this.mesh.position.x = this.calc.map(val1, 0, 1, this.xBase - this.system.spread / 2, this.xBase + this.system.spread / 2);
-				this.mesh.scale.set(val2, val3, this.size);
+				this.mesh.position.x = this.calc.map(position, 0, 1, this.xBase - this.system.spread / 2, this.xBase + this.system.spread / 2);
+				this.mesh.scale.set(stretch, squash, this.size);
 			} else {
-				this.mesh.position.y = this.calc.map(val1, 0, 1, this.yBase - this.system.spread / 2, this.yBase + this.system.spread / 2);
-				this.mesh.scale.set(val3, val2, this.size);
+				this.mesh.position.y = this.calc.map(position, 0, 1, this.yBase - this.system.spread / 2, this.yBase + this.system.spread / 2);
+				this.mesh.scale.set(squash, stretch, this.size);
 			}
 		}
 	}]);
@@ -315,7 +316,7 @@ var Loader = function () {
 		value: function setupTime() {
 			this.timescale = 1;
 			this.clock = new THREE.Clock();
-			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeSeconds = this.clock.getDelta() * this.timescale;
 			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
 			this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 			this.elapsedMilliseconds = 0;
@@ -396,7 +397,12 @@ var Loader = function () {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.deltaTimeSeconds = this.clock.getDelta() * this.timescale;
+			this.deltaTimeSeconds = this.clock.getDelta();
+			if (this.diffTime) {
+				this.deltaTimeSeconds -= this.diffTime;
+				this.diffTime = 0;
+			}
+			this.deltaTimeSeconds *= this.timescale;
 			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
 			this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 			this.elapsedMilliseconds += this.deltaTimeMilliseconds;
@@ -420,18 +426,38 @@ var Loader = function () {
 			window.addEventListener('resize', function (e) {
 				return _this2.onResize(e);
 			});
+
 			this.dom.replayButton.addEventListener('click', function (e) {
 				return _this2.onReplayButtonClick(e);
 			});
 			this.dom.debugButton.addEventListener('click', function (e) {
 				return _this2.onDebugButtonClick(e);
 			});
+
 			if (this.isOrbit) {
 				this.dom.timescaleRange.addEventListener('change', function (e) {
 					return _this2.onTimescaleRangeChange(e);
 				});
 				this.dom.timescaleRange.addEventListener('mousemove', function (e) {
 					return _this2.onTimescaleRangeChange(e);
+				});
+			}
+
+			this.hidden = null;
+			this.visibilityChange = null;
+			if (typeof document.hidden !== 'undefined') {
+				this.hidden = 'hidden';
+				this.visibilityChange = 'visibilitychange';
+			} else if (typeof document.msHidden !== 'undefined') {
+				this.hidden = 'msHidden';
+				this.visibilityChange = 'msvisibilitychange';
+			} else if (typeof document.webkitHidden !== 'undefined') {
+				this.hidden = 'webkitHidden';
+				this.visibilityChange = 'webkitvisibilitychange';
+			}
+			if (typeof document.addEventListener === 'undefined' || typeof document.hidden === 'undefined') {} else {
+				window.addEventListener(this.visibilityChange, function (e) {
+					return _this2.onVisibilityChange(e);
 				});
 			}
 		}
@@ -508,6 +534,18 @@ var Loader = function () {
 		value: function onTimescaleRangeChange(e) {
 			this.timescale = parseFloat(this.dom.timescaleRange.value);
 			this.dom.timescaleValue.innerHTML = this.timescale.toFixed(1);
+		}
+	}, {
+		key: 'onVisibilityChange',
+		value: function onVisibilityChange(e) {
+			if (document.hidden) {
+				this.blurTime = Date.now();
+			} else {
+				this.focusTime = Date.now();
+				if (this.blurTime) {
+					this.diffTime = (this.focusTime - this.blurTime) / 1000;
+				}
+			}
 		}
 	}, {
 		key: 'loop',
@@ -604,7 +642,7 @@ var SystemBase = function () {
 		this.calc = this.loader.calc;
 		this.ease = this.loader.ease;
 
-		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 12, 12);
+		this.sphereGeometry = new THREE.SphereBufferGeometry(1, 16, 16);
 		this.boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1);
 		this.center = new THREE.Vector3();
 

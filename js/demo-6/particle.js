@@ -84,7 +84,7 @@ class Particle extends ParticleBase {
 		this.osc.update(this.loader.timescale);
 
 		let oscEased = this.osc.val(this.ease.inOutExpo);
-		this.angle = Math.PI / 2 + (this.index % 3) * ((Math.PI * 2) / 3) + oscEased * ((Math.PI * 6) / 3);
+		this.angle = (Math.PI / 2) + (this.index % 3) * ((Math.PI * 2) / 3) + oscEased * ((Math.PI * 6) / 3);
 		this.angle += oscEased * (Math.PI / 3);
 		this.particleMesh.position.x = Math.cos(this.angle) * this.radius;
 		this.particleMesh.position.y = Math.sin(this.angle) * this.radius;

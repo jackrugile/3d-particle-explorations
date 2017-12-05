@@ -63,7 +63,7 @@ class Loader {
 	setupTime() {
 		this.timescale = 1;
 		this.clock = new THREE.Clock();
-		this.deltaTimeSeconds = this.clock.getDelta();
+		this.deltaTimeSeconds = this.clock.getDelta() * this.timescale;
 		this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
 		this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 		this.elapsedMilliseconds = 0;
@@ -140,7 +140,12 @@ class Loader {
 	}
 
 	update() {
-		this.deltaTimeSeconds = this.clock.getDelta() * this.timescale;
+		this.deltaTimeSeconds = this.clock.getDelta();
+		if(this.diffTime) {
+			this.deltaTimeSeconds -= this.diffTime;
+			this.diffTime = 0;
+		}
+		this.deltaTimeSeconds *= this.timescale;
 		this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
 		this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 		this.elapsedMilliseconds += this.deltaTimeMilliseconds;
@@ -158,11 +163,30 @@ class Loader {
 
 	listen() {
 		window.addEventListener('resize', (e) => this.onResize(e));
+
 		this.dom.replayButton.addEventListener('click', (e) => this.onReplayButtonClick(e));
 		this.dom.debugButton.addEventListener('click', (e) => this.onDebugButtonClick(e));
+
 		if(this.isOrbit) {
 			this.dom.timescaleRange.addEventListener('change', (e) => this.onTimescaleRangeChange(e));
 			this.dom.timescaleRange.addEventListener('mousemove', (e) => this.onTimescaleRangeChange(e));
+		}
+
+		this.hidden = null;
+		this.visibilityChange = null;
+		if(typeof document.hidden !== 'undefined') {
+			this.hidden = 'hidden';
+			this.visibilityChange = 'visibilitychange';
+		} else if(typeof document.msHidden !== 'undefined') {
+			this.hidden = 'msHidden';
+			this.visibilityChange = 'msvisibilitychange';
+		} else if(typeof document.webkitHidden !== 'undefined') {
+			this.hidden = 'webkitHidden';
+			this.visibilityChange = 'webkitvisibilitychange';
+		}
+		if(typeof document.addEventListener === 'undefined' || typeof document.hidden === 'undefined') {
+		} else {
+			window.addEventListener(this.visibilityChange, (e) => this.onVisibilityChange(e));
 		}
 	}
 
@@ -230,6 +254,17 @@ class Loader {
 	onTimescaleRangeChange(e) {
 		this.timescale = parseFloat(this.dom.timescaleRange.value);
 		this.dom.timescaleValue.innerHTML = this.timescale.toFixed(1);
+	}
+
+	onVisibilityChange(e) {
+		if(document.hidden) {
+			this.blurTime = Date.now();
+		} else {
+			this.focusTime = Date.now();
+			if(this.blurTime) {
+				this.diffTime = (this.focusTime - this.blurTime) / 1000;
+			}
+		}
 	}
 
 	loop() {
