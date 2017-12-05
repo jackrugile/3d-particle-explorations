@@ -7,9 +7,9 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
-		this.duration = 8500;
+		this.duration = 7700;
 		this.simplex = new FastSimplexNoise();
-		this.count = 330;
+		this.count = 300;
 		this.size = 30;
 
 		for(let i = 0; i < this.count; i++) {
@@ -29,13 +29,16 @@ class System extends SystemBase {
 			}, this, this.loader));
 		}
 
+		this.osc1 = new Osc(0.2, 0.015);
+		this.osc2 = new Osc(0, 0.015, true, false);
+
 		this.reset();
 	}
 
 	reset() {
-		this.osc1 = new Osc(0.2, 0.015);
+		this.osc1.reset();
 		this.osc1Eased = 0;
-		this.osc2 = new Osc(1, 0.015, true, false);
+		this.osc2.reset();
 		this.rotationZTarget = 0;
 		this.lastRotationZTarget = this.rotationZTarget;
 		this.rotationZProgress = 0;
@@ -60,7 +63,7 @@ class System extends SystemBase {
 		}
 
 		if(this.rotationZProgress < 1) {
-			this.rotationZProgress += 0.02 * this.loader.deltaTimeNormal;
+			this.rotationZProgress += 0.025 * this.loader.deltaTimeNormal;
 		}
 		this.rotationZProgress = this.calc.clamp(this.rotationZProgress, 0, 1);
 

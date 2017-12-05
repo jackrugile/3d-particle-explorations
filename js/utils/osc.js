@@ -21,6 +21,10 @@ class Osc {
 		this._rate = this._rateBase;
 		this._dir = this._dirBase;
 		this._flip = this._flipBase;
+
+		this.trigger = false;
+		this.triggerTop = false;
+		this.triggerBot = false;
 	}
 
 	update(dt) {

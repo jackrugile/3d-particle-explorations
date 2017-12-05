@@ -9,16 +9,19 @@ class Particle extends ParticleBase {
 		this.radius = config.radius;
 		this.order = config.order;
 		this.alternate = config.alternate;
+
+		this.osc = new Osc(this.order, 0.015, true, false);
+
 		this.reset();
 	}
 
 	reset() {
 		super.reset();
-		this.osc = new Osc(this.order, 0.015, true, false);
+		this.osc.reset();
 	}
 
 	update() {
-		this.osc.update(1);
+		this.osc.update(this.loader.timescale);
 
 		let angle = this.calc.map(this.order, 0, 1, -Math.cos(this.loader.elapsedMilliseconds * 0.0015) * (Math.PI * 1.5), Math.sin(this.loader.elapsedMilliseconds * 0.0015) * (Math.PI * 1.5));
 		angle += this.alternate ? Math.PI : 0;

@@ -21,6 +21,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ParticleBase = require('../particle-base');
+var Osc = require('../utils/osc');
 
 var Particle = function (_ParticleBase) {
 	_inherits(Particle, _ParticleBase);
@@ -30,15 +31,14 @@ var Particle = function (_ParticleBase) {
 
 		var _this = _possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, config, system, loader));
 
-		_this.size = 0.0001;
-		_this.sizeTarget = config.size;
 		_this.sizeBase = config.size;
-
 		_this.delay = config.delay;
-		_this.elapsedMilliseconds = 0;
-		_this.initiated = true;
-		_this.active = false;
-		_this.dying = false;
+		_this.opacityBase = config.opacity;
+
+		_this.osc1 = new Osc(0, 0.04, true, false);
+		_this.osc2 = new Osc(0, 0.05, true, false);
+
+		_this.reset();
 		return _this;
 	}
 
@@ -47,10 +47,18 @@ var Particle = function (_ParticleBase) {
 		value: function reset() {
 			_get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'reset', this).call(this);
 			this.size = 0.0001;
+			this.opacity = this.opacityBase;
 			this.elapsedMilliseconds = 0;
 			this.initiated = true;
 			this.active = false;
 			this.dying = false;
+			this.mesh.position.x = 0;
+			this.mesh.position.y = 0;
+			this.mesh.position.z = 0;
+			this.growthComplete = false;
+			this.osc1.reset();
+			this.osc2.reset();
+			this.resetFlag = false;
 		}
 	}, {
 		key: 'update',
@@ -67,32 +75,34 @@ var Particle = function (_ParticleBase) {
 			}
 
 			if (this.active && !this.dying) {
-				this.size = this.calc.lerp(this.size, this.sizeTarget, 0.1);
-				this.mesh.position.z = this.calc.map(this.size / this.sizeTarget, 0, 1, -10, this.z);
+				if (!this.growthComplete) {
+					this.osc1.update(this.loader.deltaTimeNormal);
+				}
+				if (this.osc1.triggerTop) {
+					this.growthComplete = true;
+				}
+				this.size = this.calc.map(this.osc1.val(this.ease.inOutExpo), 0, 1, 0.0001, this.sizeBase);
+				this.mesh.position.z = this.calc.map(this.osc1.val(this.ease.inOutExpo), 0, 1, -10, this.z);
 			}
 
-			if (!this.dying && this.elapsedMilliseconds > 1500 + this.delay * 4) {
+			if (!this.dying && this.elapsedMilliseconds > 1500 + this.delay * 2) {
 				this.dying = true;
 			}
 
-			if (this.dying) {
-				this.size *= 0.85;
-				this.mesh.position.z *= 1.2;
-				this.mesh.material.opacity = this.size / this.sizeBase;
-				if (this.size < 0.1) {
-					this.dying = false;
-					this.active = false;
-					this.elapsedMilliseconds = 0;
-					this.initiated = false;
-					this.mesh.position.x = 0;
-					this.mesh.position.y = 0;
-					this.mesh.position.z = 0;
-					this.size = 0.0001;
-					this.sizeTarget = this.sizeBase;
-					this.mesh.material.opacity = this.calc.rand(0.1, 1);
+			if (this.dying && !this.resetFlag) {
+				this.osc2.update(this.loader.deltaTimeNormal);
+				this.size = this.calc.map(this.osc2.val(this.ease.inExpo), 0, 1, this.sizeBase, 0.01);
+				this.mesh.position.z = this.calc.map(this.osc2.val(this.ease.inExpo), 0, 1, this.z, this.z + 5);
+				this.opacity = this.calc.map(this.osc2.val(this.ease.inExpo), 0, 1, this.opacityBase, 0);
+				if (this.osc2.triggerTop) {
+					this.opacity = 0;
+					this.size = 0.01;
+					this.mesh.position.z = this.z + 5;
+					this.resetFlag = true;
 				}
 			}
 
+			this.mesh.material.opacity = this.opacity;
 			this.mesh.scale.set(this.size, this.size, this.size);
 		}
 	}]);
@@ -102,7 +112,7 @@ var Particle = function (_ParticleBase) {
 
 module.exports = Particle;
 
-},{"../particle-base":5}],3:[function(require,module,exports){
+},{"../particle-base":5,"../utils/osc":10}],3:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -164,6 +174,7 @@ var System = function (_SystemBase) {
 				}
 			}
 
+			var resetFlagCount = 0;
 			for (var _i = 0, l = this.particles.length; _i < l; _i++) {
 				var c1 = this.particles[_i];
 				var c1pos = c1.mesh.position;
@@ -184,6 +195,15 @@ var System = function (_SystemBase) {
 						c2pos.x -= x * this.loader.deltaTimeNormal;
 						c2pos.y -= y * this.loader.deltaTimeNormal;
 					}
+				}
+				if (c1.resetFlag) {
+					resetFlagCount++;
+				}
+			}
+
+			if (resetFlagCount >= this.particles.length) {
+				for (var _i2 = 0, _l = this.particles.length; _i2 < _l; _i2++) {
+					this.particles[_i2].reset();
 				}
 			}
 
@@ -221,6 +241,9 @@ var Loader = function () {
 		this.dom = {
 			html: document.documentElement,
 			container: document.querySelector('.loader'),
+			timescaleWrap: document.querySelector('.timescale-wrap'),
+			timescaleRange: document.querySelector('.timescale-range'),
+			timescaleValue: document.querySelector('.timescale-value'),
 			replayButton: document.querySelector('.replay-animation'),
 			debugButton: document.querySelector('.icon--debug')
 		};
@@ -273,10 +296,11 @@ var Loader = function () {
 	}, {
 		key: 'setupTime',
 		value: function setupTime() {
+			this.timescale = 1;
 			this.clock = new THREE.Clock();
 			this.deltaTimeSeconds = this.clock.getDelta();
 			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
-			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 			this.elapsedMilliseconds = 0;
 		}
 	}, {
@@ -291,7 +315,7 @@ var Loader = function () {
 
 			this.cameraBaseX = this.isGrid ? -20 : 0;
 			this.cameraBaseY = this.isGrid ? 15 : 0;
-			this.cameraBaseZ = this.isGrid ? 20 : 35;
+			this.cameraBaseZ = this.isGrid ? 20 : 30;
 
 			this.camera.position.x = this.cameraBaseX;
 			this.camera.position.y = this.cameraBaseY;
@@ -315,6 +339,8 @@ var Loader = function () {
 				this.controls.enableDamping = true;
 				this.controls.dampingFactor = 0.2;
 				this.controls.enableKeys = false;
+
+				this.dom.timescaleWrap.style.visibility = 'visible';
 			}
 		}
 	}, {
@@ -330,7 +356,7 @@ var Loader = function () {
 				0.1, // 7
 				0.1 // 8
 				];
-				this.gridHelper = new THREE.GridHelper(100, 20, 0xffffff, 0xffffff);
+				this.gridHelper = new THREE.GridHelper(300, 60, 0xffffff, 0xffffff);
 				this.gridHelper.material.transparent = true;
 				this.gridHelper.material.opacity = this.gridOpacityMap[demoNum - 1];
 				this.scene.add(this.gridHelper);
@@ -344,7 +370,7 @@ var Loader = function () {
 				0.3, // 7
 				0.3 // 8
 				];
-				this.axisHelper = new AxisHelper(50, this.axisOpacityMap[demoNum - 1]);
+				this.axisHelper = new AxisHelper(150, this.axisOpacityMap[demoNum - 1]);
 				this.scene.add(this.axisHelper);
 
 				this.camera.lookAt(new THREE.Vector3());
@@ -353,9 +379,9 @@ var Loader = function () {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeSeconds = this.clock.getDelta() * this.timescale;
 			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
-			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 			this.elapsedMilliseconds += this.deltaTimeMilliseconds;
 
 			this.system.update();
@@ -383,6 +409,14 @@ var Loader = function () {
 			this.dom.debugButton.addEventListener('click', function (e) {
 				return _this2.onDebugButtonClick(e);
 			});
+			if (this.isOrbit) {
+				this.dom.timescaleRange.addEventListener('change', function (e) {
+					return _this2.onTimescaleRangeChange(e);
+				});
+				this.dom.timescaleRange.addEventListener('mousemove', function (e) {
+					return _this2.onTimescaleRangeChange(e);
+				});
+			}
 		}
 	}, {
 		key: 'replay',
@@ -451,6 +485,12 @@ var Loader = function () {
 				location.href = baseURL + '#debug';
 			}
 			location.reload();
+		}
+	}, {
+		key: 'onTimescaleRangeChange',
+		value: function onTimescaleRangeChange(e) {
+			this.timescale = parseFloat(this.dom.timescaleRange.value);
+			this.dom.timescaleValue.innerHTML = this.timescale.toFixed(1);
 		}
 	}, {
 		key: 'loop',
@@ -1451,5 +1491,96 @@ var Ease = function () {
 }();
 
 module.exports = Ease;
+
+},{}],10:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Osc = function () {
+	function Osc(val, rate) {
+		var dir = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+		var flip = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+		_classCallCheck(this, Osc);
+
+		this._val = val;
+		this._rate = rate;
+		this._dir = dir;
+		this._flip = flip;
+
+		this._valBase = val;
+		this._rateBase = rate;
+		this._dirBase = dir;
+		this._flipBase = flip;
+
+		this.trigger = false;
+		this.triggerTop = false;
+		this.triggerBot = false;
+	}
+
+	_createClass(Osc, [{
+		key: "reset",
+		value: function reset() {
+			this._val = this._valBase;
+			this._rate = this._rateBase;
+			this._dir = this._dirBase;
+			this._flip = this._flipBase;
+
+			this.trigger = false;
+			this.triggerTop = false;
+			this.triggerBot = false;
+		}
+	}, {
+		key: "update",
+		value: function update(dt) {
+			this.trigger = false;
+			this.triggerTop = false;
+			this.triggerBot = false;
+			if (this._dir) {
+				if (this._val < 1) {
+					this._val += this._rate * dt;
+				} else {
+					this.trigger = true;
+					this.triggerTop = true;
+					if (this._flip) {
+						this._val = this._val - 1;
+					} else {
+						this._val = 1 - (this._val - 1);
+						this._dir = !this._dir;
+					}
+				}
+			} else {
+				if (this._val > 0) {
+					this._val -= this._rate * dt;
+				} else {
+					this.trigger = true;
+					this.triggerBot = true;
+					if (this._flip) {
+						this._val = 1 + this._val;
+					} else {
+						this._val = -this._val;
+						this._dir = !this._dir;
+					}
+				}
+			}
+		}
+	}, {
+		key: "val",
+		value: function val(ease) {
+			if (ease) {
+				return ease(this._val, 0, 1, 1);
+			} else {
+				return this._val;
+			}
+		}
+	}]);
+
+	return Osc;
+}();
+
+module.exports = Osc;
 
 },{}]},{},[1]);

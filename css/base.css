@@ -439,6 +439,11 @@ a.demo--current {
 	pointer-events: none;
 }
 
+.timescale-wrap {
+	display: none;
+	visibility: hidden;
+}
+
 /* Top Navigation Style */
 .codrops-links {
 	position: relative;
@@ -505,6 +510,30 @@ a.demo--current {
 	}
 	.demo--current span {
 		display: block;
+	}
+	.timescale-wrap {
+		display: block;
+		pointer-events: auto;
+		position: absolute;
+		right: 84px;
+		top: -66px;
+		width: 192px;
+	}
+	.timescale-label {
+		color: var(--color-link);
+		display: block;
+		font-size: 15px;
+		text-align: left;
+	}
+	.timescale-range {
+		display: block;
+		margin-bottom: 10px;
+		width: 100%;
+	}
+	.timescale-title {
+		font-weight: bold;
+	}
+	.timescale-value {
 	}
 }
 

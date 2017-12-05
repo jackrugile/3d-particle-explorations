@@ -55,11 +55,13 @@ class System extends SystemBase {
 			}
 		}
 
+		this.osc = new Osc(0.3, 0.015, false, false);
+
 		this.reset();
 	}
 
 	reset() {
-		this.osc = new Osc(0.3, 0.015, false, false);
+		this.osc.reset();
 
 		this.particleGroup.rotation.z = Math.PI / 4;
 

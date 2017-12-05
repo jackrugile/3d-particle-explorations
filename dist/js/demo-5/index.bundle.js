@@ -310,7 +310,7 @@ var System = function (_SystemBase) {
 		key: 'setCamera',
 		value: function setCamera() {
 			if (!this.loader.isGrid) {
-				this.loader.cameraBaseY = 20;
+				this.loader.cameraBaseY = 25;
 				this.loader.camera.position.y = this.loader.cameraBaseY;
 				this.loader.camera.lookAt(this.center);
 			}
@@ -367,9 +367,10 @@ var System = function (_SystemBase) {
 		value: function update() {
 			_get(System.prototype.__proto__ || Object.getPrototypeOf(System.prototype), 'update', this).call(this);
 
-			if (this.tick % this.dropTick === 0) {
+			if (this.tick >= this.dropTick) {
 				this.createDrop();
 				this.dropTick = this.calc.randInt(this.dropTickMin, this.dropTickMax);
+				this.tick = 0;
 			}
 
 			this.updateDrops();
@@ -391,7 +392,7 @@ var System = function (_SystemBase) {
 			this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMilliseconds * 0.0005) * 0.1;
 			this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMilliseconds * 0.0005) * -0.2;
 
-			this.tick++;
+			this.tick += this.loader.deltaTimeNormal;
 
 			if (this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 				this.loader.camera.position.y = this.loader.cameraBaseY - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseY;
@@ -427,6 +428,9 @@ var Loader = function () {
 		this.dom = {
 			html: document.documentElement,
 			container: document.querySelector('.loader'),
+			timescaleWrap: document.querySelector('.timescale-wrap'),
+			timescaleRange: document.querySelector('.timescale-range'),
+			timescaleValue: document.querySelector('.timescale-value'),
 			replayButton: document.querySelector('.replay-animation'),
 			debugButton: document.querySelector('.icon--debug')
 		};
@@ -479,10 +483,11 @@ var Loader = function () {
 	}, {
 		key: 'setupTime',
 		value: function setupTime() {
+			this.timescale = 1;
 			this.clock = new THREE.Clock();
 			this.deltaTimeSeconds = this.clock.getDelta();
 			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
-			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 			this.elapsedMilliseconds = 0;
 		}
 	}, {
@@ -497,7 +502,7 @@ var Loader = function () {
 
 			this.cameraBaseX = this.isGrid ? -20 : 0;
 			this.cameraBaseY = this.isGrid ? 15 : 0;
-			this.cameraBaseZ = this.isGrid ? 20 : 35;
+			this.cameraBaseZ = this.isGrid ? 20 : 30;
 
 			this.camera.position.x = this.cameraBaseX;
 			this.camera.position.y = this.cameraBaseY;
@@ -521,6 +526,8 @@ var Loader = function () {
 				this.controls.enableDamping = true;
 				this.controls.dampingFactor = 0.2;
 				this.controls.enableKeys = false;
+
+				this.dom.timescaleWrap.style.visibility = 'visible';
 			}
 		}
 	}, {
@@ -536,7 +543,7 @@ var Loader = function () {
 				0.1, // 7
 				0.1 // 8
 				];
-				this.gridHelper = new THREE.GridHelper(100, 20, 0xffffff, 0xffffff);
+				this.gridHelper = new THREE.GridHelper(300, 60, 0xffffff, 0xffffff);
 				this.gridHelper.material.transparent = true;
 				this.gridHelper.material.opacity = this.gridOpacityMap[demoNum - 1];
 				this.scene.add(this.gridHelper);
@@ -550,7 +557,7 @@ var Loader = function () {
 				0.3, // 7
 				0.3 // 8
 				];
-				this.axisHelper = new AxisHelper(50, this.axisOpacityMap[demoNum - 1]);
+				this.axisHelper = new AxisHelper(150, this.axisOpacityMap[demoNum - 1]);
 				this.scene.add(this.axisHelper);
 
 				this.camera.lookAt(new THREE.Vector3());
@@ -559,9 +566,9 @@ var Loader = function () {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeSeconds = this.clock.getDelta() * this.timescale;
 			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
-			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 			this.elapsedMilliseconds += this.deltaTimeMilliseconds;
 
 			this.system.update();
@@ -589,6 +596,14 @@ var Loader = function () {
 			this.dom.debugButton.addEventListener('click', function (e) {
 				return _this2.onDebugButtonClick(e);
 			});
+			if (this.isOrbit) {
+				this.dom.timescaleRange.addEventListener('change', function (e) {
+					return _this2.onTimescaleRangeChange(e);
+				});
+				this.dom.timescaleRange.addEventListener('mousemove', function (e) {
+					return _this2.onTimescaleRangeChange(e);
+				});
+			}
 		}
 	}, {
 		key: 'replay',
@@ -657,6 +672,12 @@ var Loader = function () {
 				location.href = baseURL + '#debug';
 			}
 			location.reload();
+		}
+	}, {
+		key: 'onTimescaleRangeChange',
+		value: function onTimescaleRangeChange(e) {
+			this.timescale = parseFloat(this.dom.timescaleRange.value);
+			this.dom.timescaleValue.innerHTML = this.timescale.toFixed(1);
 		}
 	}, {
 		key: 'loop',

@@ -64,7 +64,7 @@ class System extends SystemBase {
 
 	setCamera() {
 		if(!this.loader.isGrid) {
-			this.loader.cameraBaseY = 20;
+			this.loader.cameraBaseY = 25;
 			this.loader.camera.position.y = this.loader.cameraBaseY;
 			this.loader.camera.lookAt(this.center);
 		}
@@ -115,9 +115,10 @@ class System extends SystemBase {
 	update() {
 		super.update();
 
-		if(this.tick % this.dropTick === 0) {
+		if(this.tick >= this.dropTick) {
 			this.createDrop();
 			this.dropTick = this.calc.randInt(this.dropTickMin, this.dropTickMax);
+			this.tick = 0;
 		}
 
 		this.updateDrops();
@@ -139,7 +140,7 @@ class System extends SystemBase {
 		this.particleGroup.rotation.x = Math.cos(this.loader.elapsedMilliseconds * 0.0005) * 0.1;
 		this.particleGroup.rotation.y = Math.PI * 0.25 + Math.sin(this.loader.elapsedMilliseconds * 0.0005) * -0.2;
 
-		this.tick++;
+		this.tick += this.loader.deltaTimeNormal;
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
 			this.loader.camera.position.y = this.loader.cameraBaseY - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseY;

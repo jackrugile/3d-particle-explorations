@@ -35,9 +35,13 @@ var Particle = function (_ParticleBase) {
 		_this.order = config.order;
 		_this.index = config.index;
 		_this.radius = config.radius;
-		_this.reset();
+
 		_this.createTail();
 		_this.createHead();
+
+		_this.osc = new Osc(1 - _this.order / 5, 0.015, true, false);
+
+		_this.reset();
 		return _this;
 	}
 
@@ -45,7 +49,7 @@ var Particle = function (_ParticleBase) {
 		key: 'reset',
 		value: function reset() {
 			_get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'reset', this).call(this);
-			this.osc = new Osc(1 - this.order / 5, 0.015, true, false);
+			this.osc.reset();
 		}
 	}, {
 		key: 'createMesh',
@@ -100,7 +104,7 @@ var Particle = function (_ParticleBase) {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.osc.update(1);
+			this.osc.update(this.loader.timescale);
 
 			var oscEased = this.osc.val(this.ease.inOutExpo);
 			this.angle = Math.PI / 2 + this.index % 3 * (Math.PI * 2 / 3) + oscEased * (Math.PI * 6 / 3);
@@ -170,6 +174,8 @@ var System = function (_SystemBase) {
 			}, _this, _this.loader));
 		}
 
+		_this.osc = new Osc(0.5, 0.015, true, false);
+
 		_this.reset();
 		return _this;
 	}
@@ -177,7 +183,7 @@ var System = function (_SystemBase) {
 	_createClass(System, [{
 		key: 'reset',
 		value: function reset() {
-			this.osc = new Osc(0.5, 0.015, true, false);
+			this.osc.reset();
 			this.rotationYTarget = 0;
 			this.lastRotationYTarget = this.rotationYTarget;
 			this.rotationYProgress = 0;
@@ -240,6 +246,9 @@ var Loader = function () {
 		this.dom = {
 			html: document.documentElement,
 			container: document.querySelector('.loader'),
+			timescaleWrap: document.querySelector('.timescale-wrap'),
+			timescaleRange: document.querySelector('.timescale-range'),
+			timescaleValue: document.querySelector('.timescale-value'),
 			replayButton: document.querySelector('.replay-animation'),
 			debugButton: document.querySelector('.icon--debug')
 		};
@@ -292,10 +301,11 @@ var Loader = function () {
 	}, {
 		key: 'setupTime',
 		value: function setupTime() {
+			this.timescale = 1;
 			this.clock = new THREE.Clock();
 			this.deltaTimeSeconds = this.clock.getDelta();
 			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
-			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 			this.elapsedMilliseconds = 0;
 		}
 	}, {
@@ -310,7 +320,7 @@ var Loader = function () {
 
 			this.cameraBaseX = this.isGrid ? -20 : 0;
 			this.cameraBaseY = this.isGrid ? 15 : 0;
-			this.cameraBaseZ = this.isGrid ? 20 : 35;
+			this.cameraBaseZ = this.isGrid ? 20 : 30;
 
 			this.camera.position.x = this.cameraBaseX;
 			this.camera.position.y = this.cameraBaseY;
@@ -334,6 +344,8 @@ var Loader = function () {
 				this.controls.enableDamping = true;
 				this.controls.dampingFactor = 0.2;
 				this.controls.enableKeys = false;
+
+				this.dom.timescaleWrap.style.visibility = 'visible';
 			}
 		}
 	}, {
@@ -349,7 +361,7 @@ var Loader = function () {
 				0.1, // 7
 				0.1 // 8
 				];
-				this.gridHelper = new THREE.GridHelper(100, 20, 0xffffff, 0xffffff);
+				this.gridHelper = new THREE.GridHelper(300, 60, 0xffffff, 0xffffff);
 				this.gridHelper.material.transparent = true;
 				this.gridHelper.material.opacity = this.gridOpacityMap[demoNum - 1];
 				this.scene.add(this.gridHelper);
@@ -363,7 +375,7 @@ var Loader = function () {
 				0.3, // 7
 				0.3 // 8
 				];
-				this.axisHelper = new AxisHelper(50, this.axisOpacityMap[demoNum - 1]);
+				this.axisHelper = new AxisHelper(150, this.axisOpacityMap[demoNum - 1]);
 				this.scene.add(this.axisHelper);
 
 				this.camera.lookAt(new THREE.Vector3());
@@ -372,9 +384,9 @@ var Loader = function () {
 	}, {
 		key: 'update',
 		value: function update() {
-			this.deltaTimeSeconds = this.clock.getDelta();
+			this.deltaTimeSeconds = this.clock.getDelta() * this.timescale;
 			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
-			this.deltaTimeNormal = this.calc.clamp(this.deltaTimeMilliseconds / (1000 / 60), 0.25, 3);
+			this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 			this.elapsedMilliseconds += this.deltaTimeMilliseconds;
 
 			this.system.update();
@@ -402,6 +414,14 @@ var Loader = function () {
 			this.dom.debugButton.addEventListener('click', function (e) {
 				return _this2.onDebugButtonClick(e);
 			});
+			if (this.isOrbit) {
+				this.dom.timescaleRange.addEventListener('change', function (e) {
+					return _this2.onTimescaleRangeChange(e);
+				});
+				this.dom.timescaleRange.addEventListener('mousemove', function (e) {
+					return _this2.onTimescaleRangeChange(e);
+				});
+			}
 		}
 	}, {
 		key: 'replay',
@@ -470,6 +490,12 @@ var Loader = function () {
 				location.href = baseURL + '#debug';
 			}
 			location.reload();
+		}
+	}, {
+		key: 'onTimescaleRangeChange',
+		value: function onTimescaleRangeChange(e) {
+			this.timescale = parseFloat(this.dom.timescaleRange.value);
+			this.dom.timescaleValue.innerHTML = this.timescale.toFixed(1);
 		}
 	}, {
 		key: 'loop',
@@ -1507,6 +1533,10 @@ var Osc = function () {
 			this._rate = this._rateBase;
 			this._dir = this._dirBase;
 			this._flip = this._flipBase;
+
+			this.trigger = false;
+			this.triggerTop = false;
+			this.triggerBot = false;
 		}
 	}, {
 		key: "update",

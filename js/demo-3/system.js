@@ -41,6 +41,7 @@ class System extends SystemBase {
 			}
 		}
 
+		let resetFlagCount = 0;
 		for(let i = 0, l = this.particles.length; i < l; i++) {
 			let c1 = this.particles[i];
 			let c1pos = c1.mesh.position;
@@ -61,6 +62,15 @@ class System extends SystemBase {
 					c2pos.x -= x * this.loader.deltaTimeNormal;
 					c2pos.y -= y * this.loader.deltaTimeNormal;
 				}
+			}
+			if(c1.resetFlag) {
+				resetFlagCount++;
+			}
+		}
+
+		if(resetFlagCount >= this.particles.length) {
+			for(let i = 0, l = this.particles.length; i < l; i++) {
+				this.particles[i].reset();
 			}
 		}
 

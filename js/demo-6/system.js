@@ -33,11 +33,13 @@ class System extends SystemBase {
 			}, this, this.loader));
 		}
 
+		this.osc = new Osc(0.5, 0.015, true, false);
+
 		this.reset();
 	}
 
 	reset() {
-		this.osc = new Osc(0.5, 0.015, true, false);
+		this.osc.reset();
 		this.rotationYTarget = 0;
 		this.lastRotationYTarget = this.rotationYTarget;
 		this.rotationYProgress = 0;

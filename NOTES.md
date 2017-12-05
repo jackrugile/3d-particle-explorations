@@ -6,3 +6,8 @@
 - [ ] switch to uglified/minified version when complete
 - [ ] payment details
 - [ ] approve color/order changes after received
+- [ ] ease illustration gif
+
+
+
+make sure all durations are still intact

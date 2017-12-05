@@ -10,14 +10,18 @@ class Particle extends ParticleBase {
 		this.order = config.order;
 		this.index = config.index;
 		this.radius = config.radius;
-		this.reset();
+
 		this.createTail();
 		this.createHead();
+
+		this.osc = new Osc(1 - this.order / 5, 0.015, true, false);
+
+		this.reset();
 	}
 
 	reset() {
 		super.reset();
-		this.osc = new Osc(1 - this.order / 5, 0.015, true, false);
+		this.osc.reset();
 	}
 
 	createMesh() {
@@ -77,7 +81,7 @@ class Particle extends ParticleBase {
 	}
 
 	update() {
-		this.osc.update(1);
+		this.osc.update(this.loader.timescale);
 
 		let oscEased = this.osc.val(this.ease.inOutExpo);
 		this.angle = Math.PI / 2 + (this.index % 3) * ((Math.PI * 2) / 3) + oscEased * ((Math.PI * 6) / 3);

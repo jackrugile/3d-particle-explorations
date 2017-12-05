@@ -82,21 +82,23 @@ class System extends SystemBase {
 
 		this.updateParticleAttributes(true, true, true);
 
+		this.osc = new Osc(0, 0.015, true, false);
+
 		this.reset();
 	}
 
 	reset() {
-		this.osc = new Osc(0, 0.015, true, false);
+		this.osc.reset();
 	}
 
 	generateTexture() {
 		let c = document.createElement('canvas');
 		let ctx = c.getContext('2d');
-		let size = 64;
+		let size = 128;
 		c.width = size;
 		c.height = size;
 
-		let gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+		let gradient = ctx.createRadialGradient(size * 0.5, size * 0.5, 0, size * 0.5, size * 0.5, size * 0.4);
 		gradient.addColorStop(0, 'hsla(0, 0%, 100%, 1)');
 		gradient.addColorStop(1, 'hsla(0, 0%, 100%, 0)');
 
@@ -190,7 +192,7 @@ class System extends SystemBase {
 			part.position.z += Math.sin(noise3 * Math.PI * 2) * noiseVelocity * this.loader.deltaTimeNormal;
 
 			if(part.life > 0 ) {
-				part.life -= part.decay * this.oscEased;
+				part.life -= part.decay * this.oscEased * this.loader.deltaTimeNormal;
 			}
 			
 			if(part.life <= 0 || part.firstRun) {
