@@ -269,6 +269,19 @@ main {
 	pointer-events: none;
 }
 
+.is-debug .loader {
+	cursor: move;
+	cursor: grab;
+	cursor: -moz-grab;
+	cursor: -webkit-grab;
+}
+
+.is-debug .loader:active {
+	cursor: grabbing;
+	cursor: -moz-grabbing;
+	cursor: -webkit-grabbing;
+}
+
 .content {
 	position: relative;
 	display: flex;
@@ -473,10 +486,10 @@ a.demo--current {
 	.icon--debug {
 		cursor: pointer;
 		position: absolute;
-		right: 6px;
-		bottom: 60px;
+		right: 9px;
+		bottom: 54px;
 		display: block;
-		width: 60px;
+		width: 54px;
 		height: 42px;
 		fill: var(--color-link);
 		pointer-events: auto;
@@ -522,12 +535,12 @@ a.demo--current {
 	.timescale-label {
 		color: var(--color-link);
 		display: block;
-		font-size: 15px;
+		font-size: 13px;
 		text-align: left;
 	}
 	.timescale-range {
 		display: block;
-		margin-bottom: 10px;
+		margin-bottom: 7px;
 		width: 100%;
 	}
 	.timescale-title {

@@ -8,6 +8,4 @@
 - [ ] approve color/order changes after received
 - [ ] ease illustration gif
 
-
-
-dt is off when leaving blur window
+new screenshots

@@ -241,6 +241,7 @@ var Loader = function () {
 				this.isGrid = true;
 				this.isOrbit = true;
 				this.debugHash += 'debug';
+				this.dom.html.classList.add('is-debug');
 			} else {
 				this.debugHash += this.isGrid ? 'grid' : '';
 				this.debugHash += this.isOrbit ? 'orbit' : '';
