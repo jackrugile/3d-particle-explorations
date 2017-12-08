@@ -204,6 +204,9 @@ class Loader {
 		this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
 		this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 		this.elapsedMilliseconds = 0;
+		this.blurTime = 0;
+		this.diffTime = 0;
+		this.focusTime = 0;
 
 		this.system.replay();
 		this.completed = false;
