@@ -10,7 +10,7 @@ class Ripple {
 		this.array = config.array;
 		this.group = config.group;
 		this.sphere = new THREE.Sphere(new THREE.Vector3(config.x, config.y, config.z), 0);
-		this.strength = this.calc.rand(7, 12);
+		this.strength = config.strength ? config.strength : this.calc.rand(7, 12);
 		this.threshold = this.calc.rand(4, 8);
 		this.growth = this.calc.rand(0.1, 0.3);
 		this.life = 1;

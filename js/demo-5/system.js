@@ -16,11 +16,10 @@ class System extends SystemBase {
 
 		this.drops = []
 		this.ripples = [];
-		this.tick = 0;
 
-		this.dropTick = 20;
-		this.dropTickMin = 20;
-		this.dropTickMax = 40;
+		this.dropTick = 15;
+		this.dropTickMin = 15;
+		this.dropTickMax = 35;
 
 		for(let col = 0; col < this.cols; col++) {
 			for(let row = 0; row < this.rows; row++) {
@@ -45,6 +44,7 @@ class System extends SystemBase {
 
 	reset() {
 		this.tick = 0;
+		this.finalDrop = false;
 		this.setCamera();
 
 		let i = this.drops.length;
@@ -70,16 +70,17 @@ class System extends SystemBase {
 		}
 	}
 
-	createDrop() {
+	createDrop(x, y, z, strength) {
 		this.drops.push(new Drop({
 			array: this.drops,
 			group: this.particleGroup,
-			x: this.calc.rand(-this.size / 2, this.size / 2),
-			y: this.calc.rand(15, 20),
-			z: this.calc.rand(-this.size / 2, this.size / 2),
+			x: x === undefined ? this.calc.rand(-this.size / 2, this.size / 2) : x,
+			y: y === undefined ? this.calc.rand(15, 20) : y,
+			z: z === undefined ? this.calc.rand(-this.size / 2, this.size / 2) : z,
 			size: 0.1,
 			color: 0xffffff,
-			opacity: 0
+			opacity: 0,
+			strength: strength
 		}, this, this.loader));
 	}
 
@@ -90,13 +91,14 @@ class System extends SystemBase {
 		}
 	}
 
-	createRipple(x, z) {
+	createRipple(x, z, strength) {
 		this.ripples.push(new Ripple({
 			array: this.ripples,
 			group: this.particleGroup,
 			x: x,
 			y: -0.1,
-			z: z
+			z: z,
+			strength: strength
 		}, this, this.loader));
 	}
 
@@ -143,6 +145,10 @@ class System extends SystemBase {
 		this.tick += this.loader.deltaTimeNormal;
 
 		if(this.exiting && !this.loader.isOrbit && !this.loader.isGrid) {
+			if(!this.finalDrop) {
+				this.createDrop(0, 20, 0, 20);
+				this.finalDrop = true;
+			}
 			this.loader.camera.position.y = this.loader.cameraBaseY - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseY;
 			this.loader.camera.position.z = this.loader.cameraBaseZ - this.ease.inExpo(this.exitProgress, 0, 1, 1) * this.loader.cameraBaseZ;
 			this.loader.camera.lookAt(this.center);

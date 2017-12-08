@@ -15,6 +15,7 @@ class Drop {
 		this.size = config.size;
 		this.color = config.color;
 		this.opacity = config.opacity;
+		this.strength = config.strength;
 
 		this.yBase = config.y;
 
@@ -57,7 +58,7 @@ class Drop {
 			this.material.dispose();
 			this.group.remove(this.mesh);
 			this.array.splice(i, 1);
-			this.system.createRipple(this.mesh.position.x, this.mesh.position.z);
+			this.system.createRipple(this.mesh.position.x, this.mesh.position.z, this.strength);
 		}
 	}
 
