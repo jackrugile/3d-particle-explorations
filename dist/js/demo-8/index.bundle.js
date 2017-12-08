@@ -198,7 +198,7 @@ var System = function (_SystemBase) {
 					part.position.y = this.calc.rand(-this.size / 2, this.size / 2);
 					part.position.z = this.calc.rand(-this.size / 2, this.size / 2);
 
-					var hue = (this.loader.elapsedMilliseconds / 25 + this.calc.rand(60)) % 360 + 110;
+					var hue = (this.loader.elapsedMilliseconds / 25 + this.calc.rand(90)) % 360 + 110;
 					var lightness = Math.round(this.calc.rand(10, 50));
 					this.color.set('hsl(' + hue + ', 85%, ' + lightness + '%)');
 
@@ -464,7 +464,12 @@ var Loader = function () {
 			this.camera.position.y = this.cameraBaseY;
 			this.camera.position.z = this.cameraBaseZ;
 
+			this.timescale = 1;
+			this.deltaTimeSeconds = 1 / 60;
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 			this.elapsedMilliseconds = 0;
+
 			this.system.replay();
 			this.completed = false;
 			this.clock.start();

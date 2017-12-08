@@ -362,7 +362,12 @@ var Loader = function () {
 			this.camera.position.y = this.cameraBaseY;
 			this.camera.position.z = this.cameraBaseZ;
 
+			this.timescale = 1;
+			this.deltaTimeSeconds = 1 / 60;
+			this.deltaTimeMilliseconds = this.deltaTimeSeconds * 1000;
+			this.deltaTimeNormal = this.deltaTimeMilliseconds / (1000 / 60);
 			this.elapsedMilliseconds = 0;
+
 			this.system.replay();
 			this.completed = false;
 			this.clock.start();

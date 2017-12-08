@@ -245,6 +245,10 @@ a:focus {
 	display: none;
 }
 
+.icon--debug {
+	display: none;
+}
+
 main {
 	position: relative;
 	width: 100%;

@@ -201,7 +201,7 @@ class System extends SystemBase {
 				part.position.y = this.calc.rand(-this.size / 2, this.size / 2);
 				part.position.z = this.calc.rand(-this.size / 2, this.size / 2);
 
-				let hue = (this.loader.elapsedMilliseconds / 25 + this.calc.rand(60)) % 360 + 110;
+				let hue = (this.loader.elapsedMilliseconds / 25 + this.calc.rand(90)) % 360 + 110;
 				let lightness = Math.round(this.calc.rand(10, 50));
 				this.color.set(`hsl(${hue}, 85%, ${lightness}%)`);
 

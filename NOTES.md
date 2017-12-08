@@ -1,11 +1,11 @@
 #### WORKING
 
-- [ ] clean up inconsistencies in code
 - [ ] article write up
-  - [ ] mention debug tools in article write up
+  - [ ] mention debug tools (orbit, grid, timescale) in article write up
 - [ ] switch to uglified/minified version when complete
-- [ ] payment details
 - [ ] approve color/order changes after received
 - [ ] ease illustration gif
+- [ ] new screenshots
+- [ ] apply delta time adjustments to ripple physics if possible
 
-new screenshots
+when too much time goes by, replay anim will get stuck

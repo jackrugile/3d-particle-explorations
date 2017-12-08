@@ -63,12 +63,12 @@ class Particle extends ParticleBase {
 		if(this.dying && !this.resetFlag) {
 			this.osc2.update(this.loader.deltaTimeNormal);
 			this.size = this.calc.map(this.osc2.val(this.ease.inExpo), 0, 1, this.sizeBase, 0.01);
-			this.mesh.position.z = this.calc.map(this.osc2.val(this.ease.inExpo), 0, 1, this.z, this.z + 5);
+			this.mesh.position.z = this.calc.map(this.osc2.val(this.ease.inExpo), 0, 1, this.z, this.z + 15);
 			this.opacity = this.calc.map(this.osc2.val(this.ease.inExpo), 0, 1, this.opacityBase, 0);
 			if(this.osc2.triggerTop) {
 				this.opacity = 0;
 				this.size = 0.01;
-				this.mesh.position.z = this.z + 5;
+				this.mesh.position.z = this.z + 15;
 				this.resetFlag = true;
 			}
 		}
