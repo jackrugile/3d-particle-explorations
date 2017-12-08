@@ -7,7 +7,7 @@ class System extends SystemBase {
 	constructor(loader) {
 		super(loader);
 
-		this.duration = 6100;
+		this.duration = 8200;
 		this.count = 60;
 		this.outer = 12;
 
@@ -33,7 +33,7 @@ class System extends SystemBase {
 			}, this, this.loader));
 		}
 
-		this.osc = new Osc(0.5, 0.015, true, false);
+		this.osc = new Osc(0.1, 0.0075, true, false);
 
 		this.reset();
 	}
@@ -55,14 +55,14 @@ class System extends SystemBase {
 
 		this.osc.update(this.loader.deltaTimeNormal);
 
-		if(this.osc.triggerTop) {
+		if(this.osc.trigger) {
 			this.lastRotationYTarget = this.rotationYTarget;
-			this.rotationYTarget += Math.PI / -1;
+			this.rotationYTarget += Math.PI * -0.5;
 			this.rotationYProgress = this.rotationYProgress - 1;
 		}
 
 		if(this.rotationYProgress < 1) {
-			this.rotationYProgress += 0.0075 * this.loader.deltaTimeNormal;
+			this.rotationYProgress += 0.02 * this.loader.deltaTimeNormal;
 		}
 		this.rotationYProgress = this.calc.clamp(this.rotationYProgress, 0, 1);
 
