@@ -2,11 +2,11 @@
 
 Particle animation explorations in 3D space with three.js. By Jack Rugile.
 
-![Image Title](link)
+![3D Particle Explorations](https://tympanus.net/codrops/wp-content/uploads/2017/12/3dparticleexplorations.jpg)
 
-[Article on Codrops]()
+[Article on Codrops](https://tympanus.net/codrops/?p=33246)
 
-[Demo]()
+[Demo](http://tympanus.net/Development/3d-particle-explorations/)
 
 ## Credits
 
