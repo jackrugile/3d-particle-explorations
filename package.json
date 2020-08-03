@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "gulpfile.js",
+  "scripts": {
+    "start": "gulp",
+    "serve": "gulp serve",
+    "watch": "gulp watch",
+    "build": "gulp build"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jackrugile/3d-particle-explorations.git"
