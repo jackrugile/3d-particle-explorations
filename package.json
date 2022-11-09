@@ -20,7 +20,7 @@
     "browserify": "^14.5.0",
     "event-stream": "^3.3.4",
     "glob": "^7.1.2",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.2",
     "gulp-rename": "^1.2.2",
     "gulp-streamify": "^1.0.2",
     "gulp-uglify": "^3.0.0",
